@@ -20,6 +20,7 @@ data/private_faces/
 data/query/
 data/annotations/
 data/evaluation/gallagher_*.csv
+data/evaluation/holidays_*.csv
 data/**/*.zip
 data/**/*.tar
 data/**/*.tar.gz

@@ -7,3 +7,4 @@ tqdm
 matplotlib
 pillow
 scikit-learn
+kagglehub

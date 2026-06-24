@@ -188,6 +188,47 @@ python scripts/global/03_evaluate_global.py `
   --output-dir outputs/reports
 ```
 
+### Base global: INRIA Holidays
+
+A INRIA Holidays e usada para avaliar CBIR global por imagem inteira. Ela possui 1491 imagens organizadas em 500 grupos. A primeira imagem de cada grupo e a consulta; as demais imagens do mesmo grupo sao relevantes.
+
+Baixar e preparar localmente pelo espelho Kaggle:
+
+```powershell
+python scripts/data/download_holidays.py `
+  --output-dir data/raw/holidays `
+  --source kaggle
+```
+
+Saidas locais:
+
+- `data/raw/holidays/images/`
+- `data/raw/holidays/metadata/holidays_metadata.csv`
+- `data/evaluation/holidays_global_queries.csv`
+- `data/evaluation/holidays_relevance.csv`
+
+Indexar com ResNet50:
+
+```powershell
+python scripts/global/01_index_global_resnet.py `
+  --input-dir data/raw/holidays/images `
+  --output-dir outputs/global_index_holidays `
+  --device cpu
+```
+
+Avaliar:
+
+```powershell
+python scripts/global/03_evaluate_global.py `
+  --queries-csv data/evaluation/holidays_global_queries.csv `
+  --relevance-csv data/evaluation/holidays_relevance.csv `
+  --index-dir outputs/global_index_holidays `
+  --output-dir outputs/reports/holidays_global `
+  --topk 10 `
+  --device cpu `
+  --save-visual-examples
+```
+
 ### 7. Fusao face + global
 
 ```powershell
