@@ -109,6 +109,39 @@ Observacoes:
 - as imagens nao devem ser redistribuidas;
 - `data/raw/` fica fora do Git.
 
+Indexar a Gallagher em GPU:
+
+```powershell
+python scripts/face/01_index_faces.py `
+  --input-dir data/raw/gallagher/images `
+  --output-dir outputs/face_index_gallagher `
+  --device cuda `
+  --no-identity-from-parent
+```
+
+Preparar consultas e relevancia a partir das anotacoes oficiais:
+
+```powershell
+python scripts/face/04_prepare_gallagher_eval.py `
+  --index-dir outputs/face_index_gallagher `
+  --device cuda `
+  --overwrite
+```
+
+Avaliar busca facial na Gallagher:
+
+```powershell
+python scripts/face/03_evaluate_face.py `
+  --queries-csv data/evaluation/gallagher_face_queries.csv `
+  --relevance-csv data/evaluation/gallagher_relevance.csv `
+  --index-dir outputs/face_index_gallagher `
+  --output-dir outputs/reports/gallagher_face `
+  --topk 10 `
+  --threshold 0.35 `
+  --device cuda `
+  --save-visual-examples
+```
+
 ### 4. Indexar imagem inteira com ResNet50
 
 ```powershell
@@ -197,6 +230,8 @@ conda create -n cibir_face python=3.10 -y
 conda activate cibir_face
 pip install -r requirements/face.txt
 ```
+
+O ambiente facial usa `onnxruntime-gpu` para acelerar o InsightFace com NVIDIA/CUDA. Em maquina sem GPU NVIDIA, troque por `onnxruntime==1.23.2` e execute os scripts com `--device cpu`.
 
 Para o modulo global:
 

@@ -101,8 +101,11 @@ def main() -> int:
     results.to_csv(args.output_dir / "face_topk_results.csv", index=False)
     per_query.to_csv(args.output_dir / "face_metrics_per_query.csv", index=False)
     metrics.to_csv(args.output_dir / "face_metrics.csv", index=False)
+    failures_path = args.output_dir / "face_failures.csv"
     if failures:
-        pd.DataFrame(failures).to_csv(args.output_dir / "face_failures.csv", index=False)
+        pd.DataFrame(failures).to_csv(failures_path, index=False)
+    elif failures_path.exists():
+        failures_path.unlink()
     if args.save_visual_examples and not results.empty:
         save_visual_grid(
             results,
