@@ -1,0 +1,127 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from face_lib import search_face_index
+from global_lib import search_global_index
+from retrieval_common import cosine_to_unit
+
+
+def combine_face_global_results(
+    face_results: pd.DataFrame,
+    global_results: pd.DataFrame,
+    face_weight: float = 0.7,
+    global_weight: float = 0.3,
+    topk: int = 10,
+) -> pd.DataFrame:
+    beta = global_weight
+    alpha = face_weight
+    records: dict[str, dict] = {}
+
+    for row in global_results.itertuples(index=False):
+        image_id = str(row.image_id)
+        records.setdefault(
+            image_id,
+            {
+                "image_id": image_id,
+                "image_path": row.image_path,
+                "face_score": 0.0,
+                "global_score": 0.0,
+                "matched_face_id": "",
+                "bbox": "",
+            },
+        )
+        records[image_id]["global_score"] = float(cosine_to_unit(float(row.score)))
+
+    for row in face_results.itertuples(index=False):
+        image_id = str(row.image_id)
+        records.setdefault(
+            image_id,
+            {
+                "image_id": image_id,
+                "image_path": row.image_path,
+                "face_score": 0.0,
+                "global_score": 0.0,
+                "matched_face_id": "",
+                "bbox": "",
+            },
+        )
+        records[image_id]["face_score"] = float(cosine_to_unit(float(row.score)))
+        records[image_id]["matched_face_id"] = row.matched_face_id
+        records[image_id]["bbox"] = row.bbox
+
+    rows = []
+    for rec in records.values():
+        rec["score"] = alpha * rec["face_score"] + beta * rec["global_score"]
+        rows.append(rec)
+
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return pd.DataFrame(
+            columns=[
+                "rank",
+                "image_id",
+                "image_path",
+                "score",
+                "face_score",
+                "global_score",
+                "matched_face_id",
+                "bbox",
+            ]
+        )
+    out = out.sort_values("score", ascending=False).head(topk).reset_index(drop=True)
+    out.insert(0, "rank", np.arange(1, len(out) + 1))
+    return out[
+        [
+            "rank",
+            "image_id",
+            "image_path",
+            "score",
+            "face_score",
+            "global_score",
+            "matched_face_id",
+            "bbox",
+        ]
+    ]
+
+
+def search_fusion(
+    query_path: Path,
+    query_face_emb,
+    query_global_emb,
+    face_embeddings,
+    face_metadata,
+    global_embeddings,
+    global_metadata,
+    topk: int,
+    face_weight: float,
+    global_weight: float,
+    threshold: float = -1.0,
+) -> pd.DataFrame:
+    face_limit = int(face_metadata["image_id"].nunique()) if not face_metadata.empty else topk
+    global_limit = len(global_metadata) if not global_metadata.empty else topk
+    face_results = search_face_index(
+        query_face_emb,
+        face_embeddings,
+        face_metadata,
+        topk=face_limit,
+        threshold=threshold,
+        query_path=query_path,
+    )
+    global_results = search_global_index(
+        query_global_emb,
+        global_embeddings,
+        global_metadata,
+        topk=global_limit,
+        query_path=query_path,
+    )
+    return combine_face_global_results(
+        face_results,
+        global_results,
+        face_weight=face_weight,
+        global_weight=global_weight,
+        topk=topk,
+    )
