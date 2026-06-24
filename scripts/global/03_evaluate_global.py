@@ -19,6 +19,7 @@ from global_lib import (
 from project_paths import OUTPUTS_DIR
 from retrieval_common import (
     aggregate_metrics,
+    exclude_query_images_from_relevance,
     now_ms,
     relevance_from_csv,
     relevance_from_labels,
@@ -59,6 +60,8 @@ def main() -> int:
         if args.relevance_csv
         else relevance_from_labels(queries, metadata, "label_or_group")
     )
+    if not args.relevance_csv:
+        relevance = exclude_query_images_from_relevance(queries, metadata, relevance)
     extractor, transform, device = build_resnet50_feature_extractor(args.device, args.weights)
 
     all_results = []

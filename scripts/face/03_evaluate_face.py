@@ -14,6 +14,7 @@ from face_lib import build_face_app, load_face_index, query_embedding_from_image
 from project_paths import OUTPUTS_DIR
 from retrieval_common import (
     aggregate_metrics,
+    exclude_query_images_from_relevance,
     now_ms,
     relevance_from_csv,
     relevance_from_labels,
@@ -54,6 +55,8 @@ def main() -> int:
         if args.relevance_csv
         else relevance_from_labels(queries, metadata, "identity")
     )
+    if not args.relevance_csv:
+        relevance = exclude_query_images_from_relevance(queries, metadata, relevance)
     app = build_face_app(device=args.device, det_size=args.det_size)
 
     all_results = []

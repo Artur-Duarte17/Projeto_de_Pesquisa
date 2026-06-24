@@ -153,6 +153,34 @@ def relevance_from_labels(
     return rel
 
 
+def exclude_query_images_from_relevance(
+    queries: pd.DataFrame,
+    metadata: pd.DataFrame,
+    relevance: dict[str, set[str]],
+) -> dict[str, set[str]]:
+    if "query_path" not in queries.columns or "image_path" not in metadata.columns:
+        return relevance
+    out = {qid: set(ids) for qid, ids in relevance.items()}
+    image_paths = metadata[["image_id", "image_path"]].drop_duplicates()
+    resolved_to_ids: dict[Path, set[str]] = {}
+    for row in image_paths.itertuples(index=False):
+        try:
+            resolved = resolve_stored_path(str(row.image_path)).resolve()
+        except OSError:
+            continue
+        resolved_to_ids.setdefault(resolved, set()).add(str(row.image_id))
+
+    for row in queries.itertuples(index=False):
+        query_id = str(getattr(row, "query_id"))
+        try:
+            query_path = resolve_stored_path(str(getattr(row, "query_path"))).resolve()
+        except OSError:
+            continue
+        for image_id in resolved_to_ids.get(query_path, set()):
+            out.setdefault(query_id, set()).discard(image_id)
+    return out
+
+
 def summarize_rankings(
     rankings: dict[str, list[str]],
     relevance: dict[str, set[str]],
