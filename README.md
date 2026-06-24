@@ -85,6 +85,30 @@ python scripts/face/03_evaluate_face.py `
   --output-dir outputs/reports
 ```
 
+### Base facial multi-rosto: Gallagher Collection
+
+A base Gallagher e util para validar o caso real de album/evento: varias pessoas podem aparecer na mesma foto e cada rosto anotado possui uma identidade.
+
+Baixar e preparar localmente:
+
+```powershell
+python scripts/data/download_gallagher.py `
+  --output-dir data/raw/gallagher `
+  --workers 8
+```
+
+Saidas locais:
+
+- `data/raw/gallagher/images/`
+- `data/raw/gallagher/metadata/image_urls.csv`
+- `data/raw/gallagher/metadata/face_annotations.csv`
+
+Observacoes:
+
+- a base e apenas para pesquisa academica nao comercial;
+- as imagens nao devem ser redistribuidas;
+- `data/raw/` fica fora do Git.
+
 ### 4. Indexar imagem inteira com ResNet50
 
 ```powershell
