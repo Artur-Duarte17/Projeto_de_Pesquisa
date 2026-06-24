@@ -39,7 +39,7 @@ Os scripts antigos continuam na raiz de `scripts/` como referencia.
 python scripts/face/01_index_faces.py `
   --input-dir data/raw/lfw/lfw_home/lfw_funneled `
   --output-dir outputs/face_index `
-  --device cpu
+  --device cuda
 ```
 
 Saidas:
@@ -159,7 +159,7 @@ Essa avaliacao usa `source_image_id` para remover a foto original da consulta qu
 python scripts/global/01_index_global_resnet.py `
   --input-dir data/raw/holidays `
   --output-dir outputs/global_index `
-  --device cpu
+  --device cuda
 ```
 
 Saidas:
@@ -213,7 +213,7 @@ Indexar com ResNet50:
 python scripts/global/01_index_global_resnet.py `
   --input-dir data/raw/holidays/images `
   --output-dir outputs/global_index_holidays `
-  --device cpu
+  --device cuda
 ```
 
 Avaliar:
@@ -225,7 +225,7 @@ python scripts/global/03_evaluate_global.py `
   --index-dir outputs/global_index_holidays `
   --output-dir outputs/reports/holidays_global `
   --topk 10 `
-  --device cpu `
+  --device cuda `
   --save-visual-examples
 ```
 
@@ -292,6 +292,8 @@ conda create -n cibir_global python=3.10 -y
 conda activate cibir_global
 pip install -r requirements/global.txt
 ```
+
+O `requirements/global.txt` usa wheels CUDA 12.8 do PyTorch para acelerar ResNet50 em GPU NVIDIA. Em maquina sem GPU NVIDIA, instale a versao CPU do PyTorch e execute os scripts globais com `--device cpu`.
 
 Para a interface:
 
