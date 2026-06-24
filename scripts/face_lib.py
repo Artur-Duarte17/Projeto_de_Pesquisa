@@ -95,6 +95,7 @@ def search_face_index(
     topk: int = 10,
     threshold: float = -1.0,
     query_path: Path | None = None,
+    exclude_image_ids: set[str] | None = None,
 ) -> pd.DataFrame:
     scores = cosine_scores(embeddings, query_emb)
     rows = metadata.copy()
@@ -106,6 +107,9 @@ def search_face_index(
         for p in rows["image_path"].astype(str):
             keep.append(resolve_stored_path(p).resolve() != q_resolved)
         rows = rows.loc[keep].copy()
+
+    if exclude_image_ids:
+        rows = rows[~rows["image_id"].astype(str).isin(exclude_image_ids)].copy()
 
     if threshold > -1.0:
         rows = rows[rows["score"] >= threshold].copy()

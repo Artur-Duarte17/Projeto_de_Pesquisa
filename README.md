@@ -142,6 +142,17 @@ python scripts/face/03_evaluate_face.py `
   --save-visual-examples
 ```
 
+Analisar falsos positivos e consultas dificeis:
+
+```powershell
+python scripts/face/05_analyze_face_errors.py `
+  --queries-csv data/evaluation/gallagher_face_queries.csv `
+  --relevance-csv data/evaluation/gallagher_relevance.csv `
+  --output-dir outputs/reports/gallagher_face/error_analysis
+```
+
+Essa avaliacao usa `source_image_id` para remover a foto original da consulta quando a consulta e um recorte gerado a partir de uma imagem ja indexada. Isso evita um acerto trivial por auto-comparacao.
+
 ### 4. Indexar imagem inteira com ResNet50
 
 ```powershell

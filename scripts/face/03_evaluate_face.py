@@ -70,6 +70,9 @@ def main() -> int:
         try:
             t0 = now_ms()
             q, query_bbox = query_embedding_from_image(query_path, app)
+            exclude_image_ids = set()
+            if hasattr(row, "source_image_id") and pd.notna(getattr(row, "source_image_id")):
+                exclude_image_ids.add(str(getattr(row, "source_image_id")))
             res = search_face_index(
                 q,
                 embeddings,
@@ -77,6 +80,7 @@ def main() -> int:
                 topk=args.topk,
                 threshold=args.threshold,
                 query_path=query_path,
+                exclude_image_ids=exclude_image_ids,
             )
             elapsed = now_ms() - t0
         except Exception as exc:
