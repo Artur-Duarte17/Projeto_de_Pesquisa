@@ -16,6 +16,15 @@ def torch_device(device: str) -> torch.device:
     return torch.device("cpu")
 
 
+def describe_torch_device(requested: str, actual: torch.device) -> str:
+    if actual.type == "cuda":
+        name = torch.cuda.get_device_name(actual)
+        return f"requested={requested} actual=cuda device={name}"
+    if requested.lower() == "cuda":
+        return "requested=cuda actual=cpu reason=torch.cuda.is_available() is False"
+    return "requested=cpu actual=cpu"
+
+
 def build_resnet50_feature_extractor(device: str = "cpu", weights_name: str = "imagenet"):
     import torch.nn as nn
     from torchvision.models import ResNet50_Weights, resnet50

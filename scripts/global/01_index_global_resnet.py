@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from global_lib import build_resnet50_feature_extractor, extract_global_embedding
+from global_lib import build_resnet50_feature_extractor, describe_torch_device, extract_global_embedding
 from project_paths import DATA_DIR, OUTPUTS_DIR
 from retrieval_common import list_images, parent_label, read_image_size, rel_to_root, stable_image_id
 
@@ -44,6 +44,7 @@ def main() -> int:
         device=args.device,
         weights_name=args.weights,
     )
+    print(f"[INFO] Torch device: {describe_torch_device(args.device, device)}")
 
     rows = []
     embs = []

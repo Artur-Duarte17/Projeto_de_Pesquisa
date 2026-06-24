@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from global_lib import (
     build_resnet50_feature_extractor,
+    describe_torch_device,
     extract_global_embedding,
     load_global_index,
     search_global_index,
@@ -63,6 +64,7 @@ def main() -> int:
     if not args.relevance_csv:
         relevance = exclude_query_images_from_relevance(queries, metadata, relevance)
     extractor, transform, device = build_resnet50_feature_extractor(args.device, args.weights)
+    print(f"[INFO] Torch device: {describe_torch_device(args.device, device)}")
 
     all_results = []
     rankings: dict[str, list[str]] = {}

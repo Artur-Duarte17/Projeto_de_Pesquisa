@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from global_lib import (
     build_resnet50_feature_extractor,
+    describe_torch_device,
     extract_global_embedding,
     load_global_index,
     search_global_index,
@@ -38,6 +39,7 @@ def main() -> int:
 
     embeddings, metadata = load_global_index(args.index_dir)
     extractor, transform, device = build_resnet50_feature_extractor(args.device, args.weights)
+    print(f"[INFO] Torch device: {describe_torch_device(args.device, device)}")
 
     t0 = now_ms()
     q = extract_global_embedding(args.query, extractor, transform, device)
