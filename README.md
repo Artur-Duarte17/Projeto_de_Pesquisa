@@ -4,34 +4,40 @@ Protótipo de pesquisa para recuperação de imagens fotográficas por conteúdo
 
 ## Estado atual
 
-O repositório contém os scripts e notebooks do pipeline experimental. Datasets, ambientes Conda, checkpoints, embeddings, imagens geradas e outros artefatos pesados ficam fora do Git.
+O repositorio contem a versao atual do sistema de recuperacao fotografica por face + CBIR global + fusao. Datasets, ambientes Conda, checkpoints, embeddings, imagens geradas e outros artefatos pesados ficam fora do Git.
 
-Componentes principais:
+Componentes principais da versao atual:
 
-- segmentação binária com CelebAMask-HQ;
-- treinamento U-Net e DeepLabV3;
-- detecção/alinhamento facial com InsightFace;
-- geração de embeddings e busca Top-K;
-- avaliação em LFW;
-- resumo de métricas em `scripts/99_resumo_resultados.py`.
+- indexacao facial multi-rosto com InsightFace;
+- busca por pessoa retornando fotos completas;
+- extracao de embeddings globais com ResNet50;
+- busca por similaridade visual da imagem inteira;
+- avaliacao com Precision@K, Recall@K, mAP e tempo medio;
+- fusao tardia de scores facial/global;
+- interface minima em Streamlit.
 
 ## Estrutura versionada
 
-- `scripts/`: etapas do pipeline.
-- `00_run_pipeline.ipynb`: notebook orquestrador.
+- `scripts/face/`: indexacao multi-rosto, busca por pessoa e avaliacao facial.
+- `scripts/global/`: indexacao ResNet50, busca por imagem inteira e avaliacao CBIR.
+- `scripts/fusion/`: combinacao ponderada dos scores facial e global.
+- `scripts/app/`: interface Streamlit minima.
+- `scripts/data/`: download/preparo de bases publicas usadas nos experimentos.
+- `scripts/docs/`: geracao reprodutivel dos documentos finais.
+- `scripts/legacy_meta1/`: scripts historicos da Meta 1, preservados apenas para rastreabilidade.
 - `project_paths.py`: caminhos padronizados do projeto.
-- `requirements/`: dependências mínimas por ambiente.
+- `requirements/`: dependencias minimas por ambiente.
 
 ## V1 atual: face + CBIR global + fusao
 
-Os scripts novos ficam separados dos scripts historicos:
+Os scripts da versao atual ficam separados dos scripts historicos:
 
 - `scripts/face/`: indexacao multi-rosto, busca por pessoa e avaliacao facial.
 - `scripts/global/`: indexacao ResNet50, busca por imagem inteira e avaliacao CBIR.
 - `scripts/fusion/`: combinacao ponderada dos scores facial e global.
 - `scripts/app/`: interface Streamlit minima.
 
-Os scripts antigos continuam na raiz de `scripts/` como referencia.
+Os scripts antigos foram movidos para `scripts/legacy_meta1/` como referencia da primeira etapa do projeto. Eles nao fazem parte do fluxo principal atual.
 
 ### 1. Indexar todos os rostos de uma pasta
 
@@ -260,12 +266,15 @@ streamlit run scripts/app/streamlit_app.py
 
 Estas pastas são locais e devem ser mantidas fora do GitHub:
 
-- `data/`
+- `data/raw/`
+- `data/processed/`
 - `outputs/`
 - `OUTPUTS/`
 - `saidas/`
 - `laboratorio/`
 - `snapshots/`
+- `tmp/`
+- `docs/Pesquisas profundas/`
 - checkpoints como `*.pt`, `*.pth`, `*.ckpt`
 - embeddings como `*.npy`, `*.npz`
 
