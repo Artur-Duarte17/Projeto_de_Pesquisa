@@ -23,6 +23,36 @@ from project_paths import OUTPUTS_DIR
 
 UPLOAD_DIR = OUTPUTS_DIR / "app_uploads"
 
+INDEX_PRESETS = {
+    "Gallagher (demo face + global)": (
+        OUTPUTS_DIR / "face_index_gallagher",
+        OUTPUTS_DIR / "global_index_gallagher",
+    ),
+    "Padrao do projeto": (
+        OUTPUTS_DIR / "face_index",
+        OUTPUTS_DIR / "global_index",
+    ),
+    "Personalizado": (
+        OUTPUTS_DIR / "face_index",
+        OUTPUTS_DIR / "global_index",
+    ),
+}
+
+MODE_DESCRIPTIONS = {
+    "Buscar pessoa": (
+        "Busca por identidade: o sistema detecta um rosto na imagem enviada e retorna "
+        "fotos inteiras onde uma pessoa parecida aparece."
+    ),
+    "Buscar imagem semelhante": (
+        "Busca global: o sistema compara a imagem inteira e retorna fotos visualmente "
+        "parecidas, sem tentar reconhecer a identidade das pessoas."
+    ),
+    "Fusao face + global": (
+        "Fusao: combina o score facial com o score global. Na versao atual, a fusao "
+        "e uma demonstracao experimental, nao necessariamente melhor que a busca facial."
+    ),
+}
+
 
 @st.cache_resource
 def cached_face_app(device: str, det_size: int):
@@ -64,7 +94,22 @@ def show_gallery(results: pd.DataFrame) -> None:
             if not img_path.is_absolute():
                 img_path = ROOT / img_path
             st.image(str(img_path), caption=f"#{row.rank} score={float(row.score):.3f}", use_container_width=True)
-            st.code(str(row.image_path), language=None)
+            st.caption(Path(str(row.image_path)).name)
+
+
+def simplified_results(results: pd.DataFrame) -> pd.DataFrame:
+    if results.empty:
+        return results
+    out = pd.DataFrame()
+    out["rank"] = results["rank"].astype(int)
+    out["score"] = results["score"].astype(float).round(4)
+    out["arquivo"] = results["image_path"].astype(str).map(lambda p: Path(p).name)
+    out["caminho"] = results["image_path"].astype(str)
+    if "face_score" in results.columns:
+        out["score_face"] = results["face_score"].astype(float).round(4)
+    if "global_score" in results.columns:
+        out["score_global"] = results["global_score"].astype(float).round(4)
+    return out
 
 
 def main() -> None:
@@ -73,13 +118,25 @@ def main() -> None:
 
     with st.sidebar:
         search_mode = st.selectbox("Modo", ["Buscar pessoa", "Buscar imagem semelhante", "Fusao face + global"])
+        preset = st.selectbox("Acervo", list(INDEX_PRESETS.keys()))
         topk = st.slider("Top-K", 1, 50, 10)
         threshold = st.slider("Threshold facial", -1.0, 1.0, 0.35, 0.01)
         device = st.selectbox("Device", ["cpu", "cuda"])
-        face_index_dir = st.text_input("Face index", str(OUTPUTS_DIR / "face_index"))
-        global_index_dir = st.text_input("Global index", str(OUTPUTS_DIR / "global_index"))
-        face_weight = st.slider("Peso face", 0.0, 1.0, 0.7, 0.1)
+        default_face_index, default_global_index = INDEX_PRESETS[preset]
+        face_index_dir = st.text_input("Face index", str(default_face_index))
+        global_index_dir = st.text_input("Global index", str(default_global_index))
+        if search_mode == "Fusao face + global":
+            face_weight = st.slider("Peso face", 0.0, 1.0, 0.7, 0.1)
+        else:
+            face_weight = 0.7
         global_weight = 1.0 - face_weight
+
+    st.info(MODE_DESCRIPTIONS[search_mode])
+    if search_mode in {"Buscar pessoa", "Fusao face + global"}:
+        st.warning(
+            "Se a imagem de consulta tiver mais de um rosto, esta versao usa automaticamente "
+            "o maior rosto detectado. A selecao manual do rosto e uma melhoria futura."
+        )
 
     uploaded = st.file_uploader("Imagem de consulta", type=["jpg", "jpeg", "png", "bmp", "webp"])
     if uploaded is None:
@@ -127,8 +184,11 @@ def main() -> None:
         st.error(f"Falha na busca: {exc}")
         return
 
-    st.dataframe(results, use_container_width=True)
+    st.subheader("Resultados")
+    st.dataframe(simplified_results(results), use_container_width=True, hide_index=True)
     show_gallery(results)
+    with st.expander("Tabela tecnica completa"):
+        st.dataframe(results, use_container_width=True)
 
 
 if __name__ == "__main__":
