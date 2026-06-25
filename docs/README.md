@@ -6,3 +6,5 @@ Este pacote reune os documentos explicativos do projeto de recuperacao fotografi
 - [Plano de revisao bibliografica](plano_revisao_bibliografica.md)
 - [Referencias e ideias da proposta original](referencias_proposta_original.md)
 - [Texto extraido da proposta original](proposta_original_extraida.md)
+- [Sintese das pesquisas profundas](sintese_pesquisas_profundas.md)
+- [Bibliografia anotada inicial](bibliografia_anotada.md)

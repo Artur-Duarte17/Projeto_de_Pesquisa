@@ -49,6 +49,8 @@ snapshots/
 outputs_list.txt
 project_tree.txt
 scripts_list.txt
+docs/Pesquisas profundas/
+tmp/
 
 # OS/editor noise
 .DS_Store
