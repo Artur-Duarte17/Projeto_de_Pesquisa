@@ -337,8 +337,8 @@ def metric_rows(metrics: dict[str, dict[str, str]]) -> list[list[str]]:
     ]
 
 
-def add_references(doc: Document, compact: bool = False) -> None:
-    doc.add_heading("Referencias", level=1)
+def add_references(doc: Document, compact: bool = False, heading: str = "Referencias") -> None:
+    doc.add_heading(heading, level=1)
     refs = [
         "Smeulders, A. W. M. et al. Content-Based Image Retrieval at the End of the Early Years. IEEE TPAMI, 2000. DOI: 10.1109/34.895972.",
         "Datta, R. et al. Image Retrieval: Ideas, Influences, and Trends of the New Age. ACM Computing Surveys, 2008. DOI: 10.1145/1348246.1348248.",
@@ -377,54 +377,93 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
     doc.core_properties.title = "Relatorio da Meta 2 - Recuperacao Fotografica Face + CBIR Global"
     doc.core_properties.author = "Artur Duarte"
 
-    add_title_block(
-        doc,
-        "Relatorio da Meta 2",
-        "Recuperacao fotografica por conteudo e reconhecimento facial",
-        [
-            ("Projeto", "Busca inteligente em acervos fotograficos por face e CBIR global"),
-            ("Responsavel", "Artur Duarte"),
-            ("Data", TODAY),
-            ("Status", "Versao consolidada para entrega e base para artigo"),
-        ],
-    )
+    for text in [
+        "Instituto Federal de Educacao, Ciencia e Tecnologia Goiano - Campus Urutai",
+        "Discente: Artur Duarte Monteiro",
+        "Orientador: Gabriel da Silva Vieira",
+    ]:
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r = p.add_run(text)
+        set_run_font(r, size=11, bold=text.startswith("Instituto"))
 
-    doc.add_heading("Resumo executivo", level=1)
+    for _ in range(8):
+        doc.add_paragraph()
+
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = p.add_run("Relatorio Meta 2")
+    set_run_font(r, size=18, bold=True)
+
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = p.add_run("Recuperacao de Imagens Fotograficas por Conteudo e Reconhecimento Facial em Colecoes de Grande Escala")
+    set_run_font(r, size=13, bold=True)
+
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = p.add_run("Busca facial multi-rosto, CBIR global com ResNet50 e fusao tardia de scores")
+    set_run_font(r, size=11, color=COLORS["muted"])
+
+    for _ in range(9):
+        doc.add_paragraph()
+
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = p.add_run("Urutai - GO, 2026")
+    set_run_font(r, size=11)
+
+    doc.add_page_break()
+
+    doc.add_heading("1 Introducao", level=1)
     doc.add_paragraph(
-        "Esta Meta 2 consolidou uma versao funcional e avaliada do sistema de recuperacao fotografica. "
-        "O sistema indexa multiplos rostos por foto, retorna fotos completas para consultas por pessoa, "
-        "extrai descritores globais com ResNet50 para busca por imagem inteira e compara esses resultados "
-        "com uma fusao tardia de scores."
+        "Este relatorio descreve as atividades executadas na Meta 2 do projeto, com foco na consolidacao "
+        "de um sistema reprodutivel de recuperacao fotografica por conteudo. Nesta etapa, o projeto deixou "
+        "de ser apenas um conjunto de scripts exploratorios e passou a possuir modulos separados para busca "
+        "facial, busca global da imagem inteira e fusao tardia de scores."
     )
-    add_callout(
-        doc,
-        "Resultado central",
-        "A busca facial foi a melhor estrategia para recuperar pessoas no conjunto Gallagher; a busca global "
-        "foi adequada para similaridade visual no INRIA Holidays; a fusao simples nao superou a busca facial "
-        "isolada em consultas centradas em identidade, o que gera uma discussao cientifica relevante.",
-        fill=COLORS["success"],
-    )
-
-    doc.add_heading("O que foi entregue", level=1)
-    add_bullets(
-        doc,
-        [
-            "Reorganizacao do projeto para scripts novos e modulares, sem depender da estrutura antiga.",
-            "Indice facial multi-rosto, no qual uma imagem pode gerar varios embeddings faciais.",
-            "Busca por pessoa a partir de uma foto comum, retornando a fotografia inteira e nao apenas o recorte do rosto.",
-            "Indice global com ResNet50 pre-treinada para recuperar imagens visualmente semelhantes pela imagem inteira.",
-            "Avaliacao facial no Gallagher, avaliacao global no INRIA Holidays e comparacao face/global/fusao.",
-            "Interface minima em Streamlit para demonstrar busca por pessoa, busca global e fusao.",
-            "Curadoria bibliografica inicial para sustentar a escrita de artigo, TCC ou relatorio de IC.",
-        ],
-    )
-
-    doc.add_heading("Metodologia resumida", level=1)
     doc.add_paragraph(
-        "A abordagem foi separada em duas trilhas. A trilha facial detecta rostos, gera embeddings e compara "
-        "esses vetores por similaridade cosseno. A trilha global usa uma ResNet50 pre-treinada para gerar um "
-        "embedding de 2048 dimensoes da imagem inteira. A fusao combina os scores das duas trilhas por soma "
-        "ponderada, testando pesos 0.9/0.1, 0.7/0.3 e 0.5/0.5."
+        "O objetivo tecnico da Meta 2 foi implementar e avaliar tres estrategias de recuperacao: busca por "
+        "pessoa com embeddings faciais, busca por similaridade visual com descritores globais ResNet50 e "
+        "combinacao ponderada entre as duas trilhas. O resultado esperado e uma base concreta para relatorio, "
+        "TCC ou artigo curto, com metricas objetivas e exemplos visuais."
+    )
+
+    doc.add_heading("2 Metodologia", level=1)
+    doc.add_heading("2.1 Organizacao do sistema", level=2)
+    doc.add_paragraph(
+        "A implementacao foi organizada em diretorios por responsabilidade. A pasta scripts/face contem os "
+        "programas de indexacao, busca e avaliacao facial. A pasta scripts/global contem os scripts de CBIR "
+        "global com ResNet50. A pasta scripts/fusion contem a combinacao dos rankings, enquanto scripts/app "
+        "armazena a interface minima em Streamlit."
+    )
+    doc.add_paragraph(
+        "Essa separacao foi adotada para permitir a avaliacao isolada de cada modulo antes da fusao. Assim, "
+        "quando um resultado melhora ou piora, e possivel identificar se a causa esta no modulo facial, no "
+        "modulo global ou na regra de combinacao."
+    )
+
+    doc.add_heading("2.2 Indice facial multi-rosto", level=2)
+    doc.add_paragraph(
+        "O indice facial foi construido considerando que uma mesma fotografia pode conter varias pessoas. "
+        "Portanto, a unidade indexada nao e a imagem inteira, mas cada rosto detectado dentro da imagem. "
+        "Cada face recebe um embedding proprio e metadados que apontam para a fotografia original, incluindo "
+        "identificador da imagem, posicao do rosto e linha correspondente no arquivo de embeddings."
+    )
+
+    doc.add_heading("2.3 CBIR global com ResNet50", level=2)
+    doc.add_paragraph(
+        "Para a busca global, cada fotografia inteira foi processada por uma ResNet50 pre-treinada. O vetor "
+        "extraido representa o conteudo visual geral da imagem, incluindo cena, composicao, objetos e padroes "
+        "visuais. Esse modulo foi mantido separado do facial porque ele responde a uma pergunta diferente: "
+        "quais imagens sao visualmente semelhantes a imagem de consulta."
+    )
+
+    doc.add_heading("2.4 Fusao tardia de scores", level=2)
+    doc.add_paragraph(
+        "A fusao foi implementada como late fusion, ou fusao tardia. Em vez de concatenar embeddings faciais "
+        "e globais, que possuem significados diferentes, o sistema combina os scores finais de similaridade. "
+        "Foram testados os pesos 0.9/0.1, 0.7/0.3 e 0.5/0.5 para face/global."
     )
     add_table(
         doc,
@@ -438,7 +477,13 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
         [1.05, 1.55, 2.0, 1.9],
     )
 
-    doc.add_heading("Bases e indices usados", level=1)
+    doc.add_heading("3 Bases de dados e organizacao experimental", level=1)
+    doc.add_paragraph(
+        "A avaliacao foi dividida por tarefa para evitar conclusoes incorretas. A base LFW foi usada como "
+        "validacao inicial de reconhecimento facial. A base Gallagher foi usada para busca por pessoas em "
+        "fotografias de grupo e para avaliacao da fusao. A base INRIA Holidays foi usada para avaliar a busca "
+        "global por similaridade visual de imagem inteira."
+    )
     add_table(
         doc,
         ["Base/indice", "Escopo verificado", "Uso no projeto"],
@@ -452,7 +497,29 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
         [1.55, 2.25, 2.7],
     )
 
-    doc.add_heading("Resultados quantitativos", level=1)
+    doc.add_heading("4 Implementacao dos modulos", level=1)
+    doc.add_paragraph(
+        "A Meta 2 gerou scripts novos e reprodutiveis para indexacao, busca, avaliacao e demonstracao. "
+        "Os scripts principais aceitam parametros por linha de comando, como diretorio de entrada, diretorio "
+        "de saida, dispositivo de execucao, Top-K e limiar de similaridade."
+    )
+    add_table(
+        doc,
+        ["Script", "Funcao", "Saida principal"],
+        [
+            ["scripts/face/01_index_faces.py", "Detecta todos os rostos e gera embeddings faciais.", "outputs/face_index*/face_embeddings.npy"],
+            ["scripts/face/02_search_person.py", "Busca uma pessoa a partir de uma imagem de consulta.", "topk_results.csv e exemplos visuais"],
+            ["scripts/face/03_evaluate_face.py", "Avalia Precision@K, Recall@K, mAP e tempo.", "outputs/reports/*face*"],
+            ["scripts/global/01_index_global_resnet.py", "Extrai embeddings globais ResNet50.", "global_embeddings.npy"],
+            ["scripts/global/02_search_global.py", "Busca imagens semelhantes pela imagem inteira.", "global_topk_results.csv"],
+            ["scripts/global/03_evaluate_global.py", "Avalia o CBIR global.", "outputs/reports/*global*"],
+            ["scripts/fusion/02_evaluate_fusion.py", "Compara face, global e fusao.", "fusion_metrics.csv"],
+            ["scripts/app/streamlit_app.py", "Demonstra busca por pessoa, global e fusao.", "Interface local em Streamlit"],
+        ],
+        [2.15, 2.45, 1.9],
+    )
+
+    doc.add_heading("5 Avaliacao experimental", level=1)
     doc.add_paragraph(
         "As metricas abaixo foram calculadas com Precision@K, Recall@K, mAP e tempo medio de consulta. "
         "No Gallagher, a avaliacao mede recuperacao de pessoas. No INRIA Holidays, a avaliacao mede "
@@ -465,13 +532,24 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
         [1.15, 1.45, 0.65, 0.65, 0.65, 0.65, 0.75, 0.75],
     )
 
-    doc.add_heading("Interpretacao dos resultados", level=1)
+    doc.add_heading("5.1 Busca facial no Gallagher", level=2)
     doc.add_paragraph(
         "O resultado facial no Gallagher confirma que embeddings faciais sao adequados quando a pergunta do "
-        "usuario e encontrar uma pessoa especifica. O resultado global no Gallagher foi baixo porque a ResNet50 "
-        "captura cena, fundo, objetos e composicao visual, nao identidade. Em contrapartida, no INRIA Holidays "
-        "a mesma abordagem global obteve mAP elevado, mostrando que o modulo esta coerente com a tarefa de CBIR."
+        f"usuario e encontrar uma pessoa especifica. O metodo face-only obteve P@5 de {pct(metrics['face']['precision_at_5'])}, "
+        f"P@10 de {pct(metrics['face']['precision_at_10'])} e mAP de {num(metrics['face']['mAP'])}. "
+        "Como o sistema retorna fotos completas, ele atende ao objetivo pratico de localizar fotografias onde "
+        "a pessoa aparece, e nao apenas recortes de rosto."
     )
+
+    doc.add_heading("5.2 CBIR global no INRIA Holidays", level=2)
+    doc.add_paragraph(
+        f"No INRIA Holidays, o modulo global com ResNet50 obteve mAP de {num(metrics['holidays']['mAP'])}. "
+        "Esse resultado indica que a extracao de descritores globais esta coerente com a tarefa de recuperar "
+        "imagens visualmente semelhantes. No Gallagher, quando a relevancia foi definida por identidade, o "
+        "mesmo modulo teve desempenho baixo, pois captura cena, fundo, objetos e composicao visual, nao identidade."
+    )
+
+    doc.add_heading("5.3 Fusao face + global", level=2)
     doc.add_paragraph(
         "A fusao 0.9/0.1 foi a melhor entre os pesos testados, mas ainda ficou abaixo da busca facial isolada. "
         "Isso indica que adicionar contexto global pode introduzir ruido quando o criterio de relevancia e a "
@@ -479,7 +557,58 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
         "a fusao simples nao melhora automaticamente todos os cenarios."
     )
 
-    doc.add_heading("Exemplos visuais", level=1)
+    doc.add_heading("6 Interface e demonstracao", level=1)
+    doc.add_paragraph(
+        "Foi criada uma interface minima em Streamlit para demonstrar o funcionamento do sistema. A interface "
+        "permite enviar uma imagem de consulta, escolher o modo de busca, ajustar Top-K e limiar facial, e "
+        "visualizar os resultados em uma galeria ranqueada. A interface nao e o foco cientifico da Meta 2, mas "
+        "serve como prova de conceito e facilita a apresentacao do sistema."
+    )
+
+    doc.add_heading("7 Evidencias e Reprodutibilidade", level=1)
+    doc.add_paragraph(
+        "Os experimentos foram executados com ambiente Conda dedicado e suporte a GPU CUDA para os modulos "
+        "compativeis. Os resultados quantitativos foram salvos em CSV, e os exemplos visuais foram salvos em "
+        "outputs/reports. Os dados brutos, embeddings e outputs permanecem fora do Git para manter o repositorio leve."
+    )
+    add_table(
+        doc,
+        ["Evidencia", "Caminho"],
+        [
+            ["Metricas faciais", "outputs/reports/gallagher_face/face_metrics.csv"],
+            ["Metricas globais Gallagher", "outputs/reports/gallagher_global_person/global_metrics.csv"],
+            ["Metricas globais Holidays", "outputs/reports/holidays_global/global_metrics.csv"],
+            ["Metricas de fusao", "outputs/reports/gallagher_fusion/fusion_metrics.csv"],
+            ["Tabela comparativa", "outputs/reports/comparison/gallagher_face_global_fusion_comparison.csv"],
+            ["Interface", "scripts/app/streamlit_app.py"],
+        ],
+        [2.1, 4.4],
+    )
+    add_numbered(
+        doc,
+        [
+            "Indexar rostos: python scripts/face/01_index_faces.py --input-dir <pasta> --output-dir <saida> --device cuda",
+            "Indexar imagens globais: python scripts/global/01_index_global_resnet.py --input-dir <pasta> --output-dir <saida> --device cuda",
+            "Avaliar face, global e fusao com os scripts 03_evaluate_face.py, 03_evaluate_global.py e 02_evaluate_fusion.py.",
+            "Executar a interface: python -m streamlit run scripts/app/streamlit_app.py --server.port 8501",
+        ],
+    )
+
+    doc.add_heading("8 Resultados e Discussao", level=1)
+    doc.add_paragraph(
+        "Os resultados mostram que a busca facial e a estrategia mais adequada quando o objetivo e recuperar "
+        "fotografias de uma pessoa especifica. Ja a busca global e mais apropriada quando o objetivo e encontrar "
+        "imagens parecidas pela cena ou composicao visual. A fusao simples nao superou a busca facial isolada no "
+        "Gallagher, mas esse resultado e relevante: ele demonstra que combinar sinais heterogeneos sem calibracao "
+        "pode prejudicar o ranking."
+    )
+    doc.add_paragraph(
+        "Para fins de artigo, a principal contribuicao nao e afirmar que a fusao sempre melhora, mas mostrar uma "
+        "avaliacao comparativa clara entre face-only, global-only e fusao tardia. A conclusao tecnica e que os "
+        "modulos devem permanecer separados na interface e que a fusao deve ser tratada como recurso experimental."
+    )
+
+    doc.add_heading("8.1 Exemplos visuais", level=2)
     add_figure(
         doc,
         ROOT / "outputs" / "reports" / "gallagher_face" / "visual_examples" / "face_examples.png",
@@ -491,7 +620,7 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
         "Figura 2 - Exemplo de busca global no INRIA Holidays: o ranking e baseado na similaridade visual da imagem inteira.",
     )
 
-    doc.add_heading("Criterios de aceite", level=1)
+    doc.add_heading("8.2 Criterios de aceite", level=2)
     add_table(
         doc,
         ["Criterio", "Status", "Evidencia"],
@@ -507,26 +636,29 @@ def build_report(metrics: dict[str, dict[str, str]]) -> Path:
         [2.2, 1.0, 3.3],
     )
 
-    doc.add_heading("Limitacoes e proximos passos", level=1)
-    add_bullets(
-        doc,
-        [
-            "Avaliacao ainda pequena para busca facial, com 20 consultas no Gallagher.",
-            "A fusao usa regra linear simples; ainda nao ha aprendizado de pesos ou normalizacao mais sofisticada.",
-            "A interface seleciona automaticamente o maior rosto da consulta; uma versao produto deve permitir escolher o rosto.",
-            "Ainda nao ha FAISS, CLIP, criptografia de embeddings, avaliacao de vies demografico ou acervo de milhoes de imagens.",
-            "Para artigo, o texto deve enfatizar a comparacao experimental e nao prometer escala ou produto final completo.",
-        ],
-    )
-
-    doc.add_heading("Conclusao da Meta 2", level=1)
+    doc.add_heading("9 Conclusao", level=1)
     doc.add_paragraph(
         "A Meta 2 pode ser considerada concluida em nivel tecnico e experimental para uma v1. O sistema possui "
         "modulos separados de busca facial e CBIR global, avaliacao quantitativa, exemplos visuais e interface "
         "minima. O material produzido ja sustenta a escrita de um artigo curto ou relatorio tecnico, desde que "
         "as limitacoes sejam apresentadas de forma transparente."
     )
-    add_references(doc, compact=True)
+
+    doc.add_heading("10 Proximos Passos", level=1)
+    add_bullets(
+        doc,
+        [
+            "Ampliar a avaliacao facial com mais consultas e, se possivel, outro acervo de eventos.",
+            "Permitir selecao manual do rosto de consulta quando uma imagem possuir mais de uma face.",
+            "Testar CLIP como descritor global complementar ao baseline ResNet50.",
+            "Adicionar FAISS para acelerar a busca em acervos maiores.",
+            "Investigar normalizacao de scores e pesos aprendidos para melhorar a fusao.",
+            "Documentar cuidados de privacidade, vies e armazenamento seguro de embeddings faciais.",
+            "Converter o rascunho tecnico em artigo no formato exigido pelo evento ou periodico escolhido.",
+        ],
+    )
+
+    add_references(doc, compact=True, heading="11 Referencias")
 
     output = OUT_DIR / "Relatorio_Meta2_CIBIR.docx"
     doc.save(output)
