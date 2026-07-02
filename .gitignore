@@ -50,6 +50,8 @@ outputs_list.txt
 project_tree.txt
 scripts_list.txt
 docs/Pesquisas profundas/
+docs/artigo_sibgrapi_2026/
+docs/artigo_sibgrapi_2026*.zip
 tmp/
 
 # OS/editor noise
