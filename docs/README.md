@@ -8,6 +8,7 @@ Leia primeiro o mapa canônico na raiz: [`LEIA_PRIMEIRO.md`](../LEIA_PRIMEIRO.md
 |---|---|---|
 | `../LEIA_PRIMEIRO.md` | canônico e atual | ponto de entrada para escopo, alertas e próximos passos |
 | `README.md` da raiz | operacional | estrutura e comandos do software ativo |
+| `protocolo_avaliacao.md` | canônico e atual | definições de exclusão, métricas, ranking e manifestos |
 | `historico_privado/` | privado; ignorado pelo Git | dossiê completo em DOCX, PDF e Markdown; consultar apenas para história e recuperação |
 | `artigo_sibgrapi_2026/` | rascunho histórico | fonte de texto/figuras; não contém validação agro e não está pronto para submissão |
 | `entregas/` | entregas e rascunhos históricos | preservar; conferir data e protocolo antes de reutilizar resultados |
@@ -23,6 +24,11 @@ Leia primeiro o mapa canônico na raiz: [`LEIA_PRIMEIRO.md`](../LEIA_PRIMEIRO.md
 - [Bibliografia anotada inicial](bibliografia_anotada.md).
 - `entregas/Relatorio_Meta2_CIBIR.docx` — relatório histórico.
 - `entregas/Artigo_CIBIR_Rascunho.docx` — rascunho histórico.
+
+## Protocolo atual
+
+- [Protocolo de avaliação](protocolo_avaliacao.md) — regras obrigatórias para os próximos experimentos.
+- `tests/test_retrieval_methodology.py` — testes sintéticos do protocolo.
 
 ## Regra de evidência
 

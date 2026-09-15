@@ -53,12 +53,16 @@ O dossiê e o material de submissão não podem ser enviados ao GitHub público.
 - Não versionar dados, imagens, checkpoints, embeddings, índices, ambientes, outputs, PDFs de terceiros, documentos pessoais, dossiê ou manuscrito de submissão.
 - Não fazer push sem confirmação expressa de Artur.
 
+## Estado da correção metodológica
+
+O código ativo já incorpora exclusão uniforme da imagem-fonte, Precision@K com denominador K, AP/mAP sobre o ranking integral, separação do Top-K salvo, hashes das imagens indexadas, manifestos de execução e testes sintéticos. Isso corrige o protocolo no código, mas ainda não produz resultados oficiais: os índices e experimentos precisam ser refeitos.
+
 ## Próxima ordem técnica
 
-1. corrigir exclusão da imagem-fonte, Precision@K e AP/mAP;
-2. criar testes sintéticos para as métricas;
-3. separar profundidade do ranking de Top-K salvo;
-4. construir ambiente CUDA único e reproduzível;
-5. executar novamente os experimentos;
+1. construir e validar um ambiente CUDA único e reproduzível;
+2. recriar os índices para incluir SHA-256 e registrar os manifestos;
+3. executar novamente LFW, Gallagher e Holidays;
+4. conferir métricas diretamente nos CSVs e manifestos;
+5. definir um protocolo próprio para a fusão antes de tratá-la como resultado final;
 6. obter coleção agro autorizada;
 7. adaptar o manuscrito ao modelo vigente da Revista Principia.

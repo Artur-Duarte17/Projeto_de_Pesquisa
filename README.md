@@ -26,6 +26,7 @@ Componentes principais da versao atual:
 - `scripts/app/`: interface Streamlit minima.
 - `scripts/data/`: download/preparo de bases publicas usadas nos experimentos.
 - `scripts/docs/`: geracao reprodutivel dos documentos finais.
+- `tests/`: testes sinteticos das regras de ranking, exclusao e metricas.
 - `project_paths.py`: caminhos padronizados do projeto.
 - `requirements/`: dependencias minimas por ambiente.
 
@@ -53,6 +54,9 @@ Saidas:
 
 - `outputs/face_index/face_embeddings.npy`
 - `outputs/face_index/face_metadata.csv`
+- `outputs/face_index/face_index_manifest.json`
+
+O indice registra o SHA-256 de cada fotografia. Isso permite reconhecer e excluir uma copia da imagem-fonte mesmo quando ela foi enviada pela interface com outro caminho.
 
 ### 2. Buscar uma pessoa
 
@@ -76,6 +80,8 @@ query_id,query_path,target_label,query_type
 q1,data/query/Aaron_Peirsol_0004.jpg,Aaron_Peirsol,face
 ```
 
+As colunas opcionais `source_image_id` e `exclude_image_ids` informam imagens que nunca podem participar do ranking. `exclude_image_ids` aceita IDs separados por virgula, ponto e virgula ou barra vertical.
+
 Opcionalmente crie `relevance.csv`:
 
 ```csv
@@ -89,8 +95,11 @@ Se `relevance.csv` nao for informado, a avaliacao facial usa `target_label` cont
 python scripts/face/03_evaluate_face.py `
   --queries-csv data/evaluation/face_queries.csv `
   --index-dir outputs/face_index `
-  --output-dir outputs/reports
+  --output-dir outputs/reports `
+  --save-topk 10
 ```
+
+A avaliacao calcula AP sobre o ranking integral elegivel. `--save-topk` limita apenas as linhas gravadas no CSV de exemplos. Precision@K sempre usa K como denominador, inclusive quando o metodo retorna menos de K imagens.
 
 ### Base facial multi-rosto: Gallagher Collection
 
@@ -143,7 +152,7 @@ python scripts/face/03_evaluate_face.py `
   --relevance-csv data/evaluation/gallagher_relevance.csv `
   --index-dir outputs/face_index_gallagher `
   --output-dir outputs/reports/gallagher_face `
-  --topk 10 `
+  --save-topk 10 `
   --threshold 0.35 `
   --device cuda `
   --save-visual-examples
@@ -231,7 +240,7 @@ python scripts/global/03_evaluate_global.py `
   --relevance-csv data/evaluation/holidays_relevance.csv `
   --index-dir outputs/global_index_holidays `
   --output-dir outputs/reports/holidays_global `
-  --topk 10 `
+  --save-topk 10 `
   --device cuda `
   --save-visual-examples
 ```
@@ -254,8 +263,11 @@ python scripts/fusion/02_evaluate_fusion.py `
   --relevance-csv data/evaluation/relevance.csv `
   --face-index-dir outputs/face_index `
   --global-index-dir outputs/global_index `
-  --output-dir outputs/reports
+  --output-dir outputs/reports `
+  --save-topk 10
 ```
+
+Cada indexacao, busca e avaliacao grava um manifesto JSON com configuracao, hashes dos arquivos de entrada e saida, versoes do ambiente e estado do Git.
 
 ### 8. Interface minima
 
@@ -276,6 +288,8 @@ Estas pastas são locais e devem ser mantidas fora do GitHub:
 - `snapshots/`
 - `tmp/`
 - `docs/fontes_bibliograficas_brutas/`
+- `docs/Referencias/`
+- `docs/entregas/`
 - checkpoints como `*.pt`, `*.pth`, `*.ckpt`
 - embeddings como `*.npy`, `*.npz`
 
@@ -318,3 +332,13 @@ conda create -n cibir_fusion python=3.10 -y
 conda activate cibir_fusion
 pip install -r requirements/fusion.txt
 ```
+
+## Testes metodologicos rapidos
+
+Os testes nao carregam modelos nem percorrem datasets:
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+As definicoes formais e as condicoes para a proxima execucao estao em [`docs/protocolo_avaliacao.md`](docs/protocolo_avaliacao.md).

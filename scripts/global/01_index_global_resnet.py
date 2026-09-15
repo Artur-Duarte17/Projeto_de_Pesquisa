@@ -14,7 +14,15 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from global_lib import build_resnet50_feature_extractor, describe_torch_device, extract_global_embedding
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import list_images, parent_label, read_image_size, rel_to_root, stable_image_id
+from retrieval_common import (
+    list_images,
+    parent_label,
+    read_image_size,
+    rel_to_root,
+    sha256_file,
+    stable_image_id,
+)
+from run_manifest import write_run_manifest
 
 
 def parse_args() -> argparse.Namespace:
@@ -62,6 +70,7 @@ def main() -> int:
             {
                 "image_id": image_id,
                 "image_path": rel_to_root(img_path),
+                "sha256": sha256_file(img_path),
                 "embedding_row": len(embs),
                 "width": width,
                 "height": height,
@@ -77,16 +86,41 @@ def main() -> int:
 
     E = np.vstack(embs).astype(np.float32)
     meta = pd.DataFrame(rows)
-    np.save(out_dir / "global_embeddings.npy", E)
-    meta.to_csv(out_dir / "global_metadata.csv", index=False)
+    embeddings_path = out_dir / "global_embeddings.npy"
+    metadata_path = out_dir / "global_metadata.csv"
+    failures_path = out_dir / "global_failures.csv"
+    np.save(embeddings_path, E)
+    meta.to_csv(metadata_path, index=False)
     if failures:
-        pd.DataFrame(failures).to_csv(out_dir / "global_failures.csv", index=False)
+        pd.DataFrame(failures).to_csv(failures_path, index=False)
+    elif failures_path.exists():
+        failures_path.unlink()
+
+    result_files = {"embeddings": embeddings_path, "metadata": metadata_path}
+    if failures_path.exists():
+        result_files["failures"] = failures_path
+    manifest_path = write_run_manifest(
+        out_dir / "global_index_manifest.json",
+        script_path=Path(__file__),
+        method="global_resnet50_index",
+        configuration={
+            "max_images": args.max_images,
+            "device": args.device,
+            "weights": args.weights,
+            "split": args.split,
+            "label_from_parent": not args.no_label_from_parent,
+        },
+        inputs={"input_directory": input_dir},
+        result_files=result_files,
+        extra={"images_scanned": len(image_paths), "embeddings": len(meta), "failures": len(failures)},
+    )
 
     print(f"[OK] images scanned: {len(image_paths)}")
     print(f"[OK] global embeddings: {len(meta)}")
     print(f"[OK] failures: {len(failures)}")
-    print(f"[OK] {out_dir / 'global_embeddings.npy'}")
-    print(f"[OK] {out_dir / 'global_metadata.csv'}")
+    print(f"[OK] {embeddings_path}")
+    print(f"[OK] {metadata_path}")
+    print(f"[OK] {manifest_path}")
     return 0
 
 

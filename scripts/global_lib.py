@@ -7,7 +7,7 @@ import pandas as pd
 import torch
 from PIL import Image
 
-from retrieval_common import cosine_scores, l2_normalize, resolve_stored_path
+from retrieval_common import cosine_scores, image_ids_for_query_path, l2_normalize
 
 
 def torch_device(device: str) -> torch.device:
@@ -62,19 +62,24 @@ def search_global_index(
     query_emb: np.ndarray,
     embeddings: np.ndarray,
     metadata: pd.DataFrame,
-    topk: int = 10,
+    topk: int | None = 10,
     query_path: Path | None = None,
+    exclude_image_ids: set[str] | None = None,
 ) -> pd.DataFrame:
     scores = cosine_scores(embeddings, query_emb)
     rows = metadata.copy()
     rows["score"] = scores
+    excluded = set(exclude_image_ids or set())
     if query_path is not None:
-        q_resolved = query_path.resolve()
-        keep = []
-        for p in rows["image_path"].astype(str):
-            keep.append(resolve_stored_path(p).resolve() != q_resolved)
-        rows = rows.loc[keep].copy()
-    rows = rows.sort_values("score", ascending=False).head(topk).reset_index(drop=True)
+        excluded.update(image_ids_for_query_path(query_path, metadata))
+    if excluded:
+        rows = rows[~rows["image_id"].astype(str).isin(excluded)].copy()
+    rows = rows.sort_values("score", ascending=False)
+    if topk is not None:
+        if topk < 0:
+            raise ValueError("topk must be non-negative or None")
+        rows = rows.head(topk)
+    rows = rows.reset_index(drop=True)
     rows.insert(0, "rank", np.arange(1, len(rows) + 1))
     rows["matched_face_id"] = ""
     rows["bbox"] = ""

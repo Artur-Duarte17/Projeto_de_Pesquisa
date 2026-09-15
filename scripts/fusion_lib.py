@@ -15,7 +15,7 @@ def combine_face_global_results(
     global_results: pd.DataFrame,
     face_weight: float = 0.7,
     global_weight: float = 0.3,
-    topk: int = 10,
+    topk: int | None = 10,
 ) -> pd.DataFrame:
     beta = global_weight
     alpha = face_weight
@@ -72,7 +72,12 @@ def combine_face_global_results(
                 "bbox",
             ]
         )
-    out = out.sort_values("score", ascending=False).head(topk).reset_index(drop=True)
+    out = out.sort_values("score", ascending=False)
+    if topk is not None:
+        if topk < 0:
+            raise ValueError("topk must be non-negative or None")
+        out = out.head(topk)
+    out = out.reset_index(drop=True)
     out.insert(0, "rank", np.arange(1, len(out) + 1))
     return out[
         [
@@ -96,10 +101,11 @@ def search_fusion(
     face_metadata,
     global_embeddings,
     global_metadata,
-    topk: int,
+    topk: int | None,
     face_weight: float,
     global_weight: float,
     threshold: float = -1.0,
+    exclude_image_ids: set[str] | None = None,
 ) -> pd.DataFrame:
     face_limit = int(face_metadata["image_id"].nunique()) if not face_metadata.empty else topk
     global_limit = len(global_metadata) if not global_metadata.empty else topk
@@ -110,6 +116,7 @@ def search_fusion(
         topk=face_limit,
         threshold=threshold,
         query_path=query_path,
+        exclude_image_ids=exclude_image_ids,
     )
     global_results = search_global_index(
         query_global_emb,
@@ -117,6 +124,7 @@ def search_fusion(
         global_metadata,
         topk=global_limit,
         query_path=query_path,
+        exclude_image_ids=exclude_image_ids,
     )
     return combine_face_global_results(
         face_results,

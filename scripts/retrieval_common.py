@@ -49,6 +49,14 @@ def stable_image_id(path: Path, base_dir: Path) -> str:
     return digest
 
 
+def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(chunk_size), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def parent_label(path: Path) -> str:
     return path.parent.name
 
@@ -90,11 +98,8 @@ def now_ms() -> float:
 def precision_at_k(ranked_ids: list[str], relevant_ids: set[str], k: int) -> float:
     if k <= 0:
         return 0.0
-    top = ranked_ids[:k]
-    if not top:
-        return 0.0
-    hits = sum(1 for image_id in top if image_id in relevant_ids)
-    return hits / len(top)
+    hits = sum(1 for image_id in ranked_ids[:k] if image_id in relevant_ids)
+    return hits / k
 
 
 def recall_at_k(ranked_ids: list[str], relevant_ids: set[str], k: int) -> float:
@@ -153,32 +158,86 @@ def relevance_from_labels(
     return rel
 
 
+def parse_image_ids(value: object) -> set[str]:
+    if value is None:
+        return set()
+    try:
+        if bool(pd.isna(value)):
+            return set()
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
+    if not text:
+        return set()
+    for separator in (";", "|"):
+        text = text.replace(separator, ",")
+    return {item.strip() for item in text.split(",") if item.strip()}
+
+
+def image_ids_for_query_path(query_path: Path, metadata: pd.DataFrame) -> set[str]:
+    if "image_id" not in metadata.columns:
+        return set()
+
+    matched: set[str] = set()
+    resolved_query = resolve_stored_path(str(query_path)).resolve()
+
+    if "image_path" in metadata.columns:
+        for row in metadata[["image_id", "image_path"]].drop_duplicates().itertuples(index=False):
+            try:
+                stored_path = resolve_stored_path(str(row.image_path)).resolve()
+            except OSError:
+                continue
+            if stored_path == resolved_query:
+                matched.add(str(row.image_id))
+
+    if "sha256" in metadata.columns and resolved_query.is_file():
+        query_hash = sha256_file(resolved_query)
+        hashes = metadata["sha256"].fillna("").astype(str).str.lower()
+        ids = metadata.loc[hashes == query_hash.lower(), "image_id"].astype(str)
+        matched.update(ids.tolist())
+
+    return matched
+
+
+def excluded_image_ids_for_query(row: object, metadata: pd.DataFrame) -> set[str]:
+    excluded: set[str] = set()
+    for column in ("source_image_id", "exclude_image_ids"):
+        if hasattr(row, column):
+            excluded.update(parse_image_ids(getattr(row, column)))
+    if hasattr(row, "query_path"):
+        excluded.update(image_ids_for_query_path(Path(str(getattr(row, "query_path"))), metadata))
+    return excluded
+
+
+def build_query_exclusions(
+    queries: pd.DataFrame,
+    metadata: pd.DataFrame,
+) -> dict[str, set[str]]:
+    exclusions: dict[str, set[str]] = {}
+    for row in queries.itertuples(index=False):
+        query_id = str(getattr(row, "query_id"))
+        exclusions[query_id] = excluded_image_ids_for_query(row, metadata)
+    return exclusions
+
+
+def apply_relevance_exclusions(
+    relevance: dict[str, set[str]],
+    exclusions: dict[str, set[str]],
+) -> dict[str, set[str]]:
+    query_ids = set(relevance) | set(exclusions)
+    return {
+        query_id: set(relevance.get(query_id, set())) - set(exclusions.get(query_id, set()))
+        for query_id in query_ids
+    }
+
+
 def exclude_query_images_from_relevance(
     queries: pd.DataFrame,
     metadata: pd.DataFrame,
     relevance: dict[str, set[str]],
 ) -> dict[str, set[str]]:
-    if "query_path" not in queries.columns or "image_path" not in metadata.columns:
-        return relevance
-    out = {qid: set(ids) for qid, ids in relevance.items()}
-    image_paths = metadata[["image_id", "image_path"]].drop_duplicates()
-    resolved_to_ids: dict[Path, set[str]] = {}
-    for row in image_paths.itertuples(index=False):
-        try:
-            resolved = resolve_stored_path(str(row.image_path)).resolve()
-        except OSError:
-            continue
-        resolved_to_ids.setdefault(resolved, set()).add(str(row.image_id))
-
-    for row in queries.itertuples(index=False):
-        query_id = str(getattr(row, "query_id"))
-        try:
-            query_path = resolve_stored_path(str(getattr(row, "query_path"))).resolve()
-        except OSError:
-            continue
-        for image_id in resolved_to_ids.get(query_path, set()):
-            out.setdefault(query_id, set()).discard(image_id)
-    return out
+    exclusions = build_query_exclusions(queries, metadata)
+    return apply_relevance_exclusions(relevance, exclusions)
 
 
 def summarize_rankings(
@@ -192,6 +251,7 @@ def summarize_rankings(
         row = {
             "query_id": query_id,
             "num_relevant": len(rel),
+            "ranking_size": len(ranked_ids),
             "average_precision": average_precision(ranked_ids, rel),
         }
         for k in ks:
@@ -202,6 +262,12 @@ def summarize_rankings(
             )
         rows.append(row)
     return pd.DataFrame(rows)
+
+
+def select_results_for_storage(results: pd.DataFrame, save_topk: int) -> pd.DataFrame:
+    if save_topk <= 0:
+        raise ValueError("save_topk must be positive")
+    return results.head(save_topk).copy()
 
 
 def aggregate_metrics(per_query: pd.DataFrame, method: str) -> pd.DataFrame:

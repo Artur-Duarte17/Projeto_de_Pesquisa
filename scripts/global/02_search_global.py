@@ -17,6 +17,7 @@ from global_lib import (
 )
 from project_paths import OUTPUTS_DIR
 from retrieval_common import now_ms, save_visual_grid
+from run_manifest import write_run_manifest
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,6 +30,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     ap.add_argument("--weights", choices=["imagenet", "none"], default="imagenet")
     ap.add_argument("--max-images", type=int, default=None, help="Reserved for CLI compatibility.")
+    ap.add_argument("--exclude-image-id", action="append", default=[])
     ap.add_argument("--save-visual", action="store_true")
     return ap.parse_args()
 
@@ -43,7 +45,14 @@ def main() -> int:
 
     t0 = now_ms()
     q = extract_global_embedding(args.query, extractor, transform, device)
-    results = search_global_index(q, embeddings, metadata, topk=args.topk, query_path=args.query)
+    results = search_global_index(
+        q,
+        embeddings,
+        metadata,
+        topk=args.topk,
+        query_path=args.query,
+        exclude_image_ids=set(args.exclude_image_id),
+    )
     elapsed = now_ms() - t0
 
     query_id = args.query.stem
@@ -52,11 +61,34 @@ def main() -> int:
     results["query_time_ms"] = elapsed
     out_csv = args.output_dir / "global_topk_results.csv"
     results.to_csv(out_csv, index=False)
+    visual_path = args.output_dir / "global_topk_results.png"
     if args.save_visual:
-        save_visual_grid(results, args.output_dir / "global_topk_results.png", f"Global search: {query_id}")
+        save_visual_grid(results, visual_path, f"Global search: {query_id}")
+    result_files = {"topk": out_csv}
+    if args.save_visual and visual_path.exists():
+        result_files["visual"] = visual_path
+    manifest_path = write_run_manifest(
+        args.output_dir / "global_search_manifest.json",
+        script_path=Path(__file__),
+        method="global_resnet50_search",
+        configuration={
+            "topk": args.topk,
+            "device": args.device,
+            "weights": args.weights,
+            "exclude_image_ids": sorted(set(args.exclude_image_id)),
+        },
+        inputs={
+            "query": args.query,
+            "global_embeddings": args.index_dir / "global_embeddings.npy",
+            "global_metadata": args.index_dir / "global_metadata.csv",
+        },
+        result_files=result_files,
+        extra={"query_time_ms": elapsed},
+    )
 
     print(f"[OK] Results: {out_csv}")
     print(f"[OK] Query time ms: {elapsed:.2f}")
+    print(f"[OK] Run manifest: {manifest_path}")
     print(results[["rank", "score", "image_path"]])
     return 0
 

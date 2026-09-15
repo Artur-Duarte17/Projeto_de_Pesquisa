@@ -20,11 +20,15 @@ from global_lib import (
 from project_paths import OUTPUTS_DIR
 from retrieval_common import (
     aggregate_metrics,
+    apply_relevance_exclusions,
+    build_query_exclusions,
     now_ms,
     relevance_from_csv,
     save_visual_grid,
+    select_results_for_storage,
     summarize_rankings,
 )
+from run_manifest import write_run_manifest
 
 
 def parse_weight(value: str) -> tuple[float, float]:
@@ -44,7 +48,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--face-index-dir", type=Path, default=OUTPUTS_DIR / "face_index")
     ap.add_argument("--global-index-dir", type=Path, default=OUTPUTS_DIR / "global_index")
     ap.add_argument("--output-dir", type=Path, default=OUTPUTS_DIR / "reports")
-    ap.add_argument("--topk", type=int, default=10)
+    ap.add_argument("--save-topk", type=int, default=10)
+    ap.add_argument("--topk", type=int, default=None, help="Legacy alias for --save-topk.")
     ap.add_argument("--threshold", type=float, default=-1.0)
     ap.add_argument("--weights-list", nargs="+", type=parse_weight, default=[(0.9, 0.1), (0.7, 0.3), (0.5, 0.5)])
     ap.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
@@ -57,6 +62,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    save_topk = args.topk if args.topk is not None else args.save_topk
+    if save_topk <= 0:
+        raise ValueError("save-topk must be positive")
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     queries = pd.read_csv(args.queries_csv)
@@ -66,13 +74,16 @@ def main() -> int:
         if col not in queries.columns:
             raise ValueError(f"Missing column in queries CSV: {col}")
 
-    relevance = relevance_from_csv(args.relevance_csv)
     face_E, face_meta = load_face_index(args.face_index_dir)
     global_E, global_meta = load_global_index(args.global_index_dir)
+    combined_meta = pd.concat([face_meta, global_meta], ignore_index=True, sort=False)
+    exclusions = build_query_exclusions(queries, combined_meta)
+    relevance = apply_relevance_exclusions(relevance_from_csv(args.relevance_csv), exclusions)
     face_app = build_face_app(device=args.device, det_size=args.det_size)
     extractor, transform, device = build_resnet50_feature_extractor(args.device, args.weights)
 
     all_metric_rows = []
+    all_per_query_rows = []
     all_results = []
     failures = []
     first_visual_saved = False
@@ -97,10 +108,11 @@ def main() -> int:
                     face_meta,
                     global_E,
                     global_meta,
-                    topk=args.topk,
+                    topk=None,
                     face_weight=face_weight,
                     global_weight=global_weight,
                     threshold=args.threshold,
+                    exclude_image_ids=exclusions.get(query_id, set()),
                 )
                 elapsed = now_ms() - t0
             except Exception as exc:
@@ -121,12 +133,16 @@ def main() -> int:
         if not per_query.empty:
             per_query["query_time_ms"] = per_query["query_id"].map(query_times).fillna(0.0)
             per_query["method"] = method
+        all_per_query_rows.append(per_query)
         metrics = aggregate_metrics(per_query, method)
         metrics["face_weight"] = face_weight
         metrics["global_weight"] = global_weight
         all_metric_rows.append(metrics)
         if weight_results:
-            wr = pd.concat(weight_results, ignore_index=True)
+            wr = pd.concat(
+                [select_results_for_storage(frame, save_topk) for frame in weight_results],
+                ignore_index=True,
+            )
             all_results.append(wr)
             if args.save_visual_examples and not first_visual_saved:
                 save_visual_grid(
@@ -137,13 +153,58 @@ def main() -> int:
                 first_visual_saved = True
 
     metrics_out = pd.concat(all_metric_rows, ignore_index=True) if all_metric_rows else pd.DataFrame()
+    per_query_out = (
+        pd.concat(all_per_query_rows, ignore_index=True) if all_per_query_rows else pd.DataFrame()
+    )
     results_out = pd.concat(all_results, ignore_index=True) if all_results else pd.DataFrame()
-    metrics_out.to_csv(args.output_dir / "fusion_metrics.csv", index=False)
-    results_out.to_csv(args.output_dir / "fusion_topk_results.csv", index=False)
+    metrics_path = args.output_dir / "fusion_metrics.csv"
+    per_query_path = args.output_dir / "fusion_metrics_per_query.csv"
+    results_path = args.output_dir / "fusion_topk_results.csv"
+    metrics_out.to_csv(metrics_path, index=False)
+    per_query_out.to_csv(per_query_path, index=False)
+    results_out.to_csv(results_path, index=False)
+    failures_path = args.output_dir / "fusion_failures.csv"
     if failures:
-        pd.DataFrame(failures).to_csv(args.output_dir / "fusion_failures.csv", index=False)
+        pd.DataFrame(failures).to_csv(failures_path, index=False)
+    elif failures_path.exists():
+        failures_path.unlink()
 
-    print("[OK] Fusion metrics:", args.output_dir / "fusion_metrics.csv")
+    result_files = {
+        "saved_topk": results_path,
+        "per_query_metrics": per_query_path,
+        "aggregate_metrics": metrics_path,
+    }
+    if failures_path.exists():
+        result_files["failures"] = failures_path
+    manifest_path = write_run_manifest(
+        args.output_dir / "fusion_run_manifest.json",
+        script_path=Path(__file__),
+        method="fusion",
+        configuration={
+            "save_topk": save_topk,
+            "ranking_depth": "all_eligible_images",
+            "metric_ks": [5, 10],
+            "threshold": args.threshold,
+            "weights_list": [list(pair) for pair in args.weights_list],
+            "device": args.device,
+            "det_size": args.det_size,
+            "weights": args.weights,
+            "max_queries": args.max_queries,
+        },
+        inputs={
+            "queries_csv": args.queries_csv,
+            "relevance_csv": args.relevance_csv,
+            "face_embeddings": args.face_index_dir / "face_embeddings.npy",
+            "face_metadata": args.face_index_dir / "face_metadata.csv",
+            "global_embeddings": args.global_index_dir / "global_embeddings.npy",
+            "global_metadata": args.global_index_dir / "global_metadata.csv",
+        },
+        result_files=result_files,
+        extra={"failed_query_weight_pairs": len(failures)},
+    )
+
+    print("[OK] Fusion metrics:", metrics_path)
+    print("[OK] Run manifest:", manifest_path)
     print(metrics_out)
     if failures:
         print(f"[WARN] Query failures: {len(failures)}")

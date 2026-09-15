@@ -19,6 +19,7 @@ from face_lib import (
 )
 from project_paths import OUTPUTS_DIR
 from retrieval_common import now_ms, save_visual_grid
+from run_manifest import write_run_manifest
 
 
 def parse_args() -> argparse.Namespace:
@@ -32,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--det-size", type=int, default=640)
     ap.add_argument("--query-face-mode", choices=["largest", "index"], default="largest")
     ap.add_argument("--query-face-index", type=int, default=0)
+    ap.add_argument("--exclude-image-id", action="append", default=[])
     ap.add_argument("--save-visual", action="store_true")
     return ap.parse_args()
 
@@ -57,6 +59,7 @@ def main() -> int:
         topk=args.topk,
         threshold=args.threshold,
         query_path=args.query,
+        exclude_image_ids=set(args.exclude_image_id),
     )
     elapsed = now_ms() - t0
 
@@ -68,12 +71,38 @@ def main() -> int:
 
     out_csv = args.output_dir / "topk_results.csv"
     results.to_csv(out_csv, index=False)
+    visual_path = args.output_dir / "topk_results.png"
     if args.save_visual:
-        save_visual_grid(results, args.output_dir / "topk_results.png", f"Face search: {query_id}")
+        save_visual_grid(results, visual_path, f"Face search: {query_id}")
+    result_files = {"topk": out_csv}
+    if args.save_visual and visual_path.exists():
+        result_files["visual"] = visual_path
+    manifest_path = write_run_manifest(
+        args.output_dir / "face_search_manifest.json",
+        script_path=Path(__file__),
+        method="face_search",
+        configuration={
+            "topk": args.topk,
+            "threshold": args.threshold,
+            "device": args.device,
+            "det_size": args.det_size,
+            "query_face_mode": args.query_face_mode,
+            "query_face_index": args.query_face_index,
+            "exclude_image_ids": sorted(set(args.exclude_image_id)),
+        },
+        inputs={
+            "query": args.query,
+            "face_embeddings": args.index_dir / "face_embeddings.npy",
+            "face_metadata": args.index_dir / "face_metadata.csv",
+        },
+        result_files=result_files,
+        extra={"query_bbox": query_bbox, "query_time_ms": elapsed},
+    )
 
     pd.set_option("display.max_colwidth", 120)
     print(f"[OK] Results: {out_csv}")
     print(f"[OK] Query time ms: {elapsed:.2f}")
+    print(f"[OK] Run manifest: {manifest_path}")
     print(results[["rank", "score", "image_path", "matched_face_id"]])
     return 0
 

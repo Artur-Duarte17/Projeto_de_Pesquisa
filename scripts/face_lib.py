@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from retrieval_common import cosine_scores, l2_normalize, rel_to_root, resolve_stored_path
+from retrieval_common import cosine_scores, image_ids_for_query_path, l2_normalize, rel_to_root
 
 
 def ctx_id_from_device(device: str) -> int:
@@ -92,7 +92,7 @@ def search_face_index(
     query_emb: np.ndarray,
     embeddings: np.ndarray,
     metadata: pd.DataFrame,
-    topk: int = 10,
+    topk: int | None = 10,
     threshold: float = -1.0,
     query_path: Path | None = None,
     exclude_image_ids: set[str] | None = None,
@@ -101,22 +101,23 @@ def search_face_index(
     rows = metadata.copy()
     rows["score"] = scores
 
+    excluded = set(exclude_image_ids or set())
     if query_path is not None:
-        q_resolved = query_path.resolve()
-        keep = []
-        for p in rows["image_path"].astype(str):
-            keep.append(resolve_stored_path(p).resolve() != q_resolved)
-        rows = rows.loc[keep].copy()
-
-    if exclude_image_ids:
-        rows = rows[~rows["image_id"].astype(str).isin(exclude_image_ids)].copy()
+        excluded.update(image_ids_for_query_path(query_path, metadata))
+    if excluded:
+        rows = rows[~rows["image_id"].astype(str).isin(excluded)].copy()
 
     if threshold > -1.0:
         rows = rows[rows["score"] >= threshold].copy()
 
     rows = rows.sort_values("score", ascending=False)
     best = rows.groupby("image_id", as_index=False).head(1)
-    best = best.sort_values("score", ascending=False).head(topk).reset_index(drop=True)
+    best = best.sort_values("score", ascending=False)
+    if topk is not None:
+        if topk < 0:
+            raise ValueError("topk must be non-negative or None")
+        best = best.head(topk)
+    best = best.reset_index(drop=True)
     best.insert(0, "rank", np.arange(1, len(best) + 1))
     best["matched_face_id"] = best["face_id"]
     best["bbox"] = (
