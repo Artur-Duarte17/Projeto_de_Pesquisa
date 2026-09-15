@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local Conda/virtual environments
+laboratorio/
+.venv/
+venv/
+env/
+
+# Private publication, history and local administrative workspace
+.local/
+docs/historico_privado/
+publication_private/
+
+# Datasets and private/local inputs
+data/raw/
+data/processed/
+data/private_faces/
+data/query/
+data/annotations/
+data/evaluation/gallagher_*.csv
+data/evaluation/holidays_*.csv
+data/**/*.zip
+data/**/*.tar
+data/**/*.tar.gz
+data/**/*.7z
+!data/.gitkeep
+
+# Generated outputs, checkpoints, model weights and reports
+outputs/
+OUTPUTS/
+saidas/
+reports/
+snapshots/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.joblib
+!outputs/.gitkeep
+!reports/.gitkeep
+
+# Local/generated inventories
+outputs_list.txt
+project_tree.txt
+scripts_list.txt
+docs/fontes_bibliograficas_brutas/
+docs/Referencias/
+docs/entregas/
+docs/artigo_sibgrapi_2026/
+docs/artigo_sibgrapi_2026*.zip
+tmp/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.~lock.*#
+.vscode/
+.idea/
