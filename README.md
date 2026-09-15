@@ -295,43 +295,21 @@ Estas pastas são locais e devem ser mantidas fora do GitHub:
 
 Para compartilhar datasets ou modelos, use armazenamento externo, GitHub Releases, DVC, Hugging Face Hub, Google Drive ou outro repositório de artefatos.
 
-## Ambientes
+## Ambiente reproduzivel
 
-O projeto foi usado com ambientes Conda locais em `laboratorio/`, mas essa pasta nao deve ser versionada. Para recriar, use os arquivos em `requirements/` como ponto de partida.
+Face, CBIR global, fusao e Streamlit devem usar o mesmo ambiente Python 3.10. As dependencias diretas ficam em `requirements/experiment-gpu.in`; o arquivo congelado e instalavel e `requirements/experiment-gpu.lock.txt`. Os arquivos `face.txt`, `global.txt`, `fusion.txt` e `app.txt` sao atalhos para esse mesmo conjunto, evitando combinacoes CPU/GPU incompatíveis.
 
-Exemplo:
-
-```powershell
-conda create -n cibir_face python=3.10 -y
-conda activate cibir_face
-pip install -r requirements/face.txt
-```
-
-O ambiente facial usa `onnxruntime-gpu` para acelerar o InsightFace com NVIDIA/CUDA. Em maquina sem GPU NVIDIA, troque por `onnxruntime==1.23.2` e execute os scripts com `--device cpu`.
-
-Para o modulo global:
+Na maquina de referencia, crie um ambiente novo sem modificar o ambiente historico preservado:
 
 ```powershell
-conda create -n cibir_global python=3.10 -y
-conda activate cibir_global
-pip install -r requirements/global.txt
+uv venv laboratorio/cibir_gpu --python 3.10
+uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe -r requirements/experiment-gpu.lock.txt
+laboratorio/cibir_gpu/Scripts/python.exe scripts/validate_environment.py --require-cuda
 ```
 
-O `requirements/global.txt` usa wheels CUDA 12.8 do PyTorch para acelerar ResNet50 em GPU NVIDIA. Em maquina sem GPU NVIDIA, instale a versao CPU do PyTorch e execute os scripts globais com `--device cpu`.
+O ambiente usa PyTorch CUDA 12.8 e `onnxruntime-gpu`. O ultimo comando grava `outputs/environment/EX-007_environment_report.json` e exige que pequenos calculos reais funcionem nas duas bibliotecas com CUDA antes de liberar os experimentos.
 
-Para a interface:
-
-```powershell
-pip install -r requirements/app.txt
-```
-
-Para fusao e app, use um ambiente que tenha ao mesmo tempo as dependencias de face e global:
-
-```powershell
-conda create -n cibir_fusion python=3.10 -y
-conda activate cibir_fusion
-pip install -r requirements/fusion.txt
-```
+Em maquina sem GPU NVIDIA, deve-se criar uma especificacao CPU separada; nao altere o arquivo congelado usado para os resultados oficiais.
 
 ## Testes metodologicos rapidos
 

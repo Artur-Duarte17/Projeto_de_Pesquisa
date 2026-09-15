@@ -1,11 +1,1 @@
-insightface==0.2.1
-onnxruntime==1.23.2
-opencv-python
-torch==2.5.1
-torchvision==0.20.1
-numpy
-pandas
-tqdm
-matplotlib
-pillow
-scikit-learn
+-r experiment-gpu.lock.txt

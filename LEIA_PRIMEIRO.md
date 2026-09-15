@@ -59,7 +59,7 @@ O código ativo já incorpora exclusão uniforme da imagem-fonte, Precision@K co
 
 ## Próxima ordem técnica
 
-1. construir e validar um ambiente CUDA único e reproduzível;
+1. executar a EX-007 para criar e validar o ambiente CUDA único definido em `requirements/experiment-gpu.lock.txt`;
 2. recriar os índices para incluir SHA-256 e registrar os manifestos;
 3. executar novamente LFW, Gallagher e Holidays;
 4. conferir métricas diretamente nos CSVs e manifestos;

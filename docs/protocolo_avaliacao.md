@@ -110,8 +110,8 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ## 9. Condições antes dos experimentos completos
 
-1. ambiente CUDA único validado;
-2. versões congeladas;
+1. ambiente CUDA único validado pelo relatório `EX-007_environment_report.json`;
+2. versões congeladas em `requirements/experiment-gpu.lock.txt`;
 3. árvore Git limpa;
 4. consultas e relevância congeladas;
 5. índices recriados com a coluna `sha256`;
@@ -122,11 +122,36 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ## 10. Execuções pesadas reservadas
 
-Os comandos completos serão fechados depois da validação do ambiente CUDA. A sequência reservada é:
+### 10.1 Configuração de referência da EX-007
+
+Inventário confirmado em 15 de setembro de 2026:
+
+- GPU: NVIDIA GeForce RTX 3050 Ti Laptop GPU, com 4 GB de memória;
+- driver NVIDIA: 610.62;
+- Python: 3.10;
+- PyTorch: 2.11.0 com CUDA 12.8;
+- torchvision: 0.26.0 com CUDA 12.8;
+- ONNX Runtime GPU: 1.23.2.
+
+O ambiente preservado `laboratorio/cibir_face_new` contém PyTorch CPU e não oferece `CUDAExecutionProvider`; por isso ele não pode produzir os resultados oficiais novos. Ele deve permanecer intacto até a aprovação do ambiente substituto.
+
+### 10.2 Comandos
+
+O ambiente definitivo deve ser criado fora da árvore versionada. Na máquina de referência, `uv` substitui o `conda`, que não está disponível no `PATH`:
+
+```powershell
+uv venv laboratorio/cibir_gpu --python 3.10
+uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe -r requirements/experiment-gpu.lock.txt
+laboratorio/cibir_gpu/Scripts/python.exe scripts/validate_environment.py --require-cuda
+```
+
+Os dois primeiros comandos podem demorar e baixar vários gigabytes. Eles integram a EX-007 e devem ser executados por Artur. O terceiro comando grava `outputs/environment/EX-007_environment_report.json` e somente aprova o ambiente se um cálculo real funcionar tanto no PyTorch quanto no ONNX Runtime com CUDA.
+
+Não se deve apagar nem modificar `laboratorio/cibir_face_new` até a aprovação da EX-007. Depois disso, a sequência reservada é:
 
 | ID | Execução | Situação |
 |---|---|---|
-| EX-007 | validar e congelar o ambiente CUDA | próxima etapa; |
+| EX-007 | criar, validar e congelar o ambiente CUDA | preparada; aguarda execução por Artur; |
 | EX-008 | recriar o índice facial LFW | pendente; |
 | EX-009 | avaliar a busca facial LFW | pendente; |
 | EX-010 | recriar o índice facial Gallagher | pendente; |
