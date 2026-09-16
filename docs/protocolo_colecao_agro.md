@@ -4,7 +4,7 @@ Data de referência: **16 de setembro de 2026**.
 
 ## 1. Estado da decisão
 
-A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida como candidata principal para a validação aplicada ao contexto agro. A escolha da fonte e a auditoria de direitos de uso estão concluídas; o download integral, a anotação da pessoa-alvo e os experimentos ainda não foram executados.
+A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida como candidata principal para a validação aplicada ao contexto agro. A escolha da fonte, a auditoria de direitos de uso e o download integral dos 124 originais estão concluídos; a anotação da pessoa-alvo e os experimentos ainda não foram executados.
 
 Consequentemente, este documento não autoriza afirmar que o sistema já foi validado no agro. A afirmação correta, até a conclusão das próximas execuções, é: **foi identificada uma coleção agro aberta e foi definido um protocolo de validação**.
 
@@ -72,6 +72,12 @@ Cada uma das 124 fotografias deve receber uma decisão manual sobre a presença 
 
 Os casos `uncertain` precisam de uma segunda revisão antes do congelamento do protocolo. Nenhuma fotografia ambígua será convertida automaticamente em relevante ou irrelevante com base no ranking do próprio sistema. A relevância final deve ser definida independentemente das pontuações produzidas pelos modelos.
 
+O script `scripts/data/prepare_agrishow_review.py` valida os 124 arquivos contra o inventário, cria miniaturas locais e prepara uma galeria para a primeira revisão manual. A galeria permite marcar `present`, `absent` ou `uncertain`, registrar observações, abrir o original quando necessário e exportar o CSV. O arquivo exportado deve substituir `data/annotations/agrishow_2022_presence_review.csv` somente depois que as 124 decisões tiverem sido preenchidas. Tanto as miniaturas quanto as anotações permanecem fora do Git.
+
+```powershell
+laboratorio/cibir_gpu/Scripts/python.exe scripts/data/prepare_agrishow_review.py
+```
+
 O CSV congelado deverá conter, no mínimo:
 
 | Coluna | Conteúdo |
@@ -130,8 +136,8 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 
 | ID | Atividade | Responsável pela execução | Situação |
 |---|---|---|---|
-| EX-019 | baixar e validar os 124 originais | Artur | em andamento; 2 arquivos válidos preservados após limitação HTTP 429, retomada sequencial preparada |
-| EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | pendente |
+| EX-019 | baixar e validar os 124 originais | Artur | concluída e aprovada; 124 arquivos, 420,43 MiB, zero falhas |
+| EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | galeria e CSV preparados; primeira revisão manual pendente |
 | EX-021 | criar consultas pareadas e relevância | Artur executa; código versionado | pendente |
 | EX-022 | indexar faces e descritores globais | Artur | pendente |
 | EX-023 | avaliar os cinco métodos | Artur | pendente |

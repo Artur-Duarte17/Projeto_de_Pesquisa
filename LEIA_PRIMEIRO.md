@@ -35,7 +35,7 @@ Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial 
 
 O texto existente apresenta aplicação potencial no meio rural e em eventos. Isso é **contextualização**, não validação agro.
 
-Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como candidata autorizada. A auditoria encontrou 127 arquivos em CC BY 2.0; três recortes derivados serão excluídos, restando 124 originais para o estudo de caso de uma pessoa pública recorrente. O download integral, a anotação e a avaliação ainda não foram executados. Consulte `docs/protocolo_colecao_agro.md` antes de fazer qualquer afirmação ou experimento nesse domínio.
+Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como candidata autorizada. A auditoria encontrou 127 arquivos em CC BY 2.0; três recortes derivados foram excluídos, restando 124 originais para o estudo de caso de uma pessoa pública recorrente. A EX-019 concluiu e validou o download integral; a anotação e a avaliação ainda não foram executadas. Consulte `docs/protocolo_colecao_agro.md` antes de fazer qualquer afirmação ou experimento nesse domínio.
 
 Recuperação de maquinário permanece trabalho futuro.
 
@@ -72,7 +72,7 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 
 1. as EX-007 a EX-018 foram concluídas e auditadas;
 2. usar `docs/resultados_experimentais_congelados.md` como fonte numérica do artigo;
-3. executar a EX-019 para baixar e validar a coleção Agrishow 2022;
-4. anotar e congelar a presença da pessoa-alvo antes da execução agro;
+3. a EX-019 baixou e validou a coleção Agrishow 2022;
+4. executar a EX-020 para anotar e congelar a presença da pessoa-alvo antes da execução agro;
 5. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
 6. adaptar o manuscrito ao modelo vigente da Revista Principia.
