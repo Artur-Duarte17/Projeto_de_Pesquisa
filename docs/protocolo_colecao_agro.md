@@ -4,9 +4,9 @@ Data de referência: **16 de setembro de 2026**.
 
 ## 1. Estado da decisão
 
-A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida como candidata principal para a validação aplicada ao contexto agro. A escolha da fonte, a auditoria de direitos de uso e o download integral dos 124 originais estão concluídos; a anotação da pessoa-alvo e os experimentos ainda não foram executados.
+A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida como candidata principal para a validação aplicada ao contexto agro. A escolha da fonte, a auditoria de direitos de uso, o download integral dos 124 originais e a anotação da pessoa-alvo estão concluídos; os experimentos ainda não foram executados.
 
-Consequentemente, este documento não autoriza afirmar que o sistema já foi validado no agro. A afirmação correta, até a conclusão das próximas execuções, é: **foi identificada uma coleção agro aberta e foi definido um protocolo de validação**.
+Consequentemente, este documento não autoriza afirmar que o sistema já foi validado no agro. A afirmação correta, até a conclusão das próximas execuções, é: **a coleção agro foi adquirida e anotada, mas a avaliação experimental ainda não foi executada**.
 
 ## 2. Por que esta coleção foi escolhida
 
@@ -72,10 +72,18 @@ Cada uma das 124 fotografias deve receber uma decisão manual sobre a presença 
 
 Os casos `uncertain` precisam de uma segunda revisão antes do congelamento do protocolo. Nenhuma fotografia ambígua será convertida automaticamente em relevante ou irrelevante com base no ranking do próprio sistema. A relevância final deve ser definida independentemente das pontuações produzidas pelos modelos.
 
+A primeira revisão marcou 89 fotografias como `present`, 33 como `absent` e duas como `uncertain`. A segunda revisão confirmou a presença da pessoa-alvo nas duas fotografias incertas, incluindo um caso em que o chapéu projeta sombra sobre o rosto. O gabarito congelado contém, portanto, **91 fotografias `present`, 33 `absent` e nenhuma `uncertain`**. O SHA-256 do CSV congelado é `f5d9de8155fb5db61b32f0dc6aca4fc75e4e66740152ce74d06cd134d403edf1`.
+
 O script `scripts/data/prepare_agrishow_review.py` valida os 124 arquivos contra o inventário, cria miniaturas locais e prepara uma galeria para a primeira revisão manual. A galeria permite marcar `present`, `absent` ou `uncertain`, registrar observações, abrir o original quando necessário e exportar o CSV. O arquivo exportado deve substituir `data/annotations/agrishow_2022_presence_review.csv` somente depois que as 124 decisões tiverem sido preenchidas. Tanto as miniaturas quanto as anotações permanecem fora do Git.
 
 ```powershell
 laboratorio/cibir_gpu/Scripts/python.exe scripts/data/prepare_agrishow_review.py
+```
+
+Depois da resolução dos casos incertos, o congelamento é validado e registrado por:
+
+```powershell
+laboratorio/cibir_gpu/Scripts/python.exe scripts/data/freeze_agrishow_annotations.py
 ```
 
 O CSV congelado deverá conter, no mínimo:
@@ -137,7 +145,7 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 | ID | Atividade | Responsável pela execução | Situação |
 |---|---|---|---|
 | EX-019 | baixar e validar os 124 originais | Artur | concluída e aprovada; 124 arquivos, 420,43 MiB, zero falhas |
-| EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | galeria e CSV preparados; primeira revisão manual pendente |
+| EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | concluída e congelada; 91 presentes, 33 ausentes, zero incertos |
 | EX-021 | criar consultas pareadas e relevância | Artur executa; código versionado | pendente |
 | EX-022 | indexar faces e descritores globais | Artur | pendente |
 | EX-023 | avaliar os cinco métodos | Artur | pendente |
