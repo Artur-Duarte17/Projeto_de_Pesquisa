@@ -1,6 +1,6 @@
 # Leia primeiro — estado canônico do projeto
 
-Data de referência: **15 de setembro de 2026**.
+Data de referência: **16 de setembro de 2026**.
 
 ## Núcleo ativo
 
@@ -29,7 +29,7 @@ Os CSVs e relatórios produzidos antes desta data contêm resultados históricos
 - AP calculada no Top-10 e apresentada como mAP;
 - ambientes de execução inconsistentes.
 
-Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial atual**. Antes de publicação, o protocolo precisa ser corrigido e todas as abordagens devem ser reexecutadas no mesmo ambiente congelado.
+Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial atual**. As execuções EX-007 a EX-018 corrigiram o protocolo e produziram os resultados oficiais atuais, reunidos em `docs/resultados_experimentais_congelados.md`.
 
 ## Contexto agro
 
@@ -42,7 +42,9 @@ O próximo recorte recomendado é localizar uma pessoa ou artista em várias fot
 1. Este arquivo: mapa público e curto do estado atual.
 2. `README.md`: execução e estrutura do software ativo.
 3. `docs/README.md`: mapa dos documentos e seu status.
-4. Dossiê privado `Dossie_Tecnico_Historico_Projeto_CBIR` em DOCX, PDF e Markdown: consultar somente para história, decisões, métricas antigas e recuperação.
+4. `docs/resultados_experimentais_congelados.md`: tabela oficial para escrita acadêmica.
+5. `docs/protocolo_avaliacao.md`: protocolo, decisões e auditoria das execuções atuais.
+6. Dossiê privado `Dossie_Tecnico_Historico_Projeto_CBIR` em DOCX, PDF e Markdown: consultar somente para história, decisões, métricas antigas e recuperação.
 
 O dossiê e o material de submissão não podem ser enviados ao GitHub público.
 
@@ -61,12 +63,13 @@ As EX-008 e EX-009 já foram refeitas e auditadas no ambiente definitivo. O índ
 
 As EX-010 a EX-012 também foram refeitas e auditadas. No Gallagher, 20 consultas de identidades selecionadas entre as mais representadas obtiveram P@5 de 0,870000, P@10 de 0,645000, Recall@5 de 0,566409, Recall@10 de 0,662866 e mAP de 0,913949. O resultado valida o fluxo facial multi-rosto nesse acervo, mas o número limitado e a seleção das consultas devem permanecer explícitos.
 
+As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP de 0,842612. As EX-015 a EX-017 implementaram a fusão pareada no Gallagher: somente face obteve mAP de 0,913949, somente contexto 0,280833 e as fusões 0,9/0,1, 0,7/0,3 e 0,5/0,5 obtiveram 0,908721, 0,865268 e 0,778968. A EX-018 mostrou que a fusão 0,9/0,1 melhorou uma consulta, não alterou nove e piorou dez.
+
 ## Próxima ordem técnica
 
-1. as EX-007 a EX-012 foram concluídas e auditadas;
-2. executar a EX-013 para refazer o índice global Holidays;
-3. executar a EX-014 para avaliar a recuperação global Holidays;
-4. conferir métricas diretamente nos CSVs e manifestos;
-5. definir um protocolo próprio para a fusão antes de tratá-la como resultado final;
-6. obter coleção agro autorizada;
-7. adaptar o manuscrito ao modelo vigente da Revista Principia.
+1. as EX-007 a EX-018 foram concluídas e auditadas;
+2. usar `docs/resultados_experimentais_congelados.md` como fonte numérica do artigo;
+3. obter uma coleção agro autorizada e documentar direitos de uso;
+4. definir pessoas-alvo, consultas e relevância antes da execução agro;
+5. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
+6. adaptar o manuscrito ao modelo vigente da Revista Principia.

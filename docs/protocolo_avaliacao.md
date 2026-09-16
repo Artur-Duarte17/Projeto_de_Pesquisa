@@ -162,7 +162,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-015 | recriar o índice global Gallagher | concluída e aprovada; 589 imagens e 589 descritores; |
 | EX-016 | gerar o protocolo pareado Gallagher | concluída e aprovada; 20 consultas; |
 | EX-017 | comparar face, global contextual e fusão | concluída e aprovada; cinco configurações; |
-| EX-018 | analisar erros e casos da fusão pareada | protocolo e script preparados; execução pendente. |
+| EX-018 | analisar erros e casos da fusão pareada | concluída e aprovada; três casos selecionados; |
 
 ### 10.3 Protocolo congelado da EX-009
 
@@ -297,3 +297,15 @@ A execução no commit `532bb84` avaliou as 20 consultas nas cinco configuraçõ
 O contexto global isolado ficou acima do experimento histórico que usava incorretamente o recorte facial como consulta global, mas permaneceu muito abaixo do reconhecimento facial na tarefa de recuperar uma pessoa. A fusão `0,9/0,1` manteve as métricas Top-K do baseline, porém reduziu o mAP em `0,005228`. Em AP por consulta, ela melhorou uma consulta, empatou nove e piorou dez. As fusões com maior peso global degradaram também as métricas Top-K.
 
 Portanto, este conjunto não fornece evidência de que a soma linear com contexto global melhore, em média, a recuperação por identidade. Ele mostra que o contexto pode ajudar casos isolados, mas seu efeito não é consistente. A figura qualitativa de `0,7/0,3` foi inspecionada e apresentou coerência visual com pessoa e cenário; isso não altera a conclusão quantitativa. O tempo médio de extração facial foi `966,050 ms`; os tempos inferiores a 4 ms registrados para o backend medem apenas fusão e ordenação com descritores pré-calculados.
+
+### 10.15 Resultado auditado da EX-018
+
+A análise no commit `8cb1e12` rotulou os 1.000 resultados Top-10 da EX-017 e comparou a AP de cada método com o baseline facial. Para a fusão principal `0,9/0,1`, uma consulta melhorou, nove permaneceram inalteradas e dez pioraram.
+
+Os casos foram selecionados por regra determinística antes da inspeção visual:
+
+- maior melhora: `gallagher_id27_q1`, AP de 0,950000 para 1,000000;
+- exemplo inalterado: `gallagher_id12_q1`, AP igual a 1,000000;
+- maior degradação: `gallagher_id19_q1`, AP de 0,950000 para 0,887500.
+
+Na maior melhora, o contexto reorganizou fotografias do mesmo ambiente sem alterar quais dez imagens apareciam no Top-10. Na maior degradação, a semelhança do cenário e da composição de grupo promoveu uma imagem incorreta, ilustrando como contexto pode competir com identidade. As quatro figuras foram inspecionadas, mas permanecem somente em `outputs/` porque contêm pessoas identificáveis. O manifesto registrou árvore Git limpa, hashes válidos e os totais esperados para todos os métodos.

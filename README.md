@@ -381,4 +381,4 @@ Os testes nao carregam modelos nem percorrem datasets:
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-As definicoes formais e as condicoes para a proxima execucao estao em [`docs/protocolo_avaliacao.md`](docs/protocolo_avaliacao.md).
+As definições formais e a auditoria das execuções estão em [`docs/protocolo_avaliacao.md`](docs/protocolo_avaliacao.md). A fonte canônica dos números atuais do artigo é [`docs/resultados_experimentais_congelados.md`](docs/resultados_experimentais_congelados.md).

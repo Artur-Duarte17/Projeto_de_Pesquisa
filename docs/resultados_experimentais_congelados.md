@@ -1,0 +1,73 @@
+# Resultados experimentais oficiais
+
+Data de congelamento: **16 de setembro de 2026**.
+
+Este documento é a tabela canônica dos resultados reproduzidos no ambiente definitivo. Números encontrados em relatórios ou rascunhos anteriores não substituem estes resultados.
+
+## Ambiente comum
+
+- Python 3.10.20;
+- PyTorch 2.11.0 com CUDA 12.8;
+- ONNX Runtime GPU 1.23.2;
+- NVIDIA GeForce RTX 3050 Ti Laptop GPU;
+- métricas calculadas sobre o ranking integral;
+- Precision@K com denominador fixo K;
+- fotografia-fonte excluída do ranking e da relevância;
+- Top-10 usado somente como limite de armazenamento e apresentação.
+
+## Tabela principal
+
+| Experimento | Base | Consultas | Candidatas por consulta | P@5 | P@10 | Recall@5 | Recall@10 | mAP |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Face por identidade | LFW | 1.672 | 13.184 | 0,457177 | 0,284629 | 0,901149 | 0,945308 | 0,965135 |
+| Face multi-rosto | Gallagher | 20 | 586 | 0,870000 | 0,645000 | 0,566409 | 0,662866 | 0,913949 |
+| CBIR global | Holidays | 500 | 1.490 | 0,324000 | 0,177600 | 0,870215 | 0,917563 | 0,842612 |
+| Contexto global para pessoa | Gallagher pareado | 20 | 588 | 0,260000 | 0,195000 | 0,203513 | 0,234716 | 0,280833 |
+| Face/contexto 0,9/0,1 | Gallagher pareado | 20 | 588 | 0,870000 | 0,645000 | 0,566409 | 0,662866 | 0,908721 |
+| Face/contexto 0,7/0,3 | Gallagher pareado | 20 | 588 | 0,820000 | 0,640000 | 0,533433 | 0,657866 | 0,865268 |
+| Face/contexto 0,5/0,5 | Gallagher pareado | 20 | 588 | 0,750000 | 0,595000 | 0,473894 | 0,609914 | 0,778968 |
+
+No protocolo pareado, o baseline somente facial também foi executado no universo global de 588 candidatas. As duas fotografias sem face detectada aparecem apenas no final do ranking e todas as métricas reproduzem exatamente a avaliação facial de 586 candidatas da EX-012.
+
+## O que cada linha responde
+
+- **LFW:** o sistema recupera outras fotografias da mesma identidade em um baseline facial amplo?
+- **Gallagher face:** o sistema encontra uma pessoa em fotografias com múltiplos rostos?
+- **Holidays:** a ResNet50 recupera fotografias visualmente semelhantes?
+- **Gallagher contexto:** a aparência da fotografia-fonte, sem usar o rosto, localiza outras fotografias que contêm a pessoa?
+- **Gallagher fusão:** acrescentar contexto global ao sinal facial melhora a recuperação da pessoa selecionada?
+
+As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado ao mAP da Holidays como se os métodos fossem concorrentes diretos.
+
+## Conclusões sustentadas
+
+1. A busca facial apresentou desempenho elevado nos dois protocolos de identidade.
+2. A ResNet50 apresentou bom desempenho na tarefa própria de similaridade global da Holidays.
+3. Contexto visual isolado não substitui reconhecimento facial para localizar uma pessoa.
+4. Nenhum dos três pesos de fusão superou o baseline facial em média.
+5. A fusão 0,9/0,1 melhorou a AP de uma consulta, não alterou nove e piorou dez; portanto, ajuda casos isolados, mas não é consistentemente benéfica.
+
+## Limitações obrigatórias
+
+- O Gallagher usa 20 identidades selecionadas entre as mais frequentes, uma consulta por identidade.
+- LFW contém muitas identidades com somente uma fotografia relevante após excluir a consulta; isso eleva a frequência de AP igual a 1.
+- Holidays possui mediana de uma imagem relevante por consulta, o que reduz Precision@K mesmo quando Recall e mAP são elevados.
+- Os tempos de backend com descritores pré-calculados não representam latência completa de uma imagem nova.
+- Gallagher e Holidays não constituem validação agro.
+- As figuras com pessoas permanecem somente nos resultados locais e não devem ser publicadas automaticamente.
+
+## Evidência reprodutível
+
+| Execução | Evidência principal | Commit de execução |
+|---|---|---|
+| EX-009 | `outputs/experiments/ex-009_lfw_face_evaluation` | `ac13b6f` |
+| EX-012 | `outputs/experiments/ex-012_gallagher_face_evaluation` | `66d41bc` |
+| EX-014 | `outputs/experiments/ex-014_holidays_global_evaluation` | `c6af569` |
+| EX-017 | `outputs/experiments/ex-017_gallagher_paired_fusion` | `532bb84` |
+| EX-018 | `outputs/experiments/ex-018_paired_fusion_error_analysis` | `8cb1e12` |
+
+Os diretórios de evidência são locais e ignorados pelo Git. Cada execução possui manifesto com configuração, hashes, versões do ambiente e commit correspondente.
+
+## Regra para alterações futuras
+
+Estes números somente podem ser substituídos por uma nova execução identificada, com protocolo documentado, manifesto de árvore limpa, hashes válidos e auditoria equivalente. Novas avaliações agro devem formar uma seção separada, sem reclassificar Gallagher como conjunto agro.
