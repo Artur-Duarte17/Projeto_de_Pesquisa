@@ -119,17 +119,17 @@ laboratorio/cibir_gpu/Scripts/python.exe scripts/face/06_prepare_lfw_eval.py `
 Avaliar o índice recriado:
 
 ```powershell
-laboratorio/cibir_gpu/Scripts/python.exe scripts/face/03_evaluate_face.py `
+laboratorio/cibir_gpu/Scripts/python.exe scripts/face/07_evaluate_lfw.py `
   --queries-csv data/evaluation/lfw_face_queries.csv `
   --relevance-csv data/evaluation/lfw_face_relevance.csv `
   --index-dir outputs/experiments/ex-008_lfw_face_index `
   --output-dir outputs/experiments/ex-009_lfw_face_evaluation `
   --save-topk 10 `
-  --threshold -1 `
+  --batch-size 128 `
   --device cuda
 ```
 
-O protocolo atual contém 1.672 consultas e 7.449 relações de relevância. O LFW é usado como baseline técnico de recuperação facial; ele não substitui a avaliação em fotografias de eventos com múltiplas pessoas.
+O avaliador LFW reutiliza o embedding da maior face da fotografia-consulta já calculado na EX-008. Isso é equivalente a extrair novamente o mesmo vetor com o mesmo modelo, evita processamento duplicado e permite calcular similaridade, agregação por fotografia e ranking integral em lotes na GPU. O protocolo atual contém 1.672 consultas e 7.449 relações de relevância. O LFW é usado como baseline técnico de recuperação facial; ele não substitui a avaliação em fotografias de eventos com múltiplas pessoas.
 
 ### Base facial multi-rosto: Gallagher Collection
 

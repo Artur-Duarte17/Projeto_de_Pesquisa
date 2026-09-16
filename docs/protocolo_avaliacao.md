@@ -173,6 +173,8 @@ O LFW é tratado como baseline técnico de recuperação por identidade, não co
 - a fotografia-fonte é registrada em `source_image_id` e excluída do ranking e da relevância;
 - o protocolo contém 1.672 consultas e 7.449 relações de relevância.
 
+Como todas as consultas são fotografias do próprio índice, a EX-009 reutiliza o embedding da maior face já calculado e congelado na EX-008. A fotografia-fonte continua excluída. Similaridade, redução do melhor rosto por fotografia e ordenação integral são executadas em lotes na GPU. Em uma verificação de equivalência com 20 consultas, esse caminho produziu as mesmas métricas e o mesmo Top-10 do avaliador genérico; a diferença máxima entre scores foi `3,6 × 10^-7`, compatível com arredondamento de ponto flutuante.
+
 Os arquivos canônicos são `data/evaluation/lfw_face_queries.csv` e `data/evaluation/lfw_face_relevance.csv`. O antigo `data/evaluation/face_queries.csv`, limitado a 20 identidades sem regra de seleção documentada, foi retirado da árvore ativa e permanece recuperável pelo histórico Git.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

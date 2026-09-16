@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 
@@ -14,6 +15,12 @@ SPEC = importlib.util.spec_from_file_location("prepare_lfw_eval", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 PREPARE_LFW = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PREPARE_LFW)
+
+EVALUATOR_PATH = ROOT / "scripts" / "face" / "07_evaluate_lfw.py"
+EVALUATOR_SPEC = importlib.util.spec_from_file_location("evaluate_lfw", EVALUATOR_PATH)
+assert EVALUATOR_SPEC is not None and EVALUATOR_SPEC.loader is not None
+EVALUATE_LFW = importlib.util.module_from_spec(EVALUATOR_SPEC)
+EVALUATOR_SPEC.loader.exec_module(EVALUATE_LFW)
 
 
 class LfwProtocolTests(unittest.TestCase):
@@ -55,6 +62,17 @@ class LfwProtocolTests(unittest.TestCase):
     def test_minimum_images_cannot_be_less_than_two(self) -> None:
         with self.assertRaises(ValueError):
             PREPARE_LFW.build_protocol(pd.DataFrame(), seed=1, min_images=1)
+
+    def test_vectorized_metrics_use_full_ranking_and_fixed_k(self) -> None:
+        ranked_codes = np.array([5, 2, 9, 1, 7], dtype=np.int64)
+        metrics = EVALUATE_LFW.metrics_from_codes(ranked_codes, {2, 7, 8})
+
+        self.assertEqual(metrics["ranking_size"], 5)
+        self.assertEqual(metrics["num_relevant"], 3)
+        self.assertAlmostEqual(metrics["precision_at_5"], 2 / 5)
+        self.assertAlmostEqual(metrics["precision_at_10"], 2 / 10)
+        self.assertAlmostEqual(metrics["recall_at_5"], 2 / 3)
+        self.assertAlmostEqual(metrics["average_precision"], ((1 / 2) + (2 / 5)) / 3)
 
 
 if __name__ == "__main__":
