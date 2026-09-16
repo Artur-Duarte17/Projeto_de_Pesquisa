@@ -156,7 +156,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-009 | avaliar a busca facial LFW | concluída e aprovada; 1.672 consultas; |
 | EX-010 | recriar o índice facial Gallagher | concluída e aprovada; 589 fotografias e 1.303 faces; |
 | EX-011 | regenerar consultas e relevância Gallagher | concluída e aprovada; 20 consultas e 882 relações de relevância; |
-| EX-012 | avaliar a busca facial Gallagher | pendente; |
+| EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
 | EX-013 | recriar o índice global Holidays | pendente; |
 | EX-014 | avaliar a busca global Holidays | pendente. |
 
@@ -196,5 +196,20 @@ Precision@K utiliza denominador fixo K. Como parte considerável das identidades
 As anotações oficiais Gallagher foram cruzadas com as 587 fotografias efetivamente presentes no índice da EX-010. As identidades foram ordenadas pela quantidade decrescente de fotografias anotadas e, em caso de empate, de forma estável. Dentro de cada identidade, os candidatos foram ordenados por nome da imagem e índice da face.
 
 Foram geradas 20 consultas de 20 identidades e 882 relações de relevância. Cada consulta é um recorte construído a partir das coordenadas dos olhos nas anotações oficiais, validado novamente pelo detector facial e associado a `source_image_id`. Três candidatos foram rejeitados por ausência de face detectável no recorte; a seleção avançou para os candidatos seguintes sem reduzir o total de consultas. Todos os 20 recortes possuem tamanho e SHA-256 registrados em `data/evaluation/gallagher_query_crops_manifest.csv`.
+
+### 10.6 Resultado auditado da EX-012
+
+A avaliação no commit `66d41bc` executou 20 consultas sem falhas. Cada ranking contém 586 fotografias elegíveis depois da exclusão da fonte. Não houve fotografia-fonte no Top-10 nem repetição de `image_id` dentro de uma consulta. O manifesto registrou árvore Git limpa e hashes compatíveis com os CSVs produzidos.
+
+| Métrica | Resultado |
+|---|---:|
+| Precision@5 | 0,870000 |
+| Precision@10 | 0,645000 |
+| Recall@5 | 0,566409 |
+| Recall@10 | 0,662866 |
+| mAP | 0,913949 |
+| Tempo médio por consulta | 615,704 ms |
+
+A AP mínima foi 0,180849, a mediana foi 0,962851 e a máxima foi 1,0. O resultado sustenta a busca facial multi-rosto no Gallagher, mas não representa todas as identidades: o protocolo usa 20 pessoas selecionadas entre as mais frequentes e uma consulta por identidade.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

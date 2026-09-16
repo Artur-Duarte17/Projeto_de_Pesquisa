@@ -59,11 +59,13 @@ O código ativo já incorpora exclusão uniforme da imagem-fonte, Precision@K co
 
 As EX-008 e EX-009 já foram refeitas e auditadas no ambiente definitivo. O índice LFW contém 16.058 faces de 13.185 fotografias. A avaliação de 1.672 consultas obteve P@5 de 0,457177, P@10 de 0,284629, Recall@5 de 0,901149, Recall@10 de 0,945308 e mAP de 0,965135. Esses números são o baseline LFW corrigido; não demonstram desempenho em eventos ou no contexto agro.
 
+As EX-010 a EX-012 também foram refeitas e auditadas. No Gallagher, 20 consultas de identidades selecionadas entre as mais representadas obtiveram P@5 de 0,870000, P@10 de 0,645000, Recall@5 de 0,566409, Recall@10 de 0,662866 e mAP de 0,913949. O resultado valida o fluxo facial multi-rosto nesse acervo, mas o número limitado e a seleção das consultas devem permanecer explícitos.
+
 ## Próxima ordem técnica
 
-1. as EX-007 a EX-011 foram concluídas e auditadas;
-2. executar a EX-012 para avaliar a busca facial Gallagher;
-3. refazer o índice e a avaliação Holidays no mesmo ambiente;
+1. as EX-007 a EX-012 foram concluídas e auditadas;
+2. executar a EX-013 para refazer o índice global Holidays;
+3. executar a EX-014 para avaliar a recuperação global Holidays;
 4. conferir métricas diretamente nos CSVs e manifestos;
 5. definir um protocolo próprio para a fusão antes de tratá-la como resultado final;
 6. obter coleção agro autorizada;

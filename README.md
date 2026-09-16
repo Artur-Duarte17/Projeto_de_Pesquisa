@@ -195,6 +195,8 @@ python scripts/face/03_evaluate_face.py `
 
 Na avaliação, `--threshold -1` preserva o ranking integral necessário para AP/mAP. O limiar facial positivo é apropriado para a busca interativa, mas não para truncar o ranking usado pelas métricas.
 
+A execução validada de 20 consultas Gallagher obteve P@5 de 0,870000, P@10 de 0,645000, Recall@5 de 0,566409, Recall@10 de 0,662866 e mAP de 0,913949. As consultas representam identidades entre as mais frequentes do acervo; essa seleção deve ser considerada ao interpretar os números.
+
 Analisar falsos positivos e consultas dificeis:
 
 ```powershell
