@@ -4,7 +4,7 @@ Data de referência: **16 de setembro de 2026**.
 
 ## 1. Estado da decisão
 
-A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida para um estudo de caso aplicado ao contexto agro. A fonte, os direitos de uso, os 124 originais, o gabarito, as consultas pareadas, os índices e a avaliação quantitativa estão concluídos; a análise qualitativa permanece pendente.
+A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida para um estudo de caso aplicado ao contexto agro. A fonte, os direitos de uso, os 124 originais, o gabarito, as consultas pareadas, os índices, a avaliação quantitativa e a análise qualitativa estão concluídos.
 
 A afirmação sustentada é: **o sistema foi avaliado em um estudo de caso da Agrishow 2022, com uma pessoa pública e uma consulta sorteada antes das buscas**. Não é correto generalizar esse resultado para outros eventos, pessoas, máquinas ou para todo o domínio agro.
 
@@ -143,6 +143,10 @@ A EX-023 excluiu a fotografia-fonte, deixando 123 candidatas e 90 relevantes. O 
 
 Os dez primeiros resultados foram relevantes em todos os métodos. O Recall@K é baixo porque existem 90 imagens relevantes: cinco acertos representam `5/90` e dez acertos representam `10/90`. Face e fusão 0,9/0,1 empataram em mAP. O contexto isolado ainda organizou grande parte das imagens relevantes, provavelmente por terem sido produzidas no mesmo evento, mas ficou abaixo do sinal facial. Aumentar seu peso não melhorou o baseline facial.
 
+A EX-024 recalculou os cinco rankings integrais e reproduziu exatamente o Top-10 e a AP da EX-023. Na busca facial, o primeiro item irrelevante apareceu na posição 90; no contexto global, apareceu na posição 17. A fusão 0,9/0,1 manteve a AP da face, mas compartilhou nove das dez primeiras imagens com o baseline, demonstrando que houve reordenação interna.
+
+A figura qualitativa usa o recorte-consulta e as cinco primeiras fotografias recuperadas pela busca facial. As cinco imagens são relevantes e as caixas amarelas foram inspecionadas sobre o rosto correto. O painel cobre fotografia de grupo, cavalgada, fundo institucional e palco, com seis registros individuais de fotógrafo, fonte, licença, página original e modificação. A figura permanece local em `outputs/experiments/ex-024_agrishow_analysis/agrishow_face_top5.png` até sua incorporação controlada ao manuscrito.
+
 ## 7. Aquisição reproduzível
 
 O script `scripts/data/download_agrishow_2022.py` consulta a API do Wikimedia Commons, exige CC BY 2.0 para todos os itens, remove por padrão os três recortes derivados e produz inventário com URL, autoria, licença, dimensões, tamanho e SHA-1.
@@ -176,4 +180,4 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 | EX-021 | criar consultas pareadas e relevância | preparação e conferência concluídas | concluída; fonte, recorte facial, exclusão e hashes congelados antes das buscas |
 | EX-022 | indexar faces e descritores globais | Artur | concluída e aprovada; 1.590 faces em 123 imagens e 124 descritores globais |
 | EX-023 | avaliar os cinco métodos | execução e auditoria concluídas | concluída e aprovada; fonte excluída, 123 candidatas e 90 relevantes |
-| EX-024 | analisar erros e gerar figura qualitativa | Artur | pendente |
+| EX-024 | analisar erros e gerar figura qualitativa | execução e inspeção concluídas | concluída e aprovada; rankings reproduzidos, figura e seis atribuições validadas |

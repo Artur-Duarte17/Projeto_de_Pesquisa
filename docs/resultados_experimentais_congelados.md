@@ -54,6 +54,7 @@ As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado 
 5. A fusão 0,9/0,1 melhorou a AP de uma consulta, não alterou nove e piorou dez; portanto, ajuda casos isolados, mas não é consistentemente benéfica.
 6. No estudo de caso Agrishow, face e fusão 0,9/0,1 empataram em mAP; aumentar o peso global reduziu levemente o resultado.
 7. O estudo Agrishow demonstra a aplicação no evento selecionado, mas uma consulta e uma pessoa não sustentam generalização para todo o domínio agro.
+8. Na Agrishow, o primeiro resultado irrelevante apareceu na posição 90 para face e fusão 0,9/0,1, mas já na posição 17 para contexto global.
 
 ## Limitações obrigatórias
 
@@ -76,6 +77,7 @@ As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado 
 | EX-018 | `outputs/experiments/ex-018_paired_fusion_error_analysis` | `8cb1e12` |
 | EX-022 | índices `ex-022_agrishow_face_index` e `ex-022_agrishow_global_index` | `6aa8dad` |
 | EX-023 | `outputs/experiments/ex-023_agrishow_paired_fusion` | `ecc37f7` |
+| EX-024 | `outputs/experiments/ex-024_agrishow_analysis` | `1bf4a95` |
 
 Os diretórios de evidência são locais e ignorados pelo Git. Cada execução possui manifesto com configuração, hashes, versões do ambiente e commit correspondente.
 

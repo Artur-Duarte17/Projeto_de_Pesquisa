@@ -335,3 +335,19 @@ A avaliação no commit `ecc37f7` usou uma consulta, 123 candidatas depois da ex
 | 0,5 / 0,5 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,993485 |
 
 Todos os métodos acertaram as dez primeiras posições. A diferença de Recall decorre apenas do denominador de 90 relevantes. Face e fusão 0,9/0,1 empataram em mAP; as demais fusões ficaram ligeiramente abaixo, e contexto isolado obteve 0,797298. O resultado sustenta o funcionamento no evento, na pessoa e na consulta avaliados, mas não autoriza generalização para outras pessoas, eventos, máquinas ou condições do agronegócio.
+
+### 10.19 Resultado auditado da EX-024
+
+A análise no commit `1bf4a95` recalculou 615 posições — 123 para cada um dos cinco métodos — e reproduziu exatamente os Top-10 e as APs congeladas na EX-023. A fonte permaneceu ausente, cada ranking contém 90 relevantes e não houve duplicidade.
+
+| Método | Primeira irrelevante | Última relevante | Irrelevantes antes da última relevante | Sobreposição Top-10 com face |
+|---|---:|---:|---:|---:|
+| Face | 90 | 107 | 17 | 10 |
+| Contexto global | 17 | 123 | 33 | 4 |
+| Fusão 0,9/0,1 | 90 | 107 | 17 | 9 |
+| Fusão 0,7/0,3 | 90 | 111 | 21 | 7 |
+| Fusão 0,5/0,5 | 82 | 112 | 22 | 5 |
+
+O contexto global promoveu mais cedo fotografias sem a pessoa-alvo, apesar de manter os dez primeiros acertos. A fusão 0,9/0,1 alterou uma posição do Top-10, mas preservou a AP facial; pesos globais maiores anteciparam erros e empurraram as últimas imagens relevantes para posições posteriores.
+
+A figura qualitativa contém o recorte facial e as cinco primeiras fotografias da busca facial, todas relevantes. As caixas dos rostos foram verificadas visualmente e apontam para a pessoa-alvo nos cinco painéis. O arquivo tem 3.680 × 1.660 pixels e é acompanhado de seis atribuições individuais CC BY 2.0, incluindo fotógrafo, fonte, página original e modificação aplicada.

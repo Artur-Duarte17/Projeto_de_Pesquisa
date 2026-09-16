@@ -77,5 +77,5 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 5. a EX-021 sorteou a fotografia-fonte e congelou as consultas facial e global pareadas;
 6. a EX-022 criou e auditou os índices facial e global da Agrishow;
 7. a EX-023 avaliou os cinco métodos sem alterar retrospectivamente os pesos;
-8. a EX-024 deve analisar erros e produzir a figura qualitativa com atribuição;
-9. adaptar o manuscrito ao modelo vigente da Revista Principia.
+8. a EX-024 recalculou os rankings, analisou os erros e produziu a figura qualitativa com atribuição;
+9. adaptar o manuscrito ao modelo vigente da Revista Principia usando somente os resultados congelados.
