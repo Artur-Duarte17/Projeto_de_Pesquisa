@@ -159,7 +159,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
 | EX-013 | recriar o índice global Holidays | concluída e aprovada; 1.491 imagens e 1.491 descritores; |
 | EX-014 | avaliar a busca global Holidays | concluída e aprovada; 500 consultas; |
-| EX-015 | recriar o índice global Gallagher | protocolo definido; execução pendente; |
+| EX-015 | recriar o índice global Gallagher | concluída e aprovada; 589 imagens e 589 descritores; |
 | EX-016 | gerar o protocolo pareado Gallagher | pendente; |
 | EX-017 | comparar face, global contextual e fusão | pendente. |
 
@@ -263,8 +263,14 @@ Cada item será uma única consulta lógica com dois caminhos explicitamente rel
 - `source_image_id` liga os dois caminhos e exclui a fotografia-fonte de todas as modalidades;
 - o conjunto de relevância continua sendo a presença da pessoa-alvo segundo as anotações oficiais.
 
-Antes da fusão, a EX-015 recriará os 589 descritores globais Gallagher com a mesma ResNet50 e o mesmo ambiente da EX-013. A EX-016 produzirá um CSV pareado contendo `face_query_path`, `global_query_path`, identidade-alvo e fonte, com hashes e manifesto.
+A EX-015 recriou os 589 descritores globais Gallagher com a mesma ResNet50 e o mesmo ambiente da EX-013. A EX-016 produzirá um CSV pareado contendo `face_query_path`, `global_query_path`, identidade-alvo e fonte, com hashes e manifesto.
 
 A EX-017 comparará, no mesmo protocolo e universo de candidatas, os baselines `1,0/0,0` (somente face) e `0,0/1,0` (somente contexto global) e as combinações `0,9/0,1`, `0,7/0,3` e `0,5/0,5`. Os cossenos serão convertidos para `[0,1]` antes da soma ponderada. As cinco configurações serão relatadas como análise de sensibilidade; nenhuma será escolhida retrospectivamente como única configuração vencedora.
 
 Esse desenho responde a uma pergunta específica: o contexto da fotografia-fonte ajuda a recuperar outras fotografias que contêm a pessoa selecionada? Ele não equivale a buscar identidade somente pela cena e não constitui validação agro.
+
+### 10.12 Resultado auditado da EX-015
+
+A execução no commit `d300a6e` examinou as 589 fotografias Gallagher em 44 s, com taxa observada de 13,22 imagens/s. Foram produzidos 589 descritores globais, sem falhas, em uma matriz `(589, 2048)` de tipo `float32`. Todos os vetores são finitos e normalizados, com erro máximo de norma L2 igual a `1,192092896 × 10^-7`.
+
+Os metadados possuem 589 identificadores únicos, mapeamento contínuo para a matriz e SHA-256 válido. Os identificadores são compatíveis com o índice facial: as 587 fotografias com face detectada formam um subconjunto do índice global, que também inclui as duas fotografias sem face detectável. O manifesto registrou árvore Git limpa, CUDA, lote 32, quatro trabalhadores de CPU e hashes válidos.

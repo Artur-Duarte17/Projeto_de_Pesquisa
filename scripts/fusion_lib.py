@@ -10,6 +10,30 @@ from global_lib import search_global_index
 from retrieval_common import cosine_to_unit
 
 
+def fuse_cosine_score_matrices(
+    face_scores: np.ndarray,
+    global_scores: np.ndarray,
+    face_available: np.ndarray,
+    face_weight: float,
+    global_weight: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Convert cosine matrices to unit scores and combine them with fixed weights."""
+    if face_scores.shape != global_scores.shape or face_scores.shape != face_available.shape:
+        raise ValueError("Face, global, and availability matrices must have the same shape")
+    if face_weight < 0.0 or global_weight < 0.0:
+        raise ValueError("Fusion weights must be non-negative")
+    if not np.isclose(face_weight + global_weight, 1.0, atol=1e-9):
+        raise ValueError("Fusion weights must sum to one")
+
+    face_unit = np.zeros(face_scores.shape, dtype=np.float32)
+    face_unit[face_available] = np.asarray(
+        cosine_to_unit(face_scores[face_available]), dtype=np.float32
+    )
+    global_unit = np.asarray(cosine_to_unit(global_scores), dtype=np.float32)
+    fused = face_weight * face_unit + global_weight * global_unit
+    return fused.astype(np.float32), face_unit, global_unit
+
+
 def combine_face_global_results(
     face_results: pd.DataFrame,
     global_results: pd.DataFrame,

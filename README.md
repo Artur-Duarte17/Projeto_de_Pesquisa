@@ -312,14 +312,20 @@ python scripts/fusion/01_fusion_search.py `
 ```
 
 ```powershell
-python scripts/fusion/02_evaluate_fusion.py `
-  --queries-csv data/evaluation/fusion_queries.csv `
-  --relevance-csv data/evaluation/relevance.csv `
-  --face-index-dir outputs/face_index `
-  --global-index-dir outputs/global_index `
-  --output-dir outputs/reports `
-  --save-topk 10
+python scripts/fusion/03_prepare_paired_gallagher.py
+
+python scripts/fusion/04_evaluate_paired_gallagher.py `
+  --queries-csv data/evaluation/gallagher_fusion_queries.csv `
+  --relevance-csv data/evaluation/gallagher_relevance.csv `
+  --face-index-dir outputs/experiments/ex-010_gallagher_face_index `
+  --global-index-dir outputs/experiments/ex-015_gallagher_global_index `
+  --output-dir outputs/experiments/ex-017_gallagher_paired_fusion `
+  --save-topk 10 `
+  --device cuda `
+  --save-visual-examples
 ```
+
+Na avaliação pareada, o recorte representa a pessoa-alvo e a fotografia-fonte completa representa o contexto global da mesma consulta lógica. A fonte é excluída de todos os rankings. Os pesos somente face, somente contexto, `0,9/0,1`, `0,7/0,3` e `0,5/0,5` são comparados como análise de sensibilidade predefinida.
 
 Cada indexacao, busca e avaliacao grava um manifesto JSON com configuracao, hashes dos arquivos de entrada e saida, versoes do ambiente e estado do Git.
 

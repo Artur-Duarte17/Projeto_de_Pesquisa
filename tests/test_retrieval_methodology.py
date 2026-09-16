@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from face_lib import search_face_index
-from fusion_lib import search_fusion
+from fusion_lib import fuse_cosine_score_matrices, search_fusion
 from global_lib import extract_global_embeddings_batch, search_global_index
 from retrieval_common import (
     apply_relevance_exclusions,
@@ -196,6 +196,28 @@ class ExclusionTests(unittest.TestCase):
             "bbox_x2": 10,
             "bbox_y2": 10,
         }
+
+
+class FusionScoreTests(unittest.TestCase):
+    def test_fixed_weight_fusion_uses_unit_cosines_and_missing_face_zero(self) -> None:
+        face = np.asarray([[1.0, -0.5]], dtype=np.float32)
+        global_scores = np.asarray([[0.0, 1.0]], dtype=np.float32)
+        available = np.asarray([[True, False]])
+        fused, face_unit, global_unit = fuse_cosine_score_matrices(
+            face,
+            global_scores,
+            available,
+            face_weight=0.7,
+            global_weight=0.3,
+        )
+        np.testing.assert_allclose(face_unit, [[1.0, 0.0]], atol=1e-7)
+        np.testing.assert_allclose(global_unit, [[0.5, 1.0]], atol=1e-7)
+        np.testing.assert_allclose(fused, [[0.85, 0.3]], atol=1e-7)
+
+    def test_fusion_weights_must_sum_to_one(self) -> None:
+        scores = np.zeros((1, 1), dtype=np.float32)
+        with self.assertRaises(ValueError):
+            fuse_cosine_score_matrices(scores, scores, np.ones((1, 1), dtype=bool), 0.7, 0.4)
 
 
 class ManifestTests(unittest.TestCase):
