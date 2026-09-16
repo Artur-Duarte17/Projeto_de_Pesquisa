@@ -59,9 +59,9 @@ O código ativo já incorpora exclusão uniforme da imagem-fonte, Precision@K co
 
 ## Próxima ordem técnica
 
-1. executar a EX-007 para criar e validar o ambiente CUDA único definido em `requirements/experiment-gpu.lock.txt`;
-2. recriar os índices para incluir SHA-256 e registrar os manifestos;
-3. executar novamente LFW, Gallagher e Holidays;
+1. a EX-007 foi concluída: `laboratorio/cibir_gpu` foi validado com CUDA e o ambiente substituído foi removido;
+2. executar a EX-008 para recriar o índice facial LFW com SHA-256 e manifesto;
+3. executar novamente LFW, Gallagher e Holidays no mesmo ambiente;
 4. conferir métricas diretamente nos CSVs e manifestos;
 5. definir um protocolo próprio para a fusão antes de tratá-la como resultado final;
 6. obter coleção agro autorizada;

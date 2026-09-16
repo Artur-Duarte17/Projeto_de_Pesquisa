@@ -122,7 +122,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ## 10. Execuções pesadas reservadas
 
-### 10.1 Configuração de referência da EX-007
+### 10.1 Configuração aprovada na EX-007
 
 Inventário confirmado em 15 de setembro de 2026:
 
@@ -133,11 +133,11 @@ Inventário confirmado em 15 de setembro de 2026:
 - torchvision: 0.26.0 com CUDA 12.8;
 - ONNX Runtime GPU: 1.23.2.
 
-O ambiente preservado `laboratorio/cibir_face_new` contém PyTorch CPU e não oferece `CUDAExecutionProvider`; por isso ele não pode produzir os resultados oficiais novos. Ele deve permanecer intacto até a aprovação do ambiente substituto.
+O ambiente `laboratorio/cibir_gpu` foi criado e aprovado com testes reais de PyTorch e ONNX Runtime em CUDA. O ambiente anterior `laboratorio/cibir_face_new`, que continha PyTorch CPU e não oferecia `CUDAExecutionProvider`, foi removido depois dessa aprovação.
 
 ### 10.2 Comandos
 
-O ambiente definitivo deve ser criado fora da árvore versionada. Na máquina de referência, `uv` substitui o `conda`, que não está disponível no `PATH`:
+O ambiente definitivo foi criado fora da árvore versionada. Na máquina de referência, `uv` substituiu o `conda`, que não estava disponível no `PATH`. Os comandos executados foram:
 
 ```powershell
 uv venv laboratorio/cibir_gpu --python 3.10
@@ -145,13 +145,13 @@ uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe -r requirements
 laboratorio/cibir_gpu/Scripts/python.exe scripts/validate_environment.py --require-cuda
 ```
 
-Os dois primeiros comandos podem demorar e baixar vários gigabytes. Eles integram a EX-007 e devem ser executados por Artur. O terceiro comando grava `outputs/environment/EX-007_environment_report.json` e somente aprova o ambiente se um cálculo real funcionar tanto no PyTorch quanto no ONNX Runtime com CUDA.
+Os dois primeiros comandos baixaram e instalaram as dependências congeladas. O terceiro gravou `outputs/environment/EX-007_environment_report.json` e aprovou o ambiente somente depois de cálculos reais no PyTorch e no ONNX Runtime com CUDA.
 
-Não se deve apagar nem modificar `laboratorio/cibir_face_new` até a aprovação da EX-007. Depois disso, a sequência reservada é:
+A sequência reservada após a aprovação da EX-007 é:
 
 | ID | Execução | Situação |
 |---|---|---|
-| EX-007 | criar, validar e congelar o ambiente CUDA | preparada; aguarda execução por Artur; |
+| EX-007 | criar, validar e congelar o ambiente CUDA | concluída e aprovada; |
 | EX-008 | recriar o índice facial LFW | pendente; |
 | EX-009 | avaliar a busca facial LFW | pendente; |
 | EX-010 | recriar o índice facial Gallagher | pendente; |
