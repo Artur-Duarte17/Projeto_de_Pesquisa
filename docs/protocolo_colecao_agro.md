@@ -52,15 +52,17 @@ A licença autoral permite reutilização com atribuição, mas não elimina os 
 
 Três arquivos cujo título contém `(cropped)` são derivados de fotografias também presentes na categoria. Eles serão excluídos antes da indexação para impedir que versões quase idênticas da mesma imagem sejam tratadas como recuperações independentes.
 
-A consulta não será escolhida depois de observar qual fotografia produz o melhor resultado. O procedimento será:
+A consulta não será escolhida depois de observar qual fotografia produz o melhor resultado. Por decisão do pesquisador, a fotografia-fonte será sorteada uma única vez entre as 91 fotografias marcadas como `present`. O sorteio usará uma semente registrada e a menor chave SHA-256 de `seed`, `target_id` e `image_id`, tornando a escolha verificável e reproduzível. Não será permitido sortear novamente com base na qualidade do ranking. O procedimento será:
 
 1. inventariar e validar os 124 originais;
-2. definir critérios de qualidade da consulta antes de executar a busca;
-3. escolher e congelar uma fotografia-fonte representativa;
-4. produzir um recorte facial da pessoa-alvo e manter a fotografia completa correspondente;
+2. congelar o gabarito manual antes de qualquer busca;
+3. sortear e congelar uma fotografia-fonte entre as 91 imagens `present`;
+4. produzir um recorte facial da pessoa-alvo na fonte sorteada e manter a fotografia completa correspondente;
 5. registrar `source_image_id`, caminho e SHA-256;
 6. excluir a fotografia-fonte das abordagens facial, global e de fusão;
 7. não alterar pesos ou anotações depois de conhecer o resultado.
+
+O sorteio da EX-021 foi executado antes de qualquer busca, com a semente `823363566498139414`. Entre as 91 candidatas, a regra `minimum_sha256(seed, target_id, image_id)` selecionou `agrishow2022_52029027741` (`52029027741.jpg`). O SHA-256 do original é `9fa6366ac5aa1fc1e13c0ab2671dbe3b965d879fee0641ddcd9c5256100615af`. Essa fotografia será excluída de todos os rankings. A fonte está congelada; o recorte facial da pessoa-alvo ainda precisa ser produzido e validado antes da indexação.
 
 ## 5. Anotação de relevância
 
@@ -146,7 +148,7 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 |---|---|---|---|
 | EX-019 | baixar e validar os 124 originais | Artur | concluída e aprovada; 124 arquivos, 420,43 MiB, zero falhas |
 | EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | concluída e congelada; 91 presentes, 33 ausentes, zero incertos |
-| EX-021 | criar consultas pareadas e relevância | Artur executa; código versionado | pendente |
+| EX-021 | criar consultas pareadas e relevância | Artur executa; código versionado | fonte sorteada e congelada; recorte facial pendente |
 | EX-022 | indexar faces e descritores globais | Artur | pendente |
 | EX-023 | avaliar os cinco métodos | Artur | pendente |
 | EX-024 | analisar erros e gerar figura qualitativa | Artur | pendente |

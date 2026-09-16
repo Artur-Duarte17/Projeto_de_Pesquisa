@@ -74,6 +74,6 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 2. usar `docs/resultados_experimentais_congelados.md` como fonte numérica do artigo;
 3. a EX-019 baixou e validou a coleção Agrishow 2022;
 4. a EX-020 anotou e congelou a presença da pessoa-alvo;
-5. executar a EX-021 para congelar a consulta pareada antes de calcular resultados;
+5. a EX-021 sorteou e congelou a fotografia-fonte; produzir e validar o recorte facial antes de calcular resultados;
 6. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
 7. adaptar o manuscrito ao modelo vigente da Revista Principia.
