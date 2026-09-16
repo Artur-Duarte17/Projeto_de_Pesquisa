@@ -53,7 +53,7 @@ def method_name(face_weight: float, global_weight: float) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Evaluate paired face/context Gallagher retrieval.")
+    parser = argparse.ArgumentParser(description="Evaluate paired face/context retrieval.")
     parser.add_argument(
         "--queries-csv",
         type=Path,
@@ -86,6 +86,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weights-list", nargs="+", type=parse_weight, default=DEFAULT_WEIGHTS)
     parser.add_argument("--max-queries", type=int, default=None)
     parser.add_argument("--save-visual-examples", action="store_true")
+    parser.add_argument("--dataset-name", default="gallagher")
+    parser.add_argument("--face-query-source", default="validated_crop_from_ex011")
+    parser.add_argument(
+        "--global-query-source",
+        default="source_photo_descriptor_from_ex015",
+    )
     return parser.parse_args()
 
 
@@ -104,6 +110,8 @@ def main() -> int:
     queries = pd.read_csv(args.queries_csv, dtype=str)
     if args.max_queries is not None:
         queries = queries.head(args.max_queries).copy()
+    if "target_label" not in queries.columns and "target_id" in queries.columns:
+        queries["target_label"] = queries["target_id"]
     required_query_columns = {
         "query_id",
         "face_query_path",
@@ -158,13 +166,25 @@ def main() -> int:
     face_app = build_face_app(device=args.device, det_size=args.det_size)
     query_face_embeddings: list[np.ndarray] = []
     query_bboxes: list[str] = []
+    query_face_modes: list[str] = []
+    query_face_indices: list[int] = []
     face_extraction_ms: list[float] = []
     for index, query in enumerate(queries.itertuples(index=False), start=1):
+        query_face_mode = str(getattr(query, "query_face_mode", "largest") or "largest")
+        query_face_index_value = getattr(query, "query_face_index", 0)
+        query_face_index = int(query_face_index_value) if pd.notna(query_face_index_value) else 0
         started = time.perf_counter()
-        embedding, bbox = query_embedding_from_image(Path(str(query.face_query_path)), face_app)
+        embedding, bbox = query_embedding_from_image(
+            Path(str(query.face_query_path)),
+            face_app,
+            query_face_mode=query_face_mode,
+            query_face_index=query_face_index,
+        )
         face_extraction_ms.append((time.perf_counter() - started) * 1000.0)
         query_face_embeddings.append(np.asarray(embedding, dtype=np.float32))
         query_bboxes.append(str(bbox))
+        query_face_modes.append(query_face_mode)
+        query_face_indices.append(query_face_index)
         print(f"[INFO] extracted target faces: {index}/{len(queries)}")
 
     query_face_matrix = np.vstack(query_face_embeddings).astype(np.float32)
@@ -266,6 +286,8 @@ def main() -> int:
                             "source_image_id": str(query.source_image_id),
                             "target_label": str(query.target_label),
                             "query_bbox": query_bboxes[query_index],
+                            "query_face_mode": query_face_modes[query_index],
+                            "query_face_index": query_face_indices[query_index],
                             "rank": rank,
                             "image_id": str(candidate["image_id"]),
                             "image_path": str(candidate["image_path"]),
@@ -321,14 +343,14 @@ def main() -> int:
         save_visual_grid(
             topk[(topk["method"] == visual_method) & (topk["query_id"] == first_query_id)],
             visual_path,
-            f"Paired Gallagher fusion: {first_query_id} ({visual_method})",
+            f"Paired {args.dataset_name} fusion: {first_query_id} ({visual_method})",
         )
         result_files["visual_examples"] = visual_path
 
     manifest_path = write_run_manifest(
         args.output_dir / "fusion_run_manifest.json",
         script_path=Path(__file__),
-        method="gallagher_paired_face_global_fusion",
+        method=f"{args.dataset_name}_paired_face_global_fusion",
         configuration={
             "save_topk": args.save_topk,
             "ranking_depth": "all_eligible_images",
@@ -338,8 +360,10 @@ def main() -> int:
             "batch_size": args.batch_size,
             "weights_list": [list(weights) for weights in args.weights_list],
             "max_queries": args.max_queries,
-            "face_query_source": "validated_crop_from_ex011",
-            "global_query_source": "source_photo_descriptor_from_ex015",
+            "dataset_name": args.dataset_name,
+            "face_query_source": args.face_query_source,
+            "global_query_source": args.global_query_source,
+            "query_face_selection": "queries_csv_with_largest_default",
         },
         inputs={
             "queries_csv": args.queries_csv,
@@ -357,6 +381,7 @@ def main() -> int:
             "queries": int(len(queries)),
             "eligible_gallery_images": int(len(global_metadata) - 1),
             "images_without_detected_faces": int(len(global_metadata) - face_metadata["image_id"].nunique()),
+            "dataset_name": args.dataset_name,
         },
     )
     print(f"[OK] Fusion metrics: {metrics_path}")
