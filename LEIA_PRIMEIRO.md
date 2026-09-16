@@ -61,9 +61,9 @@ As EX-008 e EX-009 já foram refeitas e auditadas no ambiente definitivo. O índ
 
 ## Próxima ordem técnica
 
-1. as EX-007, EX-008, EX-009 e EX-010 foram concluídas e auditadas;
-2. executar a EX-011 para recriar as consultas e a relevância Gallagher;
-3. executar a EX-012 para avaliar a busca facial Gallagher e, depois, refazer Holidays;
+1. as EX-007 a EX-011 foram concluídas e auditadas;
+2. executar a EX-012 para avaliar a busca facial Gallagher;
+3. refazer o índice e a avaliação Holidays no mesmo ambiente;
 4. conferir métricas diretamente nos CSVs e manifestos;
 5. definir um protocolo próprio para a fusão antes de tratá-la como resultado final;
 6. obter coleção agro autorizada;

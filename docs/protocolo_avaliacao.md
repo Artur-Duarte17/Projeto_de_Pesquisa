@@ -155,7 +155,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-008 | recriar o índice facial LFW | concluída e aprovada; 13.233 imagens e 16.058 faces; |
 | EX-009 | avaliar a busca facial LFW | concluída e aprovada; 1.672 consultas; |
 | EX-010 | recriar o índice facial Gallagher | concluída e aprovada; 589 fotografias e 1.303 faces; |
-| EX-011 | regenerar consultas e relevância Gallagher | preparador validado; execução pendente; |
+| EX-011 | regenerar consultas e relevância Gallagher | concluída e aprovada; 20 consultas e 882 relações de relevância; |
 | EX-012 | avaliar a busca facial Gallagher | pendente; |
 | EX-013 | recriar o índice global Holidays | pendente; |
 | EX-014 | avaliar a busca global Holidays | pendente. |
@@ -190,5 +190,11 @@ A execução no commit `ac13b6f` avaliou 1.672 consultas sem falhas. Cada rankin
 | mAP | 0,965135 |
 
 Precision@K utiliza denominador fixo K. Como parte considerável das identidades elegíveis possui menos de cinco ou dez fotografias relevantes, P@5 e P@10 não devem ser interpretadas isoladamente como taxa de identificação. O mAP elevado também deve ser contextualizado: a mediana da AP foi 1,0 e muitas identidades possuem apenas uma fotografia relevante após a exclusão da consulta. Esse baseline mede recuperação por identidade no LFW, não generalização para álbuns de eventos.
+
+### 10.5 Protocolo congelado da EX-011
+
+As anotações oficiais Gallagher foram cruzadas com as 587 fotografias efetivamente presentes no índice da EX-010. As identidades foram ordenadas pela quantidade decrescente de fotografias anotadas e, em caso de empate, de forma estável. Dentro de cada identidade, os candidatos foram ordenados por nome da imagem e índice da face.
+
+Foram geradas 20 consultas de 20 identidades e 882 relações de relevância. Cada consulta é um recorte construído a partir das coordenadas dos olhos nas anotações oficiais, validado novamente pelo detector facial e associado a `source_image_id`. Três candidatos foram rejeitados por ausência de face detectável no recorte; a seleção avançou para os candidatos seguintes sem reduzir o total de consultas. Todos os 20 recortes possuem tamanho e SHA-256 registrados em `data/evaluation/gallagher_query_crops_manifest.csv`.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

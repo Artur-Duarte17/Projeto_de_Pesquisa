@@ -188,10 +188,12 @@ python scripts/face/03_evaluate_face.py `
   --index-dir outputs/experiments/ex-010_gallagher_face_index `
   --output-dir outputs/experiments/ex-012_gallagher_face_evaluation `
   --save-topk 10 `
-  --threshold 0.35 `
+  --threshold -1 `
   --device cuda `
   --save-visual-examples
 ```
+
+Na avaliação, `--threshold -1` preserva o ranking integral necessário para AP/mAP. O limiar facial positivo é apropriado para a busca interativa, mas não para truncar o ranking usado pelas métricas.
 
 Analisar falsos positivos e consultas dificeis:
 
