@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from face_lib import search_face_index
-from fusion_lib import fuse_cosine_score_matrices, search_fusion
+from fusion_lib import classify_metric_delta, fuse_cosine_score_matrices, search_fusion
 from global_lib import extract_global_embeddings_batch, search_global_index
 from retrieval_common import (
     apply_relevance_exclusions,
@@ -199,6 +199,11 @@ class ExclusionTests(unittest.TestCase):
 
 
 class FusionScoreTests(unittest.TestCase):
+    def test_metric_delta_classification_respects_tolerance(self) -> None:
+        self.assertEqual(classify_metric_delta(0.01), "improved")
+        self.assertEqual(classify_metric_delta(-0.01), "degraded")
+        self.assertEqual(classify_metric_delta(1e-13), "unchanged")
+
     def test_fixed_weight_fusion_uses_unit_cosines_and_missing_face_zero(self) -> None:
         face = np.asarray([[1.0, -0.5]], dtype=np.float32)
         global_scores = np.asarray([[0.0, 1.0]], dtype=np.float32)

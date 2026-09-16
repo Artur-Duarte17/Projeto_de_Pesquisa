@@ -10,6 +10,14 @@ from global_lib import search_global_index
 from retrieval_common import cosine_to_unit
 
 
+def classify_metric_delta(delta: float, tolerance: float = 1e-12) -> str:
+    if delta > tolerance:
+        return "improved"
+    if delta < -tolerance:
+        return "degraded"
+    return "unchanged"
+
+
 def fuse_cosine_score_matrices(
     face_scores: np.ndarray,
     global_scores: np.ndarray,

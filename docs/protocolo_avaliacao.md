@@ -162,6 +162,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-015 | recriar o índice global Gallagher | concluída e aprovada; 589 imagens e 589 descritores; |
 | EX-016 | gerar o protocolo pareado Gallagher | concluída e aprovada; 20 consultas; |
 | EX-017 | comparar face, global contextual e fusão | concluída e aprovada; cinco configurações; |
+| EX-018 | analisar erros e casos da fusão pareada | protocolo e script preparados; execução pendente. |
 
 ### 10.3 Protocolo congelado da EX-009
 
