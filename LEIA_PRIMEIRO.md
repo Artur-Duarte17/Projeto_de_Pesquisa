@@ -33,9 +33,11 @@ Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial 
 
 ## Contexto agro
 
-O texto existente apresenta aplicação potencial no meio rural e em eventos. Isso é **contextualização**, não validação agro. Até a data acima, não havia coleção agro autorizada nem avaliação quantitativa nesse domínio.
+O texto existente apresenta aplicação potencial no meio rural e em eventos. Isso é **contextualização**, não validação agro.
 
-O próximo recorte recomendado é localizar uma pessoa ou artista em várias fotografias de um evento agro autorizado. Recuperação de maquinário permanece trabalho futuro.
+Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como candidata autorizada. A auditoria encontrou 127 arquivos em CC BY 2.0; três recortes derivados serão excluídos, restando 124 originais para o estudo de caso de uma pessoa pública recorrente. O download integral, a anotação e a avaliação ainda não foram executados. Consulte `docs/protocolo_colecao_agro.md` antes de fazer qualquer afirmação ou experimento nesse domínio.
+
+Recuperação de maquinário permanece trabalho futuro.
 
 ## Documentos canônicos
 
@@ -44,7 +46,8 @@ O próximo recorte recomendado é localizar uma pessoa ou artista em várias fot
 3. `docs/README.md`: mapa dos documentos e seu status.
 4. `docs/resultados_experimentais_congelados.md`: tabela oficial para escrita acadêmica.
 5. `docs/protocolo_avaliacao.md`: protocolo, decisões e auditoria das execuções atuais.
-6. Dossiê privado `Dossie_Tecnico_Historico_Projeto_CBIR` em DOCX, PDF e Markdown: consultar somente para história, decisões, métricas antigas e recuperação.
+6. `docs/protocolo_colecao_agro.md`: fonte candidata, direitos de uso e protocolo da validação agro.
+7. Dossiê privado `Dossie_Tecnico_Historico_Projeto_CBIR` em DOCX, PDF e Markdown: consultar somente para história, decisões, métricas antigas e recuperação.
 
 O dossiê e o material de submissão não podem ser enviados ao GitHub público.
 
@@ -69,7 +72,7 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 
 1. as EX-007 a EX-018 foram concluídas e auditadas;
 2. usar `docs/resultados_experimentais_congelados.md` como fonte numérica do artigo;
-3. obter uma coleção agro autorizada e documentar direitos de uso;
-4. definir pessoas-alvo, consultas e relevância antes da execução agro;
+3. executar a EX-019 para baixar e validar a coleção Agrishow 2022;
+4. anotar e congelar a presença da pessoa-alvo antes da execução agro;
 5. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
 6. adaptar o manuscrito ao modelo vigente da Revista Principia.

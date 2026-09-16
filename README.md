@@ -4,6 +4,8 @@ Protótipo de pesquisa para recuperação de imagens fotográficas por conteúdo
 
 > **Antes de usar resultados ou alterar o escopo, leia [`LEIA_PRIMEIRO.md`](LEIA_PRIMEIRO.md).** A auditoria de 15/09/2026 encerrou a segmentação como linha ativa e identificou correções obrigatórias no protocolo de avaliação. As métricas antigas são históricas, não resultados oficiais atuais.
 
+O estudo de caso agro planejado usa a coleção aberta Agrishow 2022. Direitos, limites éticos, prevenção de vazamento e ordem experimental estão em [`docs/protocolo_colecao_agro.md`](docs/protocolo_colecao_agro.md); ainda não existem resultados agro oficiais.
+
 ## Estado atual
 
 O repositorio contem a versao atual do sistema de recuperacao fotografica por face + CBIR global + fusao. Datasets, ambientes Conda, checkpoints, embeddings, imagens geradas e outros artefatos pesados ficam fora do Git.
