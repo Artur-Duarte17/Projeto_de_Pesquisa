@@ -297,6 +297,8 @@ python scripts/global/04_evaluate_holidays.py `
 
 O avaliador Holidays reutiliza o descritor da fotografia-consulta já congelado no índice da EX-013, exclui a própria fotografia e calcula na GPU o ranking integral das 1.490 candidatas. O Top-10 limita somente o que é salvo, não a profundidade usada no cálculo das métricas.
 
+A EX-014 avaliou as 500 consultas oficiais sem falhas: `P@5 = 0,324000`, `P@10 = 0,177600`, `Recall@5 = 0,870215`, `Recall@10 = 0,917563` e `mAP = 0,842612`. Como a mediana é de uma imagem relevante por consulta, Precision@K deve ser interpretada em conjunto com Recall e mAP.
+
 ### 7. Fusao face + global
 
 ```powershell

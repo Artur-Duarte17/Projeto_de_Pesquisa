@@ -195,7 +195,7 @@ Indice facial Gallagher:
 
 ```text
 Saida:
-C:\Projeto_de_Pesquisa\outputs\face_index_gallagher
+C:\Projeto_de_Pesquisa\outputs\experiments\ex-010_gallagher_face_index
 
 Imagens com faces detectadas: 587
 Embeddings faciais: 1.303
@@ -231,7 +231,7 @@ Indice global Holidays:
 
 ```text
 Saida:
-C:\Projeto_de_Pesquisa\outputs\global_index_holidays
+C:\Projeto_de_Pesquisa\outputs\experiments\ex-013_holidays_global_index
 
 Imagens indexadas: 1.491
 Embeddings globais: 1.491
@@ -292,20 +292,20 @@ A avaliacao facial no Gallagher usou 20 consultas.
 Metricas:
 
 ```text
-Precision@5:  0.8775
-Precision@10: 0.8180
-Recall@5:     0.5450
-Recall@10:    0.6700
-mAP:          0.6322
-Tempo medio:  635 ms por consulta
+Precision@5:  0.8700
+Precision@10: 0.6450
+Recall@5:     0.5664
+Recall@10:    0.6629
+mAP:          0.9139
+Tempo medio:  615,704 ms por consulta
 ```
 
 Interpretacao simples:
 
-- **Precision@5 = 0.8775** significa que, entre as 5 primeiras fotos retornadas, a maior parte estava correta.
-- **Precision@10 = 0.8180** significa que o resultado continua forte mesmo olhando as 10 primeiras fotos.
-- **Recall@10 = 0.6700** significa que, dentro do limite de 10 resultados, o sistema encontrou uma parte relevante das fotos corretas.
-- **mAP = 0.6322** mostra que os resultados corretos tendem a aparecer bem ranqueados.
+- **Precision@5 = 0.8700** significa que, entre as 5 primeiras fotos retornadas, a maior parte estava correta.
+- **Precision@10 = 0.6450** usa denominador fixo dez e inclui identidades com menos de dez respostas relevantes.
+- **Recall@10 = 0.6629** significa que, dentro do limite de 10 resultados, o sistema encontrou uma parte relevante das fotos corretas.
+- **mAP = 0.9139** mostra que os resultados corretos tendem a aparecer bem ranqueados no protocolo atual.
 
 Conclusao: a busca facial esta funcionando bem para o objetivo de encontrar pessoas.
 
@@ -344,15 +344,16 @@ Precision@5:  0.3240
 Precision@10: 0.1776
 Recall@5:     0.8702
 Recall@10:    0.9176
-mAP:          0.8351
-Tempo medio:  297 ms por consulta
+mAP:          0.8426
+Tempo medio do ranking: 0,704 ms por consulta
 ```
 
 Interpretacao simples:
 
-- O **mAP = 0.8351** e forte para a tarefa de CBIR global.
+- O **mAP = 0.8426** e forte para a tarefa de CBIR global.
 - O **Recall@10 = 0.9176** mostra que o sistema encontrou a maioria das imagens relevantes dentro dos 10 primeiros resultados.
 - A Precision@10 parece baixa, mas isso acontece porque muitos grupos do Holidays tem apenas 1 ou 2 imagens relevantes. Se a consulta tem poucas respostas corretas possiveis, o restante do Top-10 conta como falso positivo.
+- O tempo informado mede somente similaridade e ordenacao com descritores ja calculados; nao inclui a extracao do descritor de uma imagem nova.
 
 Conclusao: o modulo global com ResNet50 esta funcionando bem na tarefa apropriada para ele, que e encontrar imagens visualmente semelhantes.
 
@@ -400,7 +401,9 @@ Pesos testados:
 0.5 face / 0.5 global
 ```
 
-### 10.2 Resultado da fusao no Gallagher
+### 10.2 Resultado historico da fusao no Gallagher
+
+Os numeros desta secao pertencem a uma execucao anterior e nao sao resultados oficiais atuais. O protocolo final de fusao ainda depende da definicao de uma consulta compativel para face e imagem inteira. Eles sao mantidos apenas como registro do caminho experimental.
 
 Tabela comparativa:
 
@@ -493,7 +496,7 @@ Status atual:
 | Criar indice global ResNet50 | Feito |
 | Avaliar CBIR global | Feito |
 | Ativar PyTorch com GPU/CUDA | Feito |
-| Avaliar fusao face + global | Feito |
+| Avaliar fusao face + global | Resultado historico preservado; protocolo final pendente |
 | Gerar relatorio/documentacao | Feito |
 | Interface Streamlit minima | Proximo passo recomendado |
 | Material final para artigo | Proximo passo depois da interface/exemplos |
@@ -515,7 +518,7 @@ O projeto ja tem um nucleo experimental publicavel em forma inicial, porque poss
 
 O ponto mais importante para o artigo e nao vender a fusao como se ela sempre melhorasse. O resultado correto e:
 
-> A fusao simples foi avaliada e nao superou o modulo facial no cenario de busca por identidade, enquanto o CBIR global apresentou bom desempenho em uma base propria de similaridade visual.
+> Na avaliacao historica, a fusao simples nao superou o modulo facial no cenario de busca por identidade. O protocolo final de fusao ainda precisa ser congelado, enquanto o CBIR global ja apresentou bom desempenho na base Holidays.
 
 Essa frase e cientificamente honesta e defensavel.
 
@@ -541,7 +544,7 @@ Melhorias possiveis:
 1. Implementar fusao por reranking.
 2. Testar CLIP como descritor global alternativo.
 3. Testar busca por duas pessoas na mesma foto.
-4. Otimizar ResNet50 com batch processing.
+4. Comparar a ResNet50 com outro descritor global sob o mesmo protocolo.
 5. Melhorar a interface.
 
 ### 15.3 Fora da v1
@@ -576,7 +579,7 @@ A conclusao tecnica atual e:
 ```text
 A busca facial e o melhor metodo para encontrar pessoas.
 O CBIR global com ResNet50 e adequado para encontrar imagens visualmente semelhantes.
-A fusao simples entre face e global nao melhorou a busca por pessoa no Gallagher, mas gerou uma comparacao experimental importante.
+A avaliacao historica da fusao simples nao melhorou a busca por pessoa no Gallagher, mas o resultado ainda nao deve ser tratado como baseline oficial atual.
 ```
 
 Portanto, o projeto esta pronto para entrar na fase de demonstracao com interface minima e organizacao dos resultados para escrita academica.

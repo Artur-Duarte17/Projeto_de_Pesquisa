@@ -158,7 +158,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-011 | regenerar consultas e relevância Gallagher | concluída e aprovada; 20 consultas e 882 relações de relevância; |
 | EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
 | EX-013 | recriar o índice global Holidays | concluída e aprovada; 1.491 imagens e 1.491 descritores; |
-| EX-014 | avaliar a busca global Holidays | protocolo e avaliador preparados; execução completa pendente. |
+| EX-014 | avaliar a busca global Holidays | concluída e aprovada; 500 consultas; |
 
 ### 10.3 Protocolo congelado da EX-009
 
@@ -235,5 +235,20 @@ O protocolo oficial contém 500 consultas e 991 relações de relevância. A pri
 A multiplicação entre consultas e galeria é executada na GPU em lotes de 128. O `query_time_ms` mede somente esse backend de similaridade, exclusão e ordenação com descritores já calculados; portanto, não representa latência ponta a ponta de uma nova imagem enviada pelo usuário. Precision@5, Precision@10, Recall@5, Recall@10 e AP usam o ranking integral e a relevância oficial.
 
 Em uma verificação com as primeiras 20 consultas, o avaliador otimizado e o avaliador genérico produziram métricas idênticas e o mesmo Top-10 em todas as consultas. A diferença máxima entre scores foi `0,001366`, decorrente da extração CUDA em lotes distintos, sem alteração da ordenação observada. A fotografia-fonte não apareceu nos resultados.
+
+### 10.10 Resultado auditado da EX-014
+
+A avaliação no commit `c6af569` executou as 500 consultas sem falhas. Cada ranking contém as 1.490 imagens elegíveis depois da exclusão da fonte; foram salvos dez resultados por consulta. Não houve fotografia-fonte, repetição de `image_id` ou valor não finito. O manifesto registrou árvore Git limpa e hashes compatíveis com todos os CSVs e com a figura qualitativa, que também passou por inspeção visual.
+
+| Métrica | Resultado |
+|---|---:|
+| Precision@5 | 0,324000 |
+| Precision@10 | 0,177600 |
+| Recall@5 | 0,870215 |
+| Recall@10 | 0,917563 |
+| mAP | 0,842612 |
+| Tempo médio do backend por consulta | 0,704 ms |
+
+A AP mínima foi 0,004215, a mediana foi 1,0 e a máxima foi 1,0; nenhuma consulta teve AP zero. Cada consulta possui entre uma e doze imagens relevantes, com mediana igual a uma. Isso explica por que Precision@5 e Precision@10 são numericamente baixas apesar do Recall e do mAP elevados: depois de recuperar a única imagem relevante, as posições restantes até K contam como não relevantes. O tempo informado mede somente o ranking com descritores pré-calculados, não a extração ponta a ponta de uma imagem nova.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.
