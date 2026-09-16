@@ -152,12 +152,27 @@ A sequência reservada após a aprovação da EX-007 é:
 | ID | Execução | Situação |
 |---|---|---|
 | EX-007 | criar, validar e congelar o ambiente CUDA | concluída e aprovada; |
-| EX-008 | recriar o índice facial LFW | pendente; |
-| EX-009 | avaliar a busca facial LFW | pendente; |
+| EX-008 | recriar o índice facial LFW | concluída e aprovada; 13.233 imagens e 16.058 faces; |
+| EX-009 | avaliar a busca facial LFW | protocolo congelado; avaliação pendente; |
 | EX-010 | recriar o índice facial Gallagher | pendente; |
 | EX-011 | regenerar consultas e relevância Gallagher | pendente; |
 | EX-012 | avaliar a busca facial Gallagher | pendente; |
 | EX-013 | recriar o índice global Holidays | pendente; |
 | EX-014 | avaliar a busca global Holidays | pendente. |
+
+### 10.3 Protocolo congelado da EX-009
+
+O LFW é tratado como baseline técnico de recuperação por identidade, não como substituto da avaliação central em fotografias de eventos. O protocolo foi derivado exclusivamente do índice aprovado na EX-008:
+
+- 13.185 fotografias possuem ao menos uma face indexada;
+- 5.736 identidades aparecem no índice;
+- 1.672 identidades possuem ao menos duas fotografias elegíveis;
+- cada identidade elegível contribui com exatamente uma consulta;
+- a consulta é a fotografia com menor `SHA-256(semente, identidade, image_id)`, usando a semente `20260915`;
+- as demais fotografias indexadas da mesma identidade formam o conjunto de relevância;
+- a fotografia-fonte é registrada em `source_image_id` e excluída do ranking e da relevância;
+- o protocolo contém 1.672 consultas e 7.449 relações de relevância.
+
+Os arquivos canônicos são `data/evaluation/lfw_face_queries.csv` e `data/evaluation/lfw_face_relevance.csv`. O antigo `data/evaluation/face_queries.csv`, limitado a 20 identidades sem regra de seleção documentada, foi retirado da árvore ativa e permanece recuperável pelo histórico Git.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

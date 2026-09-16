@@ -101,6 +101,36 @@ python scripts/face/03_evaluate_face.py `
 
 A avaliacao calcula AP sobre o ranking integral elegivel. `--save-topk` limita apenas as linhas gravadas no CSV de exemplos. Precision@K sempre usa K como denominador, inclusive quando o metodo retorna menos de K imagens.
 
+### 4. Protocolo facial LFW
+
+A avaliação LFW usa uma consulta para cada identidade com pelo menos duas fotografias efetivamente indexadas. A consulta é escolhida de forma determinística por SHA-256 com a semente registrada, e todas as outras fotografias indexadas da mesma identidade são relevantes. A fotografia-fonte é explicitamente excluída.
+
+Gerar ou conferir o protocolo congelado:
+
+```powershell
+laboratorio/cibir_gpu/Scripts/python.exe scripts/face/06_prepare_lfw_eval.py `
+  --index-dir outputs/experiments/ex-008_lfw_face_index `
+  --output-dir data/evaluation `
+  --seed 20260915 `
+  --min-images 2 `
+  --overwrite
+```
+
+Avaliar o índice recriado:
+
+```powershell
+laboratorio/cibir_gpu/Scripts/python.exe scripts/face/03_evaluate_face.py `
+  --queries-csv data/evaluation/lfw_face_queries.csv `
+  --relevance-csv data/evaluation/lfw_face_relevance.csv `
+  --index-dir outputs/experiments/ex-008_lfw_face_index `
+  --output-dir outputs/experiments/ex-009_lfw_face_evaluation `
+  --save-topk 10 `
+  --threshold -1 `
+  --device cuda
+```
+
+O protocolo atual contém 1.672 consultas e 7.449 relações de relevância. O LFW é usado como baseline técnico de recuperação facial; ele não substitui a avaliação em fotografias de eventos com múltiplas pessoas.
+
 ### Base facial multi-rosto: Gallagher Collection
 
 A base Gallagher e util para validar o caso real de album/evento: varias pessoas podem aparecer na mesma foto e cada rosto anotado possui uma identidade.
