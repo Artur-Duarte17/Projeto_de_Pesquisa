@@ -35,7 +35,7 @@ Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial 
 
 O texto existente apresenta aplicação potencial no meio rural e em eventos. Isso é **contextualização**, não validação agro.
 
-Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como candidata autorizada. A auditoria encontrou 127 arquivos em CC BY 2.0; três recortes derivados foram excluídos, restando 124 originais para o estudo de caso de uma pessoa pública recorrente. A EX-019 concluiu e validou o download integral. A EX-020 congelou o gabarito manual com 91 fotografias presentes, 33 ausentes e nenhuma incerta. A avaliação ainda não foi executada. Consulte `docs/protocolo_colecao_agro.md` antes de fazer qualquer afirmação experimental nesse domínio.
+Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como candidata autorizada. A auditoria encontrou 127 arquivos em CC BY 2.0; três recortes derivados foram excluídos, restando 124 originais para o estudo de caso de uma pessoa pública recorrente. A EX-019 concluiu e validou o download integral. A EX-020 congelou o gabarito manual com 91 fotografias presentes, 33 ausentes e nenhuma incerta. A EX-021 sorteou a fotografia-fonte antes das buscas e congelou o par formado pelo recorte facial e pela fotografia completa. A avaliação ainda não foi executada. Consulte `docs/protocolo_colecao_agro.md` antes de fazer qualquer afirmação experimental nesse domínio.
 
 Recuperação de maquinário permanece trabalho futuro.
 
@@ -74,6 +74,7 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 2. usar `docs/resultados_experimentais_congelados.md` como fonte numérica do artigo;
 3. a EX-019 baixou e validou a coleção Agrishow 2022;
 4. a EX-020 anotou e congelou a presença da pessoa-alvo;
-5. a EX-021 sorteou e congelou a fotografia-fonte; produzir e validar o recorte facial antes de calcular resultados;
-6. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
-7. adaptar o manuscrito ao modelo vigente da Revista Principia.
+5. a EX-021 sorteou a fotografia-fonte e congelou as consultas facial e global pareadas;
+6. a EX-022 deve criar e auditar os índices facial e global da Agrishow;
+7. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
+8. adaptar o manuscrito ao modelo vigente da Revista Principia.
