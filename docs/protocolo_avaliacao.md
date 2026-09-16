@@ -160,7 +160,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-013 | recriar o índice global Holidays | concluída e aprovada; 1.491 imagens e 1.491 descritores; |
 | EX-014 | avaliar a busca global Holidays | concluída e aprovada; 500 consultas; |
 | EX-015 | recriar o índice global Gallagher | concluída e aprovada; 589 imagens e 589 descritores; |
-| EX-016 | gerar o protocolo pareado Gallagher | pendente; |
+| EX-016 | gerar o protocolo pareado Gallagher | concluída e aprovada; 20 consultas; |
 | EX-017 | comparar face, global contextual e fusão | pendente. |
 
 ### 10.3 Protocolo congelado da EX-009
@@ -274,3 +274,9 @@ Esse desenho responde a uma pergunta específica: o contexto da fotografia-fonte
 A execução no commit `d300a6e` examinou as 589 fotografias Gallagher em 44 s, com taxa observada de 13,22 imagens/s. Foram produzidos 589 descritores globais, sem falhas, em uma matriz `(589, 2048)` de tipo `float32`. Todos os vetores são finitos e normalizados, com erro máximo de norma L2 igual a `1,192092896 × 10^-7`.
 
 Os metadados possuem 589 identificadores únicos, mapeamento contínuo para a matriz e SHA-256 válido. Os identificadores são compatíveis com o índice facial: as 587 fotografias com face detectada formam um subconjunto do índice global, que também inclui as duas fotografias sem face detectável. O manifesto registrou árvore Git limpa, CUDA, lote 32, quatro trabalhadores de CPU e hashes válidos.
+
+### 10.13 Resultado auditado da EX-016
+
+O protocolo pareado foi gerado no commit `baf5f83` a partir das 20 consultas congeladas na EX-011. Ele contém 20 identidades-alvo, 20 recortes faciais e 20 fotografias completas, ligadas por `source_image_id`. Existem 19 fotografias-fonte únicas porque uma fotografia contém duas pessoas selecionadas como alvos distintos; isso é esperado em um acervo multi-rosto.
+
+Cada recorte e cada fotografia completa possui SHA-256 conferido contra o arquivo local. Todas as fontes existem nos índices facial e global, todas as consultas possuem relevância e nenhuma fonte permanece no gabarito. O manifesto registrou árvore Git limpa e hashes válidos para o CSV pareado e seu inventário de evidências.
