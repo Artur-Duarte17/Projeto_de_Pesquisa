@@ -157,7 +157,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-010 | recriar o índice facial Gallagher | concluída e aprovada; 589 fotografias e 1.303 faces; |
 | EX-011 | regenerar consultas e relevância Gallagher | concluída e aprovada; 20 consultas e 882 relações de relevância; |
 | EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
-| EX-013 | recriar o índice global Holidays | protocolo e executor preparados; execução completa pendente; |
+| EX-013 | recriar o índice global Holidays | concluída e aprovada; 1.491 imagens e 1.491 descritores; |
 | EX-014 | avaliar a busca global Holidays | pendente. |
 
 ### 10.3 Protocolo congelado da EX-009
@@ -221,5 +221,11 @@ Para aproveitar os recursos do equipamento sem alterar a representação adotada
 Antes do congelamento, 16 imagens foram processadas tanto individualmente quanto em lote. O cosseno mínimo entre descritores correspondentes foi 0,9999987, o Top-10 permaneceu idêntico e a diferença máxima entre scores foi 0,0001963. Essa diferença é compatível com arredondamento numérico de operações CUDA em formatos de lote distintos e não alterou a ordenação verificada. Um lote de 32 imagens também foi executado sem falta de memória na RTX 3050 Ti.
 
 As condições de aprovação da execução completa são: 1.491 imagens examinadas, 1.491 descritores, nenhuma falha, matriz `float32` finita com dimensão 2.048, vetores normalizados, hashes válidos e manifesto associado a uma árvore Git limpa.
+
+### 10.8 Resultado auditado da EX-013
+
+A execução no commit `4400961` examinou as 1.491 imagens em 2 min 03 s, com taxa observada de 12,09 imagens/s. Foram produzidos 1.491 descritores globais sem falha. A matriz possui forma `(1491, 2048)`, tipo `float32`, somente valores finitos e erro máximo de norma L2 igual a `1,192092896 × 10^-7`.
+
+Os metadados contêm 1.491 `image_id` e caminhos únicos, mapeamento contínuo entre linhas e descritores e SHA-256 válido para cada imagem. O manifesto registrou árvore Git limpa, os parâmetros CUDA, lote 32 e quatro trabalhadores de CPU. Uma segunda validação independente confirmou os hashes dos arquivos de descritores e metadados.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

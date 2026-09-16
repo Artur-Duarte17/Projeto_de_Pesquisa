@@ -279,6 +279,8 @@ python scripts/global/01_index_global_resnet.py `
   --no-label-from-parent
 ```
 
+A execução auditada da EX-013 produziu 1.491 descritores globais de 2.048 dimensões, sem falhas, em uma matriz `float32` normalizada por L2. O manifesto correspondente está em `outputs/experiments/ex-013_holidays_global_index/global_index_manifest.json`.
+
 Avaliar:
 
 ```powershell
