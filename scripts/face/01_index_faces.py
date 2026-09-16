@@ -15,7 +15,14 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from face_lib import build_face_app, embedding_from_face, sorted_faces
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import list_images, parent_label, rel_to_root, sha256_file, stable_image_id
+from retrieval_common import (
+    list_images,
+    load_inventory_image_ids,
+    parent_label,
+    rel_to_root,
+    sha256_file,
+    stable_image_id,
+)
 from run_manifest import write_run_manifest
 
 
@@ -28,6 +35,12 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--det-size", type=int, default=640)
     ap.add_argument("--split", default="index")
     ap.add_argument("--no-identity-from-parent", action="store_true")
+    ap.add_argument(
+        "--inventory-csv",
+        type=Path,
+        default=None,
+        help="Optional CSV whose image_id values replace generated path hashes.",
+    )
     return ap.parse_args()
 
 
@@ -41,6 +54,12 @@ def main() -> int:
     if not image_paths:
         print(f"[ERRO] No images found in {input_dir}")
         return 1
+    inventory_path = args.inventory_csv.resolve() if args.inventory_csv else None
+    inventory_ids = (
+        load_inventory_image_ids(inventory_path, input_dir, image_paths)
+        if inventory_path
+        else None
+    )
 
     app = build_face_app(device=args.device, det_size=args.det_size)
 
@@ -56,7 +75,11 @@ def main() -> int:
             n_read_fail += 1
             continue
         h, w = img.shape[:2]
-        image_id = stable_image_id(img_path, input_dir)
+        image_id = (
+            inventory_ids[img_path.resolve()]
+            if inventory_ids is not None
+            else stable_image_id(img_path, input_dir)
+        )
         image_sha256 = sha256_file(img_path)
         identity = "" if args.no_identity_from_parent else parent_label(img_path)
 
@@ -115,8 +138,9 @@ def main() -> int:
             "det_size": args.det_size,
             "split": args.split,
             "identity_from_parent": not args.no_identity_from_parent,
+            "image_id_source": "inventory_csv" if inventory_path else "stable_path_hash",
         },
-        inputs={"input_directory": input_dir},
+        inputs={"input_directory": input_dir, "inventory_csv": inventory_path},
         result_files={"embeddings": embeddings_path, "metadata": metadata_path},
         extra={
             "images_scanned": len(image_paths),

@@ -22,6 +22,7 @@ from global_lib import (
 from project_paths import DATA_DIR, OUTPUTS_DIR
 from retrieval_common import (
     list_images,
+    load_inventory_image_ids,
     parent_label,
     rel_to_root,
     sha256_file,
@@ -41,6 +42,12 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--split", default="index")
     ap.add_argument("--no-label-from-parent", action="store_true")
+    ap.add_argument(
+        "--inventory-csv",
+        type=Path,
+        default=None,
+        help="Optional CSV whose image_id values replace generated path hashes.",
+    )
     return ap.parse_args()
 
 
@@ -82,6 +89,12 @@ def main() -> int:
     if not image_paths:
         print(f"[ERRO] No images found in {input_dir}")
         return 1
+    inventory_path = args.inventory_csv.resolve() if args.inventory_csv else None
+    inventory_ids = (
+        load_inventory_image_ids(inventory_path, input_dir, image_paths)
+        if inventory_path
+        else None
+    )
 
     extractor, transform, device = build_resnet50_feature_extractor(
         device=args.device,
@@ -116,7 +129,11 @@ def main() -> int:
 
                 for item, embedding in zip(valid, batch_embeddings, strict=True):
                     img_path = Path(item["image_path"])
-                    image_id = stable_image_id(img_path, input_dir)
+                    image_id = (
+                        inventory_ids[img_path.resolve()]
+                        if inventory_ids is not None
+                        else stable_image_id(img_path, input_dir)
+                    )
                     label = "" if args.no_label_from_parent else parent_label(img_path)
                     rows.append(
                         {
@@ -165,8 +182,9 @@ def main() -> int:
             "workers": args.workers,
             "split": args.split,
             "label_from_parent": not args.no_label_from_parent,
+            "image_id_source": "inventory_csv" if inventory_path else "stable_path_hash",
         },
-        inputs={"input_directory": input_dir},
+        inputs={"input_directory": input_dir, "inventory_csv": inventory_path},
         result_files=result_files,
         extra={"images_scanned": len(image_paths), "embeddings": len(meta), "failures": len(failures)},
     )

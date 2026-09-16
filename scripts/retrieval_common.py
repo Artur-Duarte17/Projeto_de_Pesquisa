@@ -49,6 +49,51 @@ def stable_image_id(path: Path, base_dir: Path) -> str:
     return digest
 
 
+def load_inventory_image_ids(
+    inventory_csv: Path,
+    input_dir: Path,
+    image_paths: Iterable[Path],
+) -> dict[Path, str]:
+    inventory = pd.read_csv(inventory_csv, dtype=str).fillna("")
+    if "image_id" not in inventory.columns:
+        raise ValueError("Inventory CSV must contain an image_id column")
+    if "image_path" not in inventory.columns and "file_name" not in inventory.columns:
+        raise ValueError("Inventory CSV must contain image_path or file_name")
+
+    mapping: dict[Path, str] = {}
+    used_ids: dict[str, Path] = {}
+    for row in inventory.to_dict(orient="records"):
+        image_id = str(row["image_id"]).strip()
+        if not image_id:
+            raise ValueError("Inventory CSV contains an empty image_id")
+        stored_path = str(row.get("image_path", "")).strip()
+        if stored_path:
+            candidate = resolve_stored_path(stored_path).resolve()
+        else:
+            file_name = str(row.get("file_name", "")).strip()
+            if not file_name:
+                raise ValueError(f"Inventory row {image_id} has no usable image path")
+            candidate = (input_dir / file_name).resolve()
+        if candidate in mapping:
+            raise ValueError(f"Inventory contains a duplicate path: {candidate}")
+        if image_id in used_ids:
+            raise ValueError(
+                f"Inventory contains duplicate image_id {image_id}: "
+                f"{used_ids[image_id]} and {candidate}"
+            )
+        mapping[candidate] = image_id
+        used_ids[image_id] = candidate
+
+    required_paths = {path.resolve() for path in image_paths}
+    missing = sorted(str(path) for path in required_paths - set(mapping))
+    if missing:
+        preview = ", ".join(missing[:3])
+        raise ValueError(
+            f"Inventory does not map {len(missing)} indexed image(s): {preview}"
+        )
+    return {path: mapping[path] for path in required_paths}
+
+
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:

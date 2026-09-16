@@ -21,12 +21,69 @@ from retrieval_common import (
     apply_relevance_exclusions,
     average_precision,
     build_query_exclusions,
+    load_inventory_image_ids,
     precision_at_k,
     select_results_for_storage,
     sha256_file,
     summarize_rankings,
 )
 from run_manifest import write_run_manifest
+
+
+class InventoryImageIdTests(unittest.TestCase):
+    def test_inventory_ids_are_used_for_every_indexed_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_dir = root / "images"
+            input_dir.mkdir()
+            first = input_dir / "first.jpg"
+            second = input_dir / "second.jpg"
+            inventory = root / "inventory.csv"
+            inventory.write_text(
+                "image_id,file_name\nagrishow_first,first.jpg\nagrishow_second,second.jpg\n",
+                encoding="utf-8",
+            )
+
+            mapping = load_inventory_image_ids(inventory, input_dir, [first, second])
+
+            self.assertEqual(mapping[first.resolve()], "agrishow_first")
+            self.assertEqual(mapping[second.resolve()], "agrishow_second")
+
+    def test_inventory_rejects_missing_indexed_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_dir = root / "images"
+            input_dir.mkdir()
+            inventory = root / "inventory.csv"
+            inventory.write_text(
+                "image_id,file_name\nagrishow_first,first.jpg\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "does not map 1 indexed image"):
+                load_inventory_image_ids(
+                    inventory,
+                    input_dir,
+                    [input_dir / "first.jpg", input_dir / "missing.jpg"],
+                )
+
+    def test_inventory_rejects_duplicate_image_id(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_dir = root / "images"
+            input_dir.mkdir()
+            inventory = root / "inventory.csv"
+            inventory.write_text(
+                "image_id,file_name\nduplicate,first.jpg\nduplicate,second.jpg\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "duplicate image_id"):
+                load_inventory_image_ids(
+                    inventory,
+                    input_dir,
+                    [input_dir / "first.jpg", input_dir / "second.jpg"],
+                )
 
 
 class MetricTests(unittest.TestCase):
