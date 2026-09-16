@@ -1,12 +1,12 @@
-# Protocolo da coleção agro candidata
+# Protocolo e resultados da coleção agro Agrishow 2022
 
 Data de referência: **16 de setembro de 2026**.
 
 ## 1. Estado da decisão
 
-A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida como candidata principal para a validação aplicada ao contexto agro. A escolha da fonte, a auditoria de direitos de uso, o download integral dos 124 originais, a anotação da pessoa-alvo e a preparação das consultas pareadas estão concluídos; os experimentos ainda não foram executados.
+A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida para um estudo de caso aplicado ao contexto agro. A fonte, os direitos de uso, os 124 originais, o gabarito, as consultas pareadas, os índices e a avaliação quantitativa estão concluídos; a análise qualitativa permanece pendente.
 
-Consequentemente, este documento não autoriza afirmar que o sistema já foi validado no agro. A afirmação correta, até a conclusão das próximas execuções, é: **a coleção agro foi adquirida, anotada e preparada, mas a avaliação experimental ainda não foi executada**.
+A afirmação sustentada é: **o sistema foi avaliado em um estudo de caso da Agrishow 2022, com uma pessoa pública e uma consulta sorteada antes das buscas**. Não é correto generalizar esse resultado para outros eventos, pessoas, máquinas ou para todo o domínio agro.
 
 ## 2. Por que esta coleção foi escolhida
 
@@ -109,7 +109,7 @@ O CSV congelado deverá conter, no mínimo:
 | `review_status` | estado da revisão humana |
 | `notes` | observação curta sobre oclusão, escala ou dúvida |
 
-## 6. Protocolo experimental planejado
+## 6. Protocolo e resultado experimental
 
 A unidade recuperada continuará sendo a fotografia completa. A consulta facial será um recorte da pessoa-alvo; a consulta global será a fotografia-fonte completa. Serão comparadas as mesmas cinco configurações já congeladas no Gallagher:
 
@@ -128,6 +128,20 @@ Os pesos não serão ajustados usando o resultado da Agrishow. As métricas ser�
 - exemplos qualitativos de acerto e erro com atribuição das imagens.
 
 Como se trata de uma coleção pequena e de uma pessoa principal, seus resultados serão apresentados como **estudo de caso aplicado**, não como prova geral de desempenho em todo o domínio agro.
+
+A EX-022 examinou os 124 originais sem falha de leitura. O índice global contém 124 descritores de 2.048 dimensões. O índice facial contém 1.590 rostos distribuídos por 123 fotografias; a única imagem sem face detectada estava marcada como ausente, então nenhuma fotografia relevante foi perdida. A fonte sorteada está presente nos dois índices.
+
+A EX-023 excluiu a fotografia-fonte, deixando 123 candidatas e 90 relevantes. O ranking integral e o Top-10 foram auditados, sem vazamento da fonte, duplicidade ou valor não finito.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,998235 |
+| 0,0 / 1,0 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,797298 |
+| 0,9 / 0,1 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,998235 |
+| 0,7 / 0,3 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997898 |
+| 0,5 / 0,5 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,993485 |
+
+Os dez primeiros resultados foram relevantes em todos os métodos. O Recall@K é baixo porque existem 90 imagens relevantes: cinco acertos representam `5/90` e dez acertos representam `10/90`. Face e fusão 0,9/0,1 empataram em mAP. O contexto isolado ainda organizou grande parte das imagens relevantes, provavelmente por terem sido produzidas no mesmo evento, mas ficou abaixo do sinal facial. Aumentar seu peso não melhorou o baseline facial.
 
 ## 7. Aquisição reproduzível
 
@@ -160,6 +174,6 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 | EX-019 | baixar e validar os 124 originais | Artur | concluída e aprovada; 124 arquivos, 420,43 MiB, zero falhas |
 | EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | concluída e congelada; 91 presentes, 33 ausentes, zero incertos |
 | EX-021 | criar consultas pareadas e relevância | preparação e conferência concluídas | concluída; fonte, recorte facial, exclusão e hashes congelados antes das buscas |
-| EX-022 | indexar faces e descritores globais | Artur | pendente |
-| EX-023 | avaliar os cinco métodos | Artur | pendente |
+| EX-022 | indexar faces e descritores globais | Artur | concluída e aprovada; 1.590 faces em 123 imagens e 124 descritores globais |
+| EX-023 | avaliar os cinco métodos | execução e auditoria concluídas | concluída e aprovada; fonte excluída, 123 candidatas e 90 relevantes |
 | EX-024 | analisar erros e gerar figura qualitativa | Artur | pendente |

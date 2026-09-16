@@ -10,7 +10,7 @@ Leia primeiro o mapa canônico na raiz: [`LEIA_PRIMEIRO.md`](../LEIA_PRIMEIRO.md
 | `README.md` da raiz | operacional | estrutura e comandos do software ativo |
 | `protocolo_avaliacao.md` | canônico e atual | definições de exclusão, métricas, ranking e manifestos |
 | `resultados_experimentais_congelados.md` | canônico e atual | tabela oficial de métricas, interpretações e limitações |
-| `protocolo_colecao_agro.md` | canônico e atual | fonte autorizada candidata, direitos, anotação e plano da validação agro |
+| `protocolo_colecao_agro.md` | canônico e atual | fonte autorizada, direitos, protocolo, resultados e limites do estudo de caso agro |
 | `historico_privado/` | privado; ignorado pelo Git | dossiê completo em DOCX, PDF e Markdown; consultar apenas para história e recuperação |
 | `artigo_sibgrapi_2026/` | rascunho histórico | fonte de texto/figuras; não contém validação agro e não está pronto para submissão |
 | `entregas/` | entregas e rascunhos históricos | preservar; conferir data e protocolo antes de reutilizar resultados |
@@ -31,7 +31,7 @@ Leia primeiro o mapa canônico na raiz: [`LEIA_PRIMEIRO.md`](../LEIA_PRIMEIRO.md
 
 - [Protocolo de avaliação](protocolo_avaliacao.md) — regras obrigatórias para os próximos experimentos.
 - [Resultados experimentais congelados](resultados_experimentais_congelados.md) — números oficiais atuais.
-- [Protocolo da coleção agro candidata](protocolo_colecao_agro.md) — seleção da Agrishow 2022 e condições para a validação aplicada.
+- [Protocolo e resultados da coleção agro](protocolo_colecao_agro.md) — seleção da Agrishow 2022, condições, resultados e limites do estudo de caso.
 - `tests/test_retrieval_methodology.py` — testes sintéticos do protocolo.
 
 ## Regra de evidência

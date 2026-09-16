@@ -309,3 +309,29 @@ Os casos foram selecionados por regra determinística antes da inspeção visual
 - maior degradação: `gallagher_id19_q1`, AP de 0,950000 para 0,887500.
 
 Na maior melhora, o contexto reorganizou fotografias do mesmo ambiente sem alterar quais dez imagens apareciam no Top-10. Na maior degradação, a semelhança do cenário e da composição de grupo promoveu uma imagem incorreta, ilustrando como contexto pode competir com identidade. As quatro figuras foram inspecionadas, mas permanecem somente em `outputs/` porque contêm pessoas identificáveis. O manifesto registrou árvore Git limpa, hashes válidos e os totais esperados para todos os métodos.
+
+### 10.16 Protocolo Agrishow congelado
+
+A Agrishow 2022 foi tratada como estudo de caso aplicado, não como benchmark geral. Foram preservados 124 originais em CC BY 2.0 depois da remoção de três derivados recortados. Antes de qualquer busca, 91 imagens foram marcadas como presença da pessoa-alvo, 33 como ausência e nenhuma permaneceu incerta. Uma única fonte foi sorteada entre as 91 imagens presentes por regra SHA-256 com semente registrada. O recorte facial foi confirmado visualmente e a fotografia completa correspondente foi congelada como consulta global.
+
+A mesma fonte é excluída de todos os métodos. Os cinco pesos são os já definidos para o Gallagher: somente face, somente contexto e fusões 0,9/0,1, 0,7/0,3 e 0,5/0,5. Nenhum peso ou rótulo foi alterado depois da observação dos rankings.
+
+### 10.17 Resultado auditado da EX-022
+
+A indexação no commit `6aa8dad` examinou os 124 originais. O índice facial produziu 1.590 embeddings de 512 dimensões em 123 fotografias; houve uma imagem sem face, nenhuma falha de leitura e nenhuma face sem embedding. Essa imagem estava anotada como ausente, então todas as 91 fotografias relevantes possuíam ao menos uma face detectada. O índice global produziu 124 descritores de 2.048 dimensões, sem falhas.
+
+As duas matrizes são `float32`, finitas e normalizadas, com erro máximo de norma L2 igual a `1,192092896 × 10^-7`. Identificadores, caminhos e hashes coincidem com o inventário; a fonte sorteada está nos dois índices. Os manifestos registraram CUDA, árvore Git limpa e o mesmo commit.
+
+### 10.18 Resultado auditado da EX-023
+
+A avaliação no commit `ecc37f7` usou uma consulta, 123 candidatas depois da exclusão da fonte e 90 imagens relevantes. Todos os cinco rankings possuem 123 itens, e os dez primeiros resultados armazenados não contêm a fonte, duplicidades ou valores não finitos.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,998235 |
+| 0,0 / 1,0 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,797298 |
+| 0,9 / 0,1 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,998235 |
+| 0,7 / 0,3 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997898 |
+| 0,5 / 0,5 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,993485 |
+
+Todos os métodos acertaram as dez primeiras posições. A diferença de Recall decorre apenas do denominador de 90 relevantes. Face e fusão 0,9/0,1 empataram em mAP; as demais fusões ficaram ligeiramente abaixo, e contexto isolado obteve 0,797298. O resultado sustenta o funcionamento no evento, na pessoa e na consulta avaliados, mas não autoriza generalização para outras pessoas, eventos, máquinas ou condições do agronegócio.

@@ -35,7 +35,7 @@ Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial 
 
 O texto existente apresenta aplicação potencial no meio rural e em eventos. Isso é **contextualização**, não validação agro.
 
-Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como candidata autorizada. A auditoria encontrou 127 arquivos em CC BY 2.0; três recortes derivados foram excluídos, restando 124 originais para o estudo de caso de uma pessoa pública recorrente. A EX-019 concluiu e validou o download integral. A EX-020 congelou o gabarito manual com 91 fotografias presentes, 33 ausentes e nenhuma incerta. A EX-021 sorteou a fotografia-fonte antes das buscas e congelou o par formado pelo recorte facial e pela fotografia completa. A avaliação ainda não foi executada. Consulte `docs/protocolo_colecao_agro.md` antes de fazer qualquer afirmação experimental nesse domínio.
+Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como fonte autorizada para um estudo de caso. Após remover três recortes derivados, a EX-019 validou 124 originais; a EX-020 congelou 91 fotografias presentes e 33 ausentes; e a EX-021 sorteou a fonte antes das buscas. A EX-022 indexou 1.590 rostos em 123 fotografias e 124 descritores globais. Na EX-023, face e fusão 0,9/0,1 obtiveram mAP de 0,998235; o contexto isolado obteve 0,797298. Isso demonstra a aplicação no evento e na pessoa avaliados, não desempenho geral em todo o agro. Consulte `docs/protocolo_colecao_agro.md` antes de ampliar essa afirmação.
 
 Recuperação de maquinário permanece trabalho futuro.
 
@@ -46,7 +46,7 @@ Recuperação de maquinário permanece trabalho futuro.
 3. `docs/README.md`: mapa dos documentos e seu status.
 4. `docs/resultados_experimentais_congelados.md`: tabela oficial para escrita acadêmica.
 5. `docs/protocolo_avaliacao.md`: protocolo, decisões e auditoria das execuções atuais.
-6. `docs/protocolo_colecao_agro.md`: fonte candidata, direitos de uso e protocolo da validação agro.
+6. `docs/protocolo_colecao_agro.md`: fonte, direitos, protocolo, resultados e limites do estudo de caso agro.
 7. Dossiê privado `Dossie_Tecnico_Historico_Projeto_CBIR` em DOCX, PDF e Markdown: consultar somente para história, decisões, métricas antigas e recuperação.
 
 O dossiê e o material de submissão não podem ser enviados ao GitHub público.
@@ -75,6 +75,7 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 3. a EX-019 baixou e validou a coleção Agrishow 2022;
 4. a EX-020 anotou e congelou a presença da pessoa-alvo;
 5. a EX-021 sorteou a fotografia-fonte e congelou as consultas facial e global pareadas;
-6. a EX-022 deve criar e auditar os índices facial e global da Agrishow;
-7. repetir o protocolo pareado sem alterar retrospectivamente os pesos;
-8. adaptar o manuscrito ao modelo vigente da Revista Principia.
+6. a EX-022 criou e auditou os índices facial e global da Agrishow;
+7. a EX-023 avaliou os cinco métodos sem alterar retrospectivamente os pesos;
+8. a EX-024 deve analisar erros e produzir a figura qualitativa com atribuição;
+9. adaptar o manuscrito ao modelo vigente da Revista Principia.
