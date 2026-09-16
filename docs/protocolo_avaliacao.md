@@ -158,7 +158,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-011 | regenerar consultas e relevância Gallagher | concluída e aprovada; 20 consultas e 882 relações de relevância; |
 | EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
 | EX-013 | recriar o índice global Holidays | concluída e aprovada; 1.491 imagens e 1.491 descritores; |
-| EX-014 | avaliar a busca global Holidays | pendente. |
+| EX-014 | avaliar a busca global Holidays | protocolo e avaliador preparados; execução completa pendente. |
 
 ### 10.3 Protocolo congelado da EX-009
 
@@ -227,5 +227,13 @@ As condições de aprovação da execução completa são: 1.491 imagens examina
 A execução no commit `4400961` examinou as 1.491 imagens em 2 min 03 s, com taxa observada de 12,09 imagens/s. Foram produzidos 1.491 descritores globais sem falha. A matriz possui forma `(1491, 2048)`, tipo `float32`, somente valores finitos e erro máximo de norma L2 igual a `1,192092896 × 10^-7`.
 
 Os metadados contêm 1.491 `image_id` e caminhos únicos, mapeamento contínuo entre linhas e descritores e SHA-256 válido para cada imagem. O manifesto registrou árvore Git limpa, os parâmetros CUDA, lote 32 e quatro trabalhadores de CPU. Uma segunda validação independente confirmou os hashes dos arquivos de descritores e metadados.
+
+### 10.9 Protocolo congelado da EX-014
+
+O protocolo oficial contém 500 consultas e 991 relações de relevância. A primeira imagem de cada grupo Holidays é a consulta e as demais imagens do mesmo grupo são relevantes. Como todas as consultas já pertencem ao índice aprovado na EX-013, o avaliador reutiliza o descritor global congelado correspondente, exclui explicitamente a fotografia-fonte e ordena integralmente as 1.490 imagens elegíveis. Somente os dez primeiros resultados são armazenados.
+
+A multiplicação entre consultas e galeria é executada na GPU em lotes de 128. O `query_time_ms` mede somente esse backend de similaridade, exclusão e ordenação com descritores já calculados; portanto, não representa latência ponta a ponta de uma nova imagem enviada pelo usuário. Precision@5, Precision@10, Recall@5, Recall@10 e AP usam o ranking integral e a relevância oficial.
+
+Em uma verificação com as primeiras 20 consultas, o avaliador otimizado e o avaliador genérico produziram métricas idênticas e o mesmo Top-10 em todas as consultas. A diferença máxima entre scores foi `0,001366`, decorrente da extração CUDA em lotes distintos, sem alteração da ordenação observada. A fotografia-fonte não apareceu nos resultados.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

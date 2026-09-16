@@ -284,15 +284,18 @@ A execução auditada da EX-013 produziu 1.491 descritores globais de 2.048 dime
 Avaliar:
 
 ```powershell
-python scripts/global/03_evaluate_global.py `
+python scripts/global/04_evaluate_holidays.py `
   --queries-csv data/evaluation/holidays_global_queries.csv `
   --relevance-csv data/evaluation/holidays_relevance.csv `
   --index-dir outputs/experiments/ex-013_holidays_global_index `
   --output-dir outputs/experiments/ex-014_holidays_global_evaluation `
   --save-topk 10 `
+  --batch-size 128 `
   --device cuda `
   --save-visual-examples
 ```
+
+O avaliador Holidays reutiliza o descritor da fotografia-consulta já congelado no índice da EX-013, exclui a própria fotografia e calcula na GPU o ranking integral das 1.490 candidatas. O Top-10 limita somente o que é salvo, não a profundidade usada no cálculo das métricas.
 
 ### 7. Fusao face + global
 
