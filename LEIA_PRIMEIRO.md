@@ -55,13 +55,15 @@ O dossiê e o material de submissão não podem ser enviados ao GitHub público.
 
 ## Estado da correção metodológica
 
-O código ativo já incorpora exclusão uniforme da imagem-fonte, Precision@K com denominador K, AP/mAP sobre o ranking integral, separação do Top-K salvo, hashes das imagens indexadas, manifestos de execução e testes sintéticos. Isso corrige o protocolo no código, mas ainda não produz resultados oficiais: os índices e experimentos precisam ser refeitos.
+O código ativo já incorpora exclusão uniforme da imagem-fonte, Precision@K com denominador K, AP/mAP sobre o ranking integral, separação do Top-K salvo, hashes das imagens indexadas, manifestos de execução e testes sintéticos. Essa correção, por si só, não tornou oficiais os resultados históricos; cada índice e experimento precisa ser refeito antes de substituir os números antigos.
+
+As EX-008 e EX-009 já foram refeitas e auditadas no ambiente definitivo. O índice LFW contém 16.058 faces de 13.185 fotografias. A avaliação de 1.672 consultas obteve P@5 de 0,457177, P@10 de 0,284629, Recall@5 de 0,901149, Recall@10 de 0,945308 e mAP de 0,965135. Esses números são o baseline LFW corrigido; não demonstram desempenho em eventos ou no contexto agro.
 
 ## Próxima ordem técnica
 
-1. a EX-007 foi concluída: `laboratorio/cibir_gpu` foi validado com CUDA e o ambiente substituído foi removido;
-2. as EX-008 e a preparação da EX-009 foram concluídas: o índice facial LFW e o protocolo de 1.672 consultas estão congelados;
-3. executar a avaliação facial LFW da EX-009 e, depois, Gallagher e Holidays no mesmo ambiente;
+1. as EX-007, EX-008 e EX-009 foram concluídas e auditadas;
+2. executar as EX-010 e EX-011 para recriar o índice Gallagher e suas consultas;
+3. executar a EX-012 para avaliar a busca facial Gallagher e, depois, refazer Holidays;
 4. conferir métricas diretamente nos CSVs e manifestos;
 5. definir um protocolo próprio para a fusão antes de tratá-la como resultado final;
 6. obter coleção agro autorizada;

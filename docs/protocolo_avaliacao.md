@@ -153,7 +153,7 @@ A sequência reservada após a aprovação da EX-007 é:
 |---|---|---|
 | EX-007 | criar, validar e congelar o ambiente CUDA | concluída e aprovada; |
 | EX-008 | recriar o índice facial LFW | concluída e aprovada; 13.233 imagens e 16.058 faces; |
-| EX-009 | avaliar a busca facial LFW | protocolo congelado; avaliação pendente; |
+| EX-009 | avaliar a busca facial LFW | concluída e aprovada; 1.672 consultas; |
 | EX-010 | recriar o índice facial Gallagher | pendente; |
 | EX-011 | regenerar consultas e relevância Gallagher | pendente; |
 | EX-012 | avaliar a busca facial Gallagher | pendente; |
@@ -176,5 +176,19 @@ O LFW é tratado como baseline técnico de recuperação por identidade, não co
 Como todas as consultas são fotografias do próprio índice, a EX-009 reutiliza o embedding da maior face já calculado e congelado na EX-008. A fotografia-fonte continua excluída. Similaridade, redução do melhor rosto por fotografia e ordenação integral são executadas em lotes na GPU. Em uma verificação de equivalência com 20 consultas, esse caminho produziu as mesmas métricas e o mesmo Top-10 do avaliador genérico; a diferença máxima entre scores foi `3,6 × 10^-7`, compatível com arredondamento de ponto flutuante.
 
 Os arquivos canônicos são `data/evaluation/lfw_face_queries.csv` e `data/evaluation/lfw_face_relevance.csv`. O antigo `data/evaluation/face_queries.csv`, limitado a 20 identidades sem regra de seleção documentada, foi retirado da árvore ativa e permanece recuperável pelo histórico Git.
+
+### 10.4 Resultado auditado da EX-009
+
+A execução no commit `ac13b6f` avaliou 1.672 consultas sem falhas. Cada ranking contém as 13.184 fotografias elegíveis, depois da exclusão da fonte. Não houve fotografia-fonte no Top-10 nem repetição de `image_id` dentro de uma consulta. Os manifestos do protocolo e da avaliação registraram árvore Git limpa e hashes compatíveis com os arquivos produzidos.
+
+| Métrica | Resultado |
+|---|---:|
+| Precision@5 | 0,457177 |
+| Precision@10 | 0,284629 |
+| Recall@5 | 0,901149 |
+| Recall@10 | 0,945308 |
+| mAP | 0,965135 |
+
+Precision@K utiliza denominador fixo K. Como parte considerável das identidades elegíveis possui menos de cinco ou dez fotografias relevantes, P@5 e P@10 não devem ser interpretadas isoladamente como taxa de identificação. O mAP elevado também deve ser contextualizado: a mediana da AP foi 1,0 e muitas identidades possuem apenas uma fotografia relevante após a exclusão da consulta. Esse baseline mede recuperação por identidade no LFW, não generalização para álbuns de eventos.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.
