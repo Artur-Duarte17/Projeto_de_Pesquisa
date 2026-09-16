@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
 import hashlib
 import html
@@ -44,7 +43,18 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--include-derived", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Compatibility option. Downloads are intentionally limited to one worker.",
+    )
+    parser.add_argument(
+        "--request-delay",
+        type=float,
+        default=8.0,
+        help="Seconds to wait between original-image requests (default: 8).",
+    )
     parser.add_argument("--timeout", type=int, default=90)
     parser.add_argument("--max-images", type=int, default=None)
     return parser.parse_args()
@@ -180,7 +190,7 @@ def download_image(
     image_dir: Path,
     timeout: int,
     overwrite: bool,
-) -> dict[str, str]:
+) -> dict[str, str | bool]:
     destination = image_dir / str(record["file_name"])
     temporary = destination.with_suffix(destination.suffix + ".part")
     expected_sha1 = str(record["sha1"])
@@ -188,18 +198,26 @@ def download_image(
 
     if destination.exists() and not overwrite:
         if destination.stat().st_size == expected_size and sha1_file(destination) == expected_sha1:
-            return {"image_id": str(record["image_id"]), "status": "cached", "error": ""}
+            return {
+                "image_id": str(record["image_id"]),
+                "status": "cached",
+                "error": "",
+                "rate_limited": False,
+            }
         return {
             "image_id": str(record["image_id"]),
             "status": "failed",
             "error": f"Existing file failed validation: {destination}",
+            "rate_limited": False,
         }
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     last_error: Exception | None = None
-    for delay in (0, 2, 5, 10, 20):
-        if delay:
-            time.sleep(delay)
+    rate_limited = False
+    wait_before_retry = 0.0
+    for attempt in range(4):
+        if wait_before_retry:
+            time.sleep(wait_before_retry)
         if temporary.exists():
             temporary.unlink()
         request = urllib.request.Request(
@@ -229,15 +247,32 @@ def download_image(
                 "image_id": str(record["image_id"]),
                 "status": "downloaded",
                 "error": "",
+                "rate_limited": False,
             }
         except Exception as error:
             last_error = error
+            rate_limited = (
+                isinstance(error, urllib.error.HTTPError) and error.code == 429
+            )
             if temporary.exists():
                 temporary.unlink()
+            if attempt < 3:
+                if rate_limited:
+                    retry_after = error.headers.get("Retry-After")
+                    retry_after_seconds = (
+                        float(retry_after) if retry_after and retry_after.isdigit() else 0.0
+                    )
+                    wait_before_retry = max(
+                        retry_after_seconds,
+                        (30.0, 60.0, 120.0)[attempt],
+                    )
+                else:
+                    wait_before_retry = (2.0, 5.0, 10.0)[attempt]
     return {
         "image_id": str(record["image_id"]),
         "status": "failed",
         "error": repr(last_error),
+        "rate_limited": rate_limited,
     }
 
 
@@ -251,6 +286,13 @@ def write_csv(path: Path, rows: list[dict[str, str | int]]) -> None:
 
 def main() -> int:
     args = parse_args()
+    if args.request_delay < 0:
+        raise ValueError("--request-delay must be zero or greater.")
+    if args.workers != 1:
+        print(
+            "[WARN] --workers is limited to 1 to respect Wikimedia rate limits.",
+            flush=True,
+        )
     output_dir = args.output_dir.resolve()
     metadata_dir = output_dir / "metadata"
     image_dir = output_dir / "images"
@@ -282,35 +324,55 @@ def main() -> int:
         "selected_files": len(selected),
         "expected_license": EXPECTED_LICENSE,
         "selected_original_bytes": sum(int(record["size_bytes"]) for record in selected),
-        "images_downloaded": bool(args.download_images),
+        "download_attempted": bool(args.download_images),
+        "download_complete": False,
+        "downloaded_files": 0,
+        "cached_files": 0,
+        "download_failures": 0,
+        "pending_files": len(selected),
+        "request_delay_seconds": args.request_delay,
         "selection_rule": "Exclude titles containing '(cropped)' unless --include-derived is used.",
     }
 
-    failures: list[dict[str, str]] = []
+    failures: list[dict[str, str | bool]] = []
     if args.download_images:
         image_dir.mkdir(parents=True, exist_ok=True)
-        workers = max(1, args.workers)
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = {
-                executor.submit(
-                    download_image,
-                    record,
-                    image_dir,
-                    args.timeout,
-                    args.overwrite,
-                ): record
-                for record in selected
-            }
-            for number, future in enumerate(as_completed(futures), start=1):
-                result = future.result()
-                if result["status"] == "failed":
-                    failures.append(result)
+        downloaded = 0
+        cached = 0
+        for number, record in enumerate(selected, start=1):
+            result = download_image(
+                record,
+                image_dir,
+                args.timeout,
+                args.overwrite,
+            )
+            if result["status"] == "downloaded":
+                downloaded += 1
+            elif result["status"] == "cached":
+                cached += 1
+            else:
+                failures.append(result)
+            print(
+                f"[{number:03d}/{len(selected):03d}] {result['status']}: {result['image_id']}"
+                + (f" - {result['error']}" if result["error"] else ""),
+                flush=True,
+            )
+            if result["rate_limited"]:
                 print(
-                    f"[{number:03d}/{len(selected):03d}] {result['status']}: {result['image_id']}"
-                    + (f" - {result['error']}" if result["error"] else ""),
+                    "[INCOMPLETE] Wikimedia rate limit persisted; stopping to avoid "
+                    "additional requests. Re-run later to resume.",
                     flush=True,
                 )
+                break
+            if result["status"] != "cached" and number < len(selected):
+                time.sleep(args.request_delay)
+
+        valid_files = downloaded + cached
+        summary["downloaded_files"] = downloaded
+        summary["cached_files"] = cached
         summary["download_failures"] = len(failures)
+        summary["pending_files"] = len(selected) - valid_files
+        summary["download_complete"] = not failures and valid_files == len(selected)
         if failures:
             with (metadata_dir / "download_failures.json").open("w", encoding="utf-8") as stream:
                 json.dump(failures, stream, ensure_ascii=False, indent=2)
@@ -328,8 +390,14 @@ def main() -> int:
     print(f"[OK] license: {EXPECTED_LICENSE} for every audited file")
     print(f"[OK] metadata: {metadata_dir}")
     if args.download_images:
-        print(f"[OK] images: {image_dir}")
-    return 1 if failures else 0
+        if summary["download_complete"]:
+            print(f"[OK] images: {image_dir}")
+        else:
+            print(
+                f"[INCOMPLETE] images: {summary['downloaded_files']} downloaded, "
+                f"{summary['cached_files']} cached, {summary['pending_files']} pending"
+            )
+    return 1 if args.download_images and not summary["download_complete"] else 0
 
 
 if __name__ == "__main__":

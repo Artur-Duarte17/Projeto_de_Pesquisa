@@ -115,10 +115,10 @@ laboratorio/cibir_gpu/Scripts/python.exe scripts/data/download_agrishow_2022.py
 O download integral é deliberadamente explícito:
 
 ```powershell
-laboratorio/cibir_gpu/Scripts/python.exe scripts/data/download_agrishow_2022.py --download-images --workers 4
+laboratorio/cibir_gpu/Scripts/python.exe scripts/data/download_agrishow_2022.py --download-images --workers 1 --request-delay 8
 ```
 
-Cada arquivo baixado é aceito somente quando tamanho e SHA-1 coincidem com o registro do Wikimedia. A operação é retomável: arquivos já válidos são reutilizados. Os dados ficam em `data/raw/agrishow_2022`, pasta ignorada pelo Git.
+O download é sequencial e inclui uma pausa entre solicitações para respeitar os limites do servidor. Se o Wikimedia mantiver uma limitação HTTP 429 após as tentativas espaçadas, a execução é interrompida em vez de solicitar os demais arquivos. Cada arquivo baixado é aceito somente quando tamanho e SHA-1 coincidem com o registro do Wikimedia. A operação é retomável: arquivos já válidos são reutilizados. Os dados ficam em `data/raw/agrishow_2022`, pasta ignorada pelo Git.
 
 ## 8. Fontes primárias
 
@@ -130,7 +130,7 @@ Cada arquivo baixado é aceito somente quando tamanho e SHA-1 coincidem com o re
 
 | ID | Atividade | Responsável pela execução | Situação |
 |---|---|---|---|
-| EX-019 | baixar e validar os 124 originais | Artur | preparada; não executada |
+| EX-019 | baixar e validar os 124 originais | Artur | em andamento; 2 arquivos válidos preservados após limitação HTTP 429, retomada sequencial preparada |
 | EX-020 | revisar inventário e congelar presença da pessoa-alvo | Artur, com conferência | pendente |
 | EX-021 | criar consultas pareadas e relevância | Artur executa; código versionado | pendente |
 | EX-022 | indexar faces e descritores globais | Artur | pendente |
