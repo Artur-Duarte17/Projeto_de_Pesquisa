@@ -154,8 +154,8 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-007 | criar, validar e congelar o ambiente CUDA | concluída e aprovada; |
 | EX-008 | recriar o índice facial LFW | concluída e aprovada; 13.233 imagens e 16.058 faces; |
 | EX-009 | avaliar a busca facial LFW | concluída e aprovada; 1.672 consultas; |
-| EX-010 | recriar o índice facial Gallagher | pendente; |
-| EX-011 | regenerar consultas e relevância Gallagher | pendente; |
+| EX-010 | recriar o índice facial Gallagher | concluída e aprovada; 589 fotografias e 1.303 faces; |
+| EX-011 | regenerar consultas e relevância Gallagher | preparador validado; execução pendente; |
 | EX-012 | avaliar a busca facial Gallagher | pendente; |
 | EX-013 | recriar o índice global Holidays | pendente; |
 | EX-014 | avaliar a busca global Holidays | pendente. |

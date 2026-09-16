@@ -162,7 +162,7 @@ Indexar a Gallagher em GPU:
 ```powershell
 python scripts/face/01_index_faces.py `
   --input-dir data/raw/gallagher/images `
-  --output-dir outputs/face_index_gallagher `
+  --output-dir outputs/experiments/ex-010_gallagher_face_index `
   --device cuda `
   --no-identity-from-parent
 ```
@@ -171,7 +171,10 @@ Preparar consultas e relevancia a partir das anotacoes oficiais:
 
 ```powershell
 python scripts/face/04_prepare_gallagher_eval.py `
-  --index-dir outputs/face_index_gallagher `
+  --index-dir outputs/experiments/ex-010_gallagher_face_index `
+  --output-dir data/evaluation `
+  --query-crop-dir data/query/gallagher_ex011 `
+  --manifest-dir outputs/experiments/ex-011_gallagher_protocol `
   --device cuda `
   --overwrite
 ```
@@ -182,8 +185,8 @@ Avaliar busca facial na Gallagher:
 python scripts/face/03_evaluate_face.py `
   --queries-csv data/evaluation/gallagher_face_queries.csv `
   --relevance-csv data/evaluation/gallagher_relevance.csv `
-  --index-dir outputs/face_index_gallagher `
-  --output-dir outputs/reports/gallagher_face `
+  --index-dir outputs/experiments/ex-010_gallagher_face_index `
+  --output-dir outputs/experiments/ex-012_gallagher_face_evaluation `
   --save-topk 10 `
   --threshold 0.35 `
   --device cuda `
