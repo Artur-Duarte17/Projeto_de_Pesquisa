@@ -159,6 +159,9 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
 | EX-013 | recriar o índice global Holidays | concluída e aprovada; 1.491 imagens e 1.491 descritores; |
 | EX-014 | avaliar a busca global Holidays | concluída e aprovada; 500 consultas; |
+| EX-015 | recriar o índice global Gallagher | protocolo definido; execução pendente; |
+| EX-016 | gerar o protocolo pareado Gallagher | pendente; |
+| EX-017 | comparar face, global contextual e fusão | pendente. |
 
 ### 10.3 Protocolo congelado da EX-009
 
@@ -251,4 +254,17 @@ A avaliação no commit `c6af569` executou as 500 consultas sem falhas. Cada ran
 
 A AP mínima foi 0,004215, a mediana foi 1,0 e a máxima foi 1,0; nenhuma consulta teve AP zero. Cada consulta possui entre uma e doze imagens relevantes, com mediana igual a uma. Isso explica por que Precision@5 e Precision@10 são numericamente baixas apesar do Recall e do mAP elevados: depois de recuperar a única imagem relevante, as posições restantes até K contam como não relevantes. O tempo informado mede somente o ranking com descritores pré-calculados, não a extração ponta a ponta de uma imagem nova.
 
-A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.
+### 10.11 Protocolo definido para a fusão Gallagher
+
+Cada item será uma única consulta lógica com dois caminhos explicitamente relacionados:
+
+- o recorte validado na EX-011 representa a pessoa-alvo e produz o descritor facial;
+- a fotografia-fonte completa representa o contexto visual e produz o descritor global;
+- `source_image_id` liga os dois caminhos e exclui a fotografia-fonte de todas as modalidades;
+- o conjunto de relevância continua sendo a presença da pessoa-alvo segundo as anotações oficiais.
+
+Antes da fusão, a EX-015 recriará os 589 descritores globais Gallagher com a mesma ResNet50 e o mesmo ambiente da EX-013. A EX-016 produzirá um CSV pareado contendo `face_query_path`, `global_query_path`, identidade-alvo e fonte, com hashes e manifesto.
+
+A EX-017 comparará, no mesmo protocolo e universo de candidatas, os baselines `1,0/0,0` (somente face) e `0,0/1,0` (somente contexto global) e as combinações `0,9/0,1`, `0,7/0,3` e `0,5/0,5`. Os cossenos serão convertidos para `[0,1]` antes da soma ponderada. As cinco configurações serão relatadas como análise de sensibilidade; nenhuma será escolhida retrospectivamente como única configuração vencedora.
+
+Esse desenho responde a uma pergunta específica: o contexto da fotografia-fonte ajuda a recuperar outras fotografias que contêm a pessoa selecionada? Ele não equivale a buscar identidade somente pela cena e não constitui validação agro.
