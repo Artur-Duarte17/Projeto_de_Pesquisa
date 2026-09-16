@@ -2,22 +2,27 @@ from __future__ import annotations
 
 import argparse
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from PIL import Image
 from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from global_lib import build_resnet50_feature_extractor, describe_torch_device, extract_global_embedding
+from global_lib import (
+    build_resnet50_feature_extractor,
+    describe_torch_device,
+    extract_global_embeddings_batch,
+)
 from project_paths import DATA_DIR, OUTPUTS_DIR
 from retrieval_common import (
     list_images,
     parent_label,
-    read_image_size,
     rel_to_root,
     sha256_file,
     stable_image_id,
@@ -32,13 +37,43 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--max-images", type=int, default=None)
     ap.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     ap.add_argument("--weights", choices=["imagenet", "none"], default="imagenet")
+    ap.add_argument("--batch-size", type=int, default=32)
+    ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--split", default="index")
     ap.add_argument("--no-label-from-parent", action="store_true")
     return ap.parse_args()
 
 
+def prepare_image(image_path: Path, transform) -> dict[str, object]:
+    try:
+        with Image.open(image_path) as image:
+            width, height = image.size
+            tensor = transform(image.convert("RGB"))
+        return {
+            "image_path": image_path,
+            "tensor": tensor,
+            "width": int(width),
+            "height": int(height),
+            "sha256": sha256_file(image_path),
+            "error": None,
+        }
+    except Exception as exc:
+        return {
+            "image_path": image_path,
+            "tensor": None,
+            "width": None,
+            "height": None,
+            "sha256": None,
+            "error": repr(exc),
+        }
+
+
 def main() -> int:
     args = parse_args()
+    if args.batch_size <= 0:
+        raise ValueError("batch-size must be positive")
+    if args.workers <= 0:
+        raise ValueError("workers must be positive")
     input_dir = args.input_dir.resolve()
     out_dir = args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -57,28 +92,47 @@ def main() -> int:
     rows = []
     embs = []
     failures = []
-    for img_path in tqdm(image_paths, desc="Indexing global embeddings", unit="img"):
-        try:
-            emb = extract_global_embedding(img_path, extractor, transform, device)
-        except Exception as exc:
-            failures.append({"image_path": rel_to_root(img_path), "error": repr(exc)})
-            continue
-        image_id = stable_image_id(img_path, input_dir)
-        width, height = read_image_size(img_path)
-        label = "" if args.no_label_from_parent else parent_label(img_path)
-        rows.append(
-            {
-                "image_id": image_id,
-                "image_path": rel_to_root(img_path),
-                "sha256": sha256_file(img_path),
-                "embedding_row": len(embs),
-                "width": width,
-                "height": height,
-                "label_or_group": label,
-                "split": args.split,
-            }
-        )
-        embs.append(emb.astype(np.float32))
+    progress = tqdm(total=len(image_paths), desc="Indexing global embeddings", unit="img")
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        for batch_start in range(0, len(image_paths), args.batch_size):
+            batch_paths = image_paths[batch_start : batch_start + args.batch_size]
+            prepared = list(executor.map(lambda path: prepare_image(path, transform), batch_paths))
+            valid = [item for item in prepared if item["error"] is None]
+            for item in prepared:
+                if item["error"] is not None:
+                    failures.append(
+                        {
+                            "image_path": rel_to_root(Path(item["image_path"])),
+                            "error": str(item["error"]),
+                        }
+                    )
+
+            if valid:
+                batch_embeddings = extract_global_embeddings_batch(
+                    [item["tensor"] for item in valid],
+                    extractor,
+                    device,
+                )
+
+                for item, embedding in zip(valid, batch_embeddings, strict=True):
+                    img_path = Path(item["image_path"])
+                    image_id = stable_image_id(img_path, input_dir)
+                    label = "" if args.no_label_from_parent else parent_label(img_path)
+                    rows.append(
+                        {
+                            "image_id": image_id,
+                            "image_path": rel_to_root(img_path),
+                            "sha256": str(item["sha256"]),
+                            "embedding_row": len(embs),
+                            "width": int(item["width"]),
+                            "height": int(item["height"]),
+                            "label_or_group": label,
+                            "split": args.split,
+                        }
+                    )
+                    embs.append(embedding)
+            progress.update(len(batch_paths))
+    progress.close()
 
     if not embs:
         print("[ERRO] No global embeddings were extracted.")
@@ -107,6 +161,8 @@ def main() -> int:
             "max_images": args.max_images,
             "device": args.device,
             "weights": args.weights,
+            "batch_size": args.batch_size,
+            "workers": args.workers,
             "split": args.split,
             "label_from_parent": not args.no_label_from_parent,
         },

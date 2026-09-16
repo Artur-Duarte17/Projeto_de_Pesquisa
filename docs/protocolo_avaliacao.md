@@ -157,7 +157,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-010 | recriar o índice facial Gallagher | concluída e aprovada; 589 fotografias e 1.303 faces; |
 | EX-011 | regenerar consultas e relevância Gallagher | concluída e aprovada; 20 consultas e 882 relações de relevância; |
 | EX-012 | avaliar a busca facial Gallagher | concluída e aprovada; 20 consultas; |
-| EX-013 | recriar o índice global Holidays | pendente; |
+| EX-013 | recriar o índice global Holidays | protocolo e executor preparados; execução completa pendente; |
 | EX-014 | avaliar a busca global Holidays | pendente. |
 
 ### 10.3 Protocolo congelado da EX-009
@@ -211,5 +211,15 @@ A avaliação no commit `66d41bc` executou 20 consultas sem falhas. Cada ranking
 | Tempo médio por consulta | 615,704 ms |
 
 A AP mínima foi 0,180849, a mediana foi 0,962851 e a máxima foi 1,0. O resultado sustenta a busca facial multi-rosto no Gallagher, mas não representa todas as identidades: o protocolo usa 20 pessoas selecionadas entre as mais frequentes e uma consulta por identidade.
+
+### 10.7 Protocolo congelado da EX-013
+
+A EX-013 indexará as 1.491 imagens da INRIA Holidays com uma ResNet50 pré-treinada na ImageNet. A camada de classificação é removida e a saída da penúltima camada, com 2.048 dimensões, é normalizada pela norma L2 e armazenada em `float32`. Como as imagens estão em uma pasta plana e a relevância vem dos arquivos oficiais do protocolo Holidays, o nome da pasta não é usado como rótulo.
+
+Para aproveitar os recursos do equipamento sem alterar a representação adotada, a leitura, conversão, transformação e geração de SHA-256 usam quatro trabalhadores de CPU, enquanto a inferência da ResNet50 é executada na GPU em lotes de 32 imagens. O manifesto registra esses parâmetros, o commit Git, os arquivos de entrada e os hashes dos resultados.
+
+Antes do congelamento, 16 imagens foram processadas tanto individualmente quanto em lote. O cosseno mínimo entre descritores correspondentes foi 0,9999987, o Top-10 permaneceu idêntico e a diferença máxima entre scores foi 0,0001963. Essa diferença é compatível com arredondamento numérico de operações CUDA em formatos de lote distintos e não alterou a ordenação verificada. Um lote de 32 imagens também foi executado sem falta de memória na RTX 3050 Ti.
+
+As condições de aprovação da execução completa são: 1.491 imagens examinadas, 1.491 descritores, nenhuma falha, matriz `float32` finita com dimensão 2.048, vetores normalizados, hashes válidos e manifesto associado a uma árvore Git limpa.
 
 A fusão não recebe ainda um identificador de execução final. Primeiro deve ser decidido se ela usará uma fotografia completa como consulta para as duas modalidades ou caminhos distintos para o rosto e para o contexto global. Executar a fusão antes dessa decisão produziria um resultado difícil de interpretar.

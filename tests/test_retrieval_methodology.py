@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -15,7 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from face_lib import search_face_index
 from fusion_lib import search_fusion
-from global_lib import search_global_index
+from global_lib import extract_global_embeddings_batch, search_global_index
 from retrieval_common import (
     apply_relevance_exclusions,
     average_precision,
@@ -47,6 +48,30 @@ class MetricTests(unittest.TestCase):
         saved = select_results_for_storage(ranking, 2)
         self.assertEqual(ranking["image_id"].tolist(), ["a", "b", "c"])
         self.assertEqual(saved["image_id"].tolist(), ["a", "b"])
+
+
+class GlobalBatchExtractionTests(unittest.TestCase):
+    def test_batch_preserves_order_and_normalizes_descriptors(self) -> None:
+        tensors = [
+            torch.tensor([3.0, 4.0], dtype=torch.float32),
+            torch.tensor([0.0, 2.0], dtype=torch.float32),
+        ]
+        descriptors = extract_global_embeddings_batch(
+            tensors,
+            torch.nn.Identity(),
+            torch.device("cpu"),
+        )
+        expected = np.asarray([[0.6, 0.8], [0.0, 1.0]], dtype=np.float32)
+        np.testing.assert_allclose(descriptors, expected, rtol=1e-6, atol=1e-7)
+
+    def test_empty_batch_returns_empty_float32_matrix(self) -> None:
+        descriptors = extract_global_embeddings_batch(
+            [],
+            torch.nn.Identity(),
+            torch.device("cpu"),
+        )
+        self.assertEqual(descriptors.shape, (0, 0))
+        self.assertEqual(descriptors.dtype, np.float32)
 
 
 class ExclusionTests(unittest.TestCase):

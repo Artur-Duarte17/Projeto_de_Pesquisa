@@ -212,15 +212,19 @@ Essa avaliacao usa `source_image_id` para remover a foto original da consulta qu
 
 ```powershell
 python scripts/global/01_index_global_resnet.py `
-  --input-dir data/raw/holidays `
-  --output-dir outputs/global_index `
-  --device cuda
+  --input-dir data/raw/holidays/images `
+  --output-dir outputs/experiments/ex-013_holidays_global_index `
+  --device cuda `
+  --batch-size 32 `
+  --workers 4 `
+  --no-label-from-parent
 ```
 
 Saidas:
 
-- `outputs/global_index/global_embeddings.npy`
-- `outputs/global_index/global_metadata.csv`
+- `outputs/experiments/ex-013_holidays_global_index/global_embeddings.npy`
+- `outputs/experiments/ex-013_holidays_global_index/global_metadata.csv`
+- `outputs/experiments/ex-013_holidays_global_index/global_index_manifest.json`
 
 ### 5. Buscar imagem semelhante
 
@@ -267,8 +271,12 @@ Indexar com ResNet50:
 ```powershell
 python scripts/global/01_index_global_resnet.py `
   --input-dir data/raw/holidays/images `
-  --output-dir outputs/global_index_holidays `
-  --device cuda
+  --output-dir outputs/experiments/ex-013_holidays_global_index `
+  --device cuda `
+  --weights imagenet `
+  --batch-size 32 `
+  --workers 4 `
+  --no-label-from-parent
 ```
 
 Avaliar:
@@ -277,8 +285,8 @@ Avaliar:
 python scripts/global/03_evaluate_global.py `
   --queries-csv data/evaluation/holidays_global_queries.csv `
   --relevance-csv data/evaluation/holidays_relevance.csv `
-  --index-dir outputs/global_index_holidays `
-  --output-dir outputs/reports/holidays_global `
+  --index-dir outputs/experiments/ex-013_holidays_global_index `
+  --output-dir outputs/experiments/ex-014_holidays_global_evaluation `
   --save-topk 10 `
   --device cuda `
   --save-visual-examples

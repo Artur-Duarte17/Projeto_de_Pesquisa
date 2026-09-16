@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as functional
 from PIL import Image
 
 from retrieval_common import cosine_scores, image_ids_for_query_path, l2_normalize
@@ -44,6 +45,21 @@ def extract_global_embedding(image_path: Path, extractor, transform, device) -> 
     with torch.no_grad():
         feat = extractor(x).flatten(1).cpu().numpy()[0]
     return l2_normalize(feat.astype(np.float32))
+
+
+def extract_global_embeddings_batch(
+    tensors: list[torch.Tensor],
+    extractor,
+    device: torch.device,
+) -> np.ndarray:
+    """Extract normalized descriptors for one image batch, preserving input order."""
+    if not tensors:
+        return np.empty((0, 0), dtype=np.float32)
+    batch = torch.stack(tensors).to(device)
+    with torch.inference_mode():
+        features = extractor(batch).flatten(1)
+        features = functional.normalize(features, p=2, dim=1)
+    return features.cpu().numpy().astype(np.float32)
 
 
 def load_global_index(index_dir: Path) -> tuple[np.ndarray, pd.DataFrame]:
