@@ -357,24 +357,23 @@ Interpretacao simples:
 
 Conclusao: o modulo global com ResNet50 esta funcionando bem na tarefa apropriada para ele, que e encontrar imagens visualmente semelhantes.
 
-### 9.3 Resultado global no Gallagher para buscar pessoa
+### 9.3 Resultado global contextual no Gallagher para buscar pessoa
 
-Tambem foi testado o ResNet50 global no Gallagher usando as mesmas consultas da busca facial.
+O protocolo atual usa a fotografia-fonte completa como consulta global e avalia se o contexto ajuda a recuperar outras fotografias que contêm a pessoa selecionada.
 
 Metricas:
 
 ```text
-Precision@5:  0.1400
-Precision@10: 0.1300
-Recall@5:     0.0481
-Recall@10:    0.0748
-mAP:          0.0291
-Tempo medio:  247 ms por consulta
+Precision@5:  0.2600
+Precision@10: 0.1950
+Recall@5:     0.2035
+Recall@10:    0.2347
+mAP:          0.2808
 ```
 
 Interpretacao:
 
-Esse resultado e baixo porque a consulta do Gallagher e baseada em rosto/pessoa, mas o ResNet50 global compara a imagem inteira. Quando a consulta e um rosto recortado e o banco contem fotos completas, o conteudo visual global nao representa diretamente a identidade da pessoa.
+O resultado contextual e superior ao experimento historico que comparava um recorte de rosto com fotografias completas, mas continua baixo porque semelhanca de ambiente, objetos e composicao nao determina a identidade da pessoa.
 
 Conclusao: CBIR global nao substitui reconhecimento facial quando a tarefa e encontrar uma pessoa especifica.
 
@@ -401,19 +400,19 @@ Pesos testados:
 0.5 face / 0.5 global
 ```
 
-### 10.2 Resultado historico da fusao no Gallagher
+### 10.2 Resultado atual da fusao no Gallagher
 
-Os numeros desta secao pertencem a uma execucao anterior e nao sao resultados oficiais atuais. O protocolo final de fusao ainda depende da definicao de uma consulta compativel para face e imagem inteira. Eles sao mantidos apenas como registro do caminho experimental.
+O protocolo pareado usa o recorte validado para a busca facial e a fotografia-fonte completa para o contexto global. A fonte e excluida de todos os rankings.
 
 Tabela comparativa:
 
-| Metodo | Precision@5 | Precision@10 | Recall@10 | mAP | Tempo medio |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Face isolado | 0.8775 | 0.8180 | 0.6700 | 0.6322 | 635 ms |
-| Global isolado | 0.1400 | 0.1300 | 0.0748 | 0.0291 | 247 ms |
-| Fusao 0.9/0.1 | 0.7000 | 0.6050 | 0.6484 | 0.4365 | 1033 ms |
-| Fusao 0.7/0.3 | 0.6900 | 0.6000 | 0.6481 | 0.4268 | 957 ms |
-| Fusao 0.5/0.5 | 0.6200 | 0.5600 | 0.5743 | 0.3698 | 920 ms |
+| Metodo | Precision@5 | Precision@10 | Recall@10 | mAP |
+| --- | ---: | ---: | ---: | ---: |
+| Face isolado | 0.8700 | 0.6450 | 0.6629 | 0.9139 |
+| Contexto global isolado | 0.2600 | 0.1950 | 0.2347 | 0.2808 |
+| Fusao 0.9/0.1 | 0.8700 | 0.6450 | 0.6629 | 0.9087 |
+| Fusao 0.7/0.3 | 0.8200 | 0.6400 | 0.6579 | 0.8653 |
+| Fusao 0.5/0.5 | 0.7500 | 0.5950 | 0.6099 | 0.7790 |
 
 ### 10.3 Interpretacao da fusao
 
@@ -496,7 +495,7 @@ Status atual:
 | Criar indice global ResNet50 | Feito |
 | Avaliar CBIR global | Feito |
 | Ativar PyTorch com GPU/CUDA | Feito |
-| Avaliar fusao face + global | Resultado historico preservado; protocolo final pendente |
+| Avaliar fusao face + global | Feito com protocolo pareado atual |
 | Gerar relatorio/documentacao | Feito |
 | Interface Streamlit minima | Proximo passo recomendado |
 | Material final para artigo | Proximo passo depois da interface/exemplos |
@@ -518,7 +517,7 @@ O projeto ja tem um nucleo experimental publicavel em forma inicial, porque poss
 
 O ponto mais importante para o artigo e nao vender a fusao como se ela sempre melhorasse. O resultado correto e:
 
-> Na avaliacao historica, a fusao simples nao superou o modulo facial no cenario de busca por identidade. O protocolo final de fusao ainda precisa ser congelado, enquanto o CBIR global ja apresentou bom desempenho na base Holidays.
+> Na avaliacao pareada atual, a fusao simples nao superou o modulo facial no cenario de busca por identidade, enquanto o CBIR global apresentou bom desempenho na base Holidays.
 
 Essa frase e cientificamente honesta e defensavel.
 
@@ -579,7 +578,7 @@ A conclusao tecnica atual e:
 ```text
 A busca facial e o melhor metodo para encontrar pessoas.
 O CBIR global com ResNet50 e adequado para encontrar imagens visualmente semelhantes.
-A avaliacao historica da fusao simples nao melhorou a busca por pessoa no Gallagher, mas o resultado ainda nao deve ser tratado como baseline oficial atual.
+A fusao simples entre face e contexto global nao melhorou, em media, a busca por pessoa no Gallagher.
 ```
 
 Portanto, o projeto esta pronto para entrar na fase de demonstracao com interface minima e organizacao dos resultados para escrita academica.

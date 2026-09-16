@@ -161,7 +161,7 @@ A sequência reservada após a aprovação da EX-007 é:
 | EX-014 | avaliar a busca global Holidays | concluída e aprovada; 500 consultas; |
 | EX-015 | recriar o índice global Gallagher | concluída e aprovada; 589 imagens e 589 descritores; |
 | EX-016 | gerar o protocolo pareado Gallagher | concluída e aprovada; 20 consultas; |
-| EX-017 | comparar face, global contextual e fusão | pendente. |
+| EX-017 | comparar face, global contextual e fusão | concluída e aprovada; cinco configurações; |
 
 ### 10.3 Protocolo congelado da EX-009
 
@@ -280,3 +280,19 @@ Os metadados possuem 589 identificadores únicos, mapeamento contínuo para a ma
 O protocolo pareado foi gerado no commit `baf5f83` a partir das 20 consultas congeladas na EX-011. Ele contém 20 identidades-alvo, 20 recortes faciais e 20 fotografias completas, ligadas por `source_image_id`. Existem 19 fotografias-fonte únicas porque uma fotografia contém duas pessoas selecionadas como alvos distintos; isso é esperado em um acervo multi-rosto.
 
 Cada recorte e cada fotografia completa possui SHA-256 conferido contra o arquivo local. Todas as fontes existem nos índices facial e global, todas as consultas possuem relevância e nenhuma fonte permanece no gabarito. O manifesto registrou árvore Git limpa e hashes válidos para o CSV pareado e seu inventário de evidências.
+
+### 10.14 Resultado auditado da EX-017
+
+A execução no commit `532bb84` avaliou as 20 consultas nas cinco configurações predefinidas, sempre com 588 fotografias elegíveis após excluir a fonte. Foram produzidos 100 rankings integrais e salvos 1.000 resultados. Não houve falha, fotografia-fonte, duplicidade ou valor não finito. O baseline somente facial reproduziu exatamente o Top-10 e todas as métricas da EX-012.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 0,870000 | 0,645000 | 0,566409 | 0,662866 | 0,913949 |
+| 0,0 / 1,0 | 0,260000 | 0,195000 | 0,203513 | 0,234716 | 0,280833 |
+| 0,9 / 0,1 | 0,870000 | 0,645000 | 0,566409 | 0,662866 | 0,908721 |
+| 0,7 / 0,3 | 0,820000 | 0,640000 | 0,533433 | 0,657866 | 0,865268 |
+| 0,5 / 0,5 | 0,750000 | 0,595000 | 0,473894 | 0,609914 | 0,778968 |
+
+O contexto global isolado ficou acima do experimento histórico que usava incorretamente o recorte facial como consulta global, mas permaneceu muito abaixo do reconhecimento facial na tarefa de recuperar uma pessoa. A fusão `0,9/0,1` manteve as métricas Top-K do baseline, porém reduziu o mAP em `0,005228`. Em AP por consulta, ela melhorou uma consulta, empatou nove e piorou dez. As fusões com maior peso global degradaram também as métricas Top-K.
+
+Portanto, este conjunto não fornece evidência de que a soma linear com contexto global melhore, em média, a recuperação por identidade. Ele mostra que o contexto pode ajudar casos isolados, mas seu efeito não é consistente. A figura qualitativa de `0,7/0,3` foi inspecionada e apresentou coerência visual com pessoa e cenário; isso não altera a conclusão quantitativa. O tempo médio de extração facial foi `966,050 ms`; os tempos inferiores a 4 ms registrados para o backend medem apenas fusão e ordenação com descritores pré-calculados.

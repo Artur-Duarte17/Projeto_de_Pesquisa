@@ -327,6 +327,8 @@ python scripts/fusion/04_evaluate_paired_gallagher.py `
 
 Na avaliação pareada, o recorte representa a pessoa-alvo e a fotografia-fonte completa representa o contexto global da mesma consulta lógica. A fonte é excluída de todos os rankings. Os pesos somente face, somente contexto, `0,9/0,1`, `0,7/0,3` e `0,5/0,5` são comparados como análise de sensibilidade predefinida.
 
+Na EX-017, somente face obteve `mAP = 0,913949`, somente contexto `0,280833` e as fusões `0,9/0,1`, `0,7/0,3` e `0,5/0,5` obtiveram, respectivamente, `0,908721`, `0,865268` e `0,778968`. Assim, a soma linear não superou o baseline facial na tarefa de recuperar a pessoa selecionada.
+
 Cada indexacao, busca e avaliacao grava um manifesto JSON com configuracao, hashes dos arquivos de entrada e saida, versoes do ambiente e estado do Git.
 
 ### 8. Interface minima
