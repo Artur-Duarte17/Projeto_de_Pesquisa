@@ -27,6 +27,8 @@ from retrieval_common import (
     sha256_file,
     summarize_rankings,
 )
+
+from random_baseline_lib import expected_random_ap, probability_perfect_topk
 from run_manifest import write_run_manifest
 
 
@@ -280,6 +282,15 @@ class FusionScoreTests(unittest.TestCase):
         scores = np.zeros((1, 1), dtype=np.float32)
         with self.assertRaises(ValueError):
             fuse_cosine_score_matrices(scores, scores, np.ones((1, 1), dtype=bool), 0.7, 0.4)
+
+
+class RandomBaselineTests(unittest.TestCase):
+    def test_exact_expected_ap_matches_two_item_enumeration(self) -> None:
+        self.assertAlmostEqual(expected_random_ap(total=2, relevant=1), 0.75)
+
+    def test_perfect_topk_probability_uses_sampling_without_replacement(self) -> None:
+        self.assertAlmostEqual(probability_perfect_topk(total=4, relevant=2, k=2), 1 / 6)
+        self.assertEqual(probability_perfect_topk(total=4, relevant=2, k=3), 0.0)
 
 
 class ManifestTests(unittest.TestCase):
