@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.data.prepare_agrishow_face_query import bbox_iou, expanded_square_bbox
+from scripts.data.prepare_agrishow_robustness_queries import selection_key
 
 
 class AgrishowQueryGeometryTests(unittest.TestCase):
@@ -22,6 +23,11 @@ class AgrishowQueryGeometryTests(unittest.TestCase):
     def test_bbox_iou_matches_identical_and_disjoint_boxes(self) -> None:
         self.assertEqual(bbox_iou((1, 2, 11, 12), (1, 2, 11, 12)), 1.0)
         self.assertEqual(bbox_iou((0, 0, 10, 10), (10, 10, 20, 20)), 0.0)
+
+    def test_robustness_source_selection_key_is_reproducible(self) -> None:
+        first = selection_key(123, "agrishow2022_image_01")
+        self.assertEqual(first, selection_key(123, "agrishow2022_image_01"))
+        self.assertNotEqual(first, selection_key(124, "agrishow2022_image_01"))
 
 
 if __name__ == "__main__":
