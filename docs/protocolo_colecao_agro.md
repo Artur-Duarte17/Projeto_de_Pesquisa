@@ -145,7 +145,7 @@ Os dez primeiros resultados foram relevantes em todos os métodos. O Recall@K é
 
 A EX-024 recalculou os cinco rankings integrais e reproduziu exatamente o Top-10 e a AP da EX-023. Na busca facial, o primeiro item irrelevante apareceu na posição 90; no contexto global, apareceu na posição 17. A fusão 0,9/0,1 manteve a AP da face, mas compartilhou nove das dez primeiras imagens com o baseline, demonstrando que houve reordenação interna.
 
-A figura qualitativa usa o recorte-consulta e as cinco primeiras fotografias recuperadas pela busca facial. As cinco imagens são relevantes e as caixas amarelas foram inspecionadas sobre o rosto correto. O painel cobre fotografia de grupo, cavalgada, fundo institucional e palco, com seis registros individuais de fotógrafo, fonte, licença, página original e modificação. A figura permanece local em `outputs/experiments/ex-024_agrishow_analysis/agrishow_face_top5.png` até sua incorporação controlada ao manuscrito.
+A figura qualitativa usa o recorte-consulta e as cinco primeiras fotografias recuperadas pela busca facial. As cinco imagens são relevantes e as caixas amarelas foram inspecionadas sobre o rosto correto. O painel cobre fotografia de grupo, cavalgada, fundo institucional e palco, com seis registros individuais de fotógrafo, fonte, licença, página original e modificação. Após o encerramento experimental, a cópia canônica da figura permanece privada em `publication_private/principia/figuras/agrishow_face_top5.png`, acompanhada de atribuições, legenda e manifesto.
 
 A EX-025 mostrou por que o Top-K precisa ser interpretado com cautela: com 90 relevantes em 123 candidatas, a AP aleatória esperada é 0,741369, e um ranking aleatório tem probabilidade exata de 20,34% de acertar todas as cinco primeiras posições e 3,81% de acertar todas as dez primeiras. Em 200.000 permutações, nenhuma atingiu a AP facial de 0,998235; 14.348 atingiram ou superaram a AP global de 0,797298.
 
@@ -202,3 +202,9 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 | EX-025 | comparar a consulta inicial com rankings aleatórios | execução e auditoria concluídas | concluída e aprovada; 200.000 permutações e probabilidades exatas de P@K |
 | EX-026 | avaliar robustez em dez consultas | preparação, revisão e auditoria concluídas | concluída e aprovada; dez fontes, 50 rankings e 500 resultados Top-10 |
 | EX-027 | avaliar o caso dirigido de chapéu e sombra | preparação, revisão e auditoria concluídas | concluída e aprovada; consulta separada da amostra de robustez |
+
+## 10. Encerramento e reprodução
+
+A EX-028 preservou no dossiê privado os resultados, decisões, limitações, hashes e 30 evidências textuais pequenas. Também preservou em `publication_private/principia/figuras` a figura qualitativa final e seus arquivos de atribuição. Em seguida, removeu 45 alvos locais pesados ou intermediários, incluindo as fotografias baixadas, recortes, páginas de revisão, índices, rankings, saídas experimentais e utilitários temporários das EX-019 a EX-027. Foram removidos 410 arquivos, que somavam 524.304.264 bytes; a diferença observada de espaço livre no volume foi de 525.447.168 bytes.
+
+Essa limpeza não invalida os resultados: os CSVs públicos de consulta e relevância, os scripts do projeto, os documentos canônicos, os hashes, a proveniência Wikimedia e o histórico Git permitem reconstruir o ciclo. Uma nova execução deve baixar novamente os 124 originais, verificar tamanho e SHA-1 contra o inventário de origem e seguir, em ordem, o protocolo registrado neste documento. Os resultados continuam limitados à pessoa e ao evento avaliados.

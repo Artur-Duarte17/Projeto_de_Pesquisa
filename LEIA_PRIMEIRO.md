@@ -39,6 +39,8 @@ Em setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecion
 
 Recuperação de maquinário permanece trabalho futuro.
 
+Após o encerramento, a EX-028 preservou o dossiê, 30 evidências leves com hashes e a figura final privada, e removeu 45 alvos locais reproduzíveis (imagens baixadas, índices, rankings, revisões e utilitários temporários). Para repetir o estudo, reconstrua esses artefatos a partir dos scripts, dos CSVs públicos e das fontes registradas; não interprete a ausência dos arquivos pesados como ausência de evidência experimental.
+
 ## Documentos canônicos
 
 1. Este arquivo: mapa público e curto do estado atual.
@@ -81,4 +83,5 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 9. a EX-025 estabeleceu o controle aleatório para interpretar a alta proporção de imagens relevantes;
 10. a EX-026 avaliou robustez em dez consultas, com seleção e relevância congeladas;
 11. a EX-027 avaliou separadamente o caso dirigido de chapéu e sombra;
-12. adaptar o manuscrito ao modelo vigente da Revista Principia usando somente os resultados congelados.
+12. a EX-028 preservou as evidências essenciais e removeu os artefatos locais pesados e reproduzíveis da Agrishow;
+13. adaptar o manuscrito ao modelo vigente da Revista Principia usando somente os resultados congelados.
