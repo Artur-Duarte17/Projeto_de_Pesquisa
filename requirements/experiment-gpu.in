@@ -11,5 +11,6 @@ pillow==12.2.0
 scikit-learn==1.7.2
 streamlit==1.58.0
 kagglehub==1.0.2
+gdown==5.2.0
 torch @ https://download.pytorch.org/whl/cu128/torch-2.11.0%2Bcu128-cp310-cp310-win_amd64.whl
 torchvision @ https://download.pytorch.org/whl/cu128/torchvision-0.26.0%2Bcu128-cp310-cp310-win_amd64.whl

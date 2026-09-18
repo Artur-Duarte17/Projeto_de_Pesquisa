@@ -389,3 +389,64 @@ A EX-027 avaliou separadamente a fotografia `agrishow2022_52030041698`, já anot
 | 0,5 / 0,5 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,988609 |
 
 Nesse caso específico, a fusão 0,7/0,3 superou a face em 0,000647 de AP. O ganho não deve ser generalizado nem usado para escolher retrospectivamente um peso, pois a avaliação agregada da EX-026 continua favorecendo o baseline facial.
+
+## 11. Avaliação do detector na WIDER FACE — EX-029 a EX-032
+
+### 11.1 Escopo e fonte congelados — EX-029
+
+A avaliação usa exclusivamente as 3.226 imagens da divisão oficial de validação da WIDER FACE. Treino e teste são proibidos. A página oficial do Multimedia Laboratory da Chinese University of Hong Kong registra a licença Creative Commons BY-NC-ND, os links separados para as imagens de validação, as anotações de caixas e o pacote de avaliação. URLs, tamanhos e hashes foram congelados em `data/evaluation/widerface_sources.json` antes do download integral.
+
+O arquivo `WIDER_val.zip` deve possuir 362.752.168 bytes e SHA-256 `f9efbd09f28c5d2d884be8c0eaef3967158c866a593fc36ab0413e4b2a58a17a`. O arquivo `wider_face_split.zip` deve possuir 3.591.642 bytes, MD5 `0e3767bcf0e326556d407bf5bff5d27c` e SHA-256 `c7561e4f5e7a118c249e0a5c5c902b0de90bbf120d7da9fa28d99041f68a8a5c`. O pacote oficial `eval_tools.zip` deve possuir 8.447.003 bytes, MD5 `358576548629ca5dd6fc4b2de15b10ae` e SHA-256 `1cf49c8243fa8a1632efe7f6aa09fd7a3994ac838c9008bdbc9dd1d547bb234a`.
+
+Antes da extração, o executor rejeita hash, tamanho, membro inseguro e qualquer marcador de treino ou teste. Depois da extração, exige exatamente 3.226 imagens, 3.226 blocos de anotação, correspondência integral de nomes e os quatro arquivos oficiais de ground truth: geral, Easy, Medium e Hard.
+
+### 11.2 Detector e inferência congelados — EX-030
+
+O modelo é exclusivamente `buffalo_l/det_10g.onnx`, com SHA-256 `5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91`. Embora o fluxo anterior o descrevesse genericamente como RetinaFace, o InsightFace 0.2.1 identifica tecnicamente esse arquivo como `insightface.model_zoo.scrfd.SCRFD`. O experimento registra essa classe explicitamente para não confundir detecção com reconhecimento.
+
+Somente o grafo do detector é carregado. ArcFace não é carregado, nenhuma rotina de reconhecimento é executada e nenhum embedding é produzido. A sessão ONNX Runtime deve ter `CUDAExecutionProvider` como primeiro provedor ativo; uma sessão apenas em CPU reprova a execução.
+
+As decisões congeladas antes dos resultados são:
+
+- imagens em resolução original;
+- entrada do detector de 640 × 640;
+- `max_num=0`;
+- piso de score 0,02;
+- limiar operacional 0,50;
+- IoU mínimo 0,50;
+- uma passagem integral salva caixas e scores a partir de 0,02;
+- as métricas no limiar 0,50 são derivadas dessa mesma saída, sem repetir a inferência integral.
+
+Antes da passagem completa, uma amostra fixa de 20 imagens compara as caixas e scores obtidos diretamente em 0,50 com a filtragem, em 0,50, da saída produzida com piso 0,02. A tolerância é `1e-4` para caixas e `1e-6` para scores. Há ainda um único smoke test técnico de uma imagem; ele não constitui piloto experimental e nenhum resultado é usado para ajustar modelo, resolução ou limiar.
+
+### 11.3 Métricas e auditoria congeladas — EX-031
+
+AP Easy, Medium e Hard seguem o protocolo oficial WIDER de 1.000 limiares, normalização global de score, ground truths ignorados e integração VOC da curva precisão-recall. No limiar operacional 0,50 são calculados precisão, recall e F1 sobre todas as faces válidas. O tempo médio e a mediana por imagem medem apenas a chamada de inferência do detector.
+
+O recall descritivo é estratificado pelos atributos oficiais de desfoque, iluminação, oclusão e pose. O tamanho usa a definição do artigo WIDER pela altura da face: pequena entre 10 e 50 pixels, média entre 50 e 300 pixels e grande acima de 300 pixels; faces abaixo de 10 pixels são relatadas separadamente.
+
+Os testes sintéticos cobrem resultado perfeito, vazio, duplicado, caixa inválida e ground truth ignorado. Uma amostra fixa de 20 imagens repete as associações com uma implementação independente de IoU em `torchvision`; as caixas inclusivas do protocolo oficial são convertidas para a convenção exclusiva do `torchvision` antes da comparação. A execução também exige repetição determinística, valores finitos, caixas válidas e ausência de imagens ou anotações faltantes.
+
+### 11.4 Comando completo reservado
+
+| Campo | Valor |
+|---|---|
+| Identificador | EX-029/EX-030/EX-031 |
+| Motivo | baixar somente a validação oficial, validar fonte e hashes, executar uma passagem do detector na GPU e produzir as métricas auditadas |
+| Risco | download de aproximadamente 375 MB, uso temporário estimado de até 2 GB e execução prolongada da GPU; qualquer ausência de CUDA, divergência de hash ou presença de treino/teste interrompe o processo |
+| Duração estimada | 30 a 60 minutos, dependente da rede, disco e RTX 3050 Ti |
+| Resultado esperado | exatamente 3.226 imagens processadas, zero embeddings, AP Easy/Medium/Hard, métricas em 0,50, recalls por categoria, curva agregada, predições completas temporárias e manifesto auditável |
+
+Executar uma única vez, a partir de `C:\Projeto_de_Pesquisa`, depois do commit de preparação:
+
+```powershell
+laboratorio\cibir_gpu\Scripts\python.exe scripts\face\08_run_widerface_validation.py
+```
+
+Não repetir com parâmetros diferentes depois de observar os resultados. Qualquer alteração de modelo, resolução, piso, limiar ou IoU deve receber outro identificador experimental.
+
+### 11.5 Preservação e limpeza planejadas — EX-032
+
+Após a auditoria, os resultados agregados serão incorporados aos documentos canônicos e ao dossiê privado. A WIDER mede robustez geral de detecção; não mede reconhecimento da mesma pessoa e não constitui validação agro. Nenhuma imagem, recorte ou caixa desenhada da WIDER será publicada. O artigo poderá usar somente tabelas e gráficos agregados, mantendo a figura visual licenciada da Agrishow.
+
+Antes da limpeza, o dossiê será renderizado, inspecionado e sincronizado nas cópias local e OneDrive. A lista literal de exclusão será simulada e arquivada. Somente então poderão ser removidos imagens, arquivos compactados, anotações reproduzíveis, predições completas e caches WIDER, com registro do espaço recuperado e confirmação de preservação de LFW, Gallagher, Holidays, ambiente GPU e evidências pequenas.

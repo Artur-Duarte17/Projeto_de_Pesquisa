@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-09-18",
+  "official_project_url": "http://shuoyang1213.me/WIDERFACE/",
+  "institutional_project_url": "https://mmlab.ie.cuhk.edu.hk/projects/WIDERFace/",
+  "license": "Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND)",
+  "scope": "WIDER FACE official validation split only",
+  "expected_validation_images": 3226,
+  "archives": {
+    "validation_images": {
+      "filename": "WIDER_val.zip",
+      "google_drive_file_id": "1GUCogbp16PMGa39thoMMeWxp7Rp5oM8Q",
+      "official_link": "https://drive.google.com/file/d/1GUCogbp16PMGa39thoMMeWxp7Rp5oM8Q/view?usp=sharing",
+      "official_mirror": "https://huggingface.co/datasets/wider_face/resolve/main/data/WIDER_val.zip",
+      "bytes": 362752168,
+      "sha256": "f9efbd09f28c5d2d884be8c0eaef3967158c866a593fc36ab0413e4b2a58a17a"
+    },
+    "annotations": {
+      "filename": "wider_face_split.zip",
+      "url": "http://shuoyang1213.me/WIDERFACE/support/bbx_annotation/wider_face_split.zip",
+      "bytes": 3591642,
+      "md5": "0e3767bcf0e326556d407bf5bff5d27c",
+      "sha256": "c7561e4f5e7a118c249e0a5c5c902b0de90bbf120d7da9fa28d99041f68a8a5c"
+    },
+    "evaluation_tools": {
+      "filename": "eval_tools.zip",
+      "url": "http://shuoyang1213.me/WIDERFACE/support/eval_script/eval_tools.zip",
+      "bytes": 8447003,
+      "md5": "358576548629ca5dd6fc4b2de15b10ae",
+      "sha256": "1cf49c8243fa8a1632efe7f6aa09fd7a3994ac838c9008bdbc9dd1d547bb234a"
+    }
+  },
+  "forbidden_archive_markers": [
+    "WIDER_train",
+    "WIDER_test"
+  ],
+  "protocol": {
+    "model": "buffalo_l/det_10g.onnx",
+    "model_runtime_class": "insightface.model_zoo.scrfd.SCRFD",
+    "model_sha256": "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91",
+    "provider": "CUDAExecutionProvider",
+    "input_size": [640, 640],
+    "max_num": 0,
+    "score_floor": 0.02,
+    "operating_threshold": 0.5,
+    "iou_threshold": 0.5,
+    "image_resolution": "original",
+    "size_bins_by_face_height_px": {
+      "small": "10 <= height < 50",
+      "medium": "50 <= height <= 300",
+      "large": "height > 300"
+    }
+  }
+}
