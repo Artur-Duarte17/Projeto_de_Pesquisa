@@ -83,6 +83,18 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="CSV with query_id and manually confirmed target_face_index.",
     )
+    parser.add_argument(
+        "--reject-query-id",
+        default=None,
+        help=(
+            "Before retrieval, replace one source whose target cannot be visually "
+            "confirmed with the next source in the frozen hash order."
+        ),
+    )
+    parser.add_argument(
+        "--rejection-reason",
+        default="target_not_visually_confirmable",
+    )
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--additional-queries", type=int, default=9)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
@@ -272,15 +284,160 @@ def prepare_reviews(args: argparse.Namespace) -> int:
     return 0
 
 
-def finalize_queries(args: argparse.Namespace) -> int:
+def replace_unusable_source(args: argparse.Namespace) -> int:
     output_dir = args.output_dir.resolve()
     selection_path = output_dir / "selected_sources.csv"
-    manifest_path = output_dir / "selection_review_manifest.json"
+    original_manifest_path = output_dir / "selection_review_manifest.json"
+    require(selection_path.is_file(), "Original selected-sources table is missing")
+    require(original_manifest_path.is_file(), "Original selection manifest is missing")
+    original_manifest = json.loads(original_manifest_path.read_text(encoding="utf-8"))
+    require(original_manifest["git"]["dirty"] is False, "Original selection tree was dirty")
+    require(
+        sha256_file(selection_path)
+        == original_manifest["results"]["selected_sources"]["sha256"],
+        "Original source selection differs from its manifest",
+    )
+    final_selection_path = output_dir / "selected_sources_final.csv"
+    amendment_manifest_path = output_dir / "pre_retrieval_amendment_manifest.json"
+    if final_selection_path.exists() or amendment_manifest_path.exists():
+        raise FileExistsError("A pre-retrieval source amendment already exists")
+
+    selection = pd.read_csv(selection_path, dtype=str).fillna("")
+    reject_query_id = str(args.reject_query_id)
+    rejected_rows = selection[selection["query_id"] == reject_query_id]
+    require(len(rejected_rows) == 1, f"Unknown query selected for rejection: {reject_query_id}")
+    rejected = rejected_rows.iloc[0]
+
+    base_queries = pd.read_csv(args.base_queries_csv, dtype=str).fillna("")
+    base_relevance = pd.read_csv(args.base_relevance_csv, dtype=str).fillna("")
+    original_source = str(base_queries.iloc[0]["source_image_id"])
+    present_ids = base_relevance.loc[
+        base_relevance["relevant"].astype(int).eq(1), "image_id"
+    ].astype(str)
+    ordered = sorted(
+        [image_id for image_id in present_ids if image_id != original_source],
+        key=lambda image_id: selection_key(args.seed, image_id),
+    )
+    already_selected = set(selection["source_image_id"].astype(str))
+    replacement_id = next(image_id for image_id in ordered if image_id not in already_selected)
+    inventory = pd.read_csv(args.inventory_csv, dtype=str).fillna("").set_index("image_id")
+    item = inventory.loc[replacement_id]
+    replacement_path = resolve_stored_path(str(item["image_path"])).resolve()
+    replacement = {
+        "query_id": reject_query_id,
+        "target_id": TARGET_ID,
+        "source_image_id": replacement_id,
+        "source_file_name": str(item["file_name"]),
+        "source_image_path": rel_to_root(replacement_path),
+        "source_image_sha256": sha256_file(replacement_path),
+        "selection_seed": args.seed,
+        "selection_key": selection_key(args.seed, replacement_id),
+        "selection_rule": "next_lowest_sha256_after_pre_retrieval_visual_rejection",
+        "candidate_count": 90,
+    }
+    selection.loc[selection["query_id"] == reject_query_id, list(replacement)] = list(
+        replacement.values()
+    )
+    require(selection["source_image_id"].nunique() == 9, "Amended sources are not unique")
+    selection.to_csv(final_selection_path, index=False)
+
+    app = build_face_app(args.device, args.det_size)
+    image = cv2.imread(str(replacement_path))
+    if image is None:
+        raise FileNotFoundError(f"Could not read replacement source: {replacement_path}")
+    faces = sorted_faces(app.get(image))
+    require(bool(faces), "No face detected in deterministic replacement source")
+    candidates = candidate_rows(image, faces)
+    replacement_dir = output_dir / "replacement_face_review"
+    replacement_dir.mkdir(parents=True, exist_ok=False)
+    candidates_path = replacement_dir / f"{reject_query_id}_candidates.csv"
+    review_path = replacement_dir / f"{reject_query_id}_review.jpg"
+    pd.DataFrame(candidates).to_csv(candidates_path, index=False)
+    if not cv2.imwrite(
+        str(review_path), draw_review(image, candidates), [cv2.IMWRITE_JPEG_QUALITY, 94]
+    ):
+        raise RuntimeError(f"Could not write replacement review: {review_path}")
+
+    rejection_path = output_dir / "pre_retrieval_eligibility_review.csv"
+    pd.DataFrame(
+        [
+            {
+                "query_id": reject_query_id,
+                "rejected_source_image_id": str(rejected["source_image_id"]),
+                "rejection_stage": "manual_face_review_before_retrieval",
+                "rejection_reason": args.rejection_reason,
+                "replacement_rule": "next_unused_source_in_frozen_sha256_order",
+                "replacement_source_image_id": replacement_id,
+                "retrieval_results_inspected": 0,
+            }
+        ]
+    ).to_csv(rejection_path, index=False)
+
+    manifest_path = write_run_manifest(
+        amendment_manifest_path,
+        script_path=Path(__file__),
+        method="agrishow_2022_pre_retrieval_source_eligibility_amendment",
+        configuration={
+            "seed": args.seed,
+            "rejected_query_id": reject_query_id,
+            "rejection_reason": args.rejection_reason,
+            "replacement_rule": "next_unused_source_in_frozen_sha256_order",
+            "device": args.device,
+            "det_size": args.det_size,
+            "retrieval_executed": False,
+        },
+        inputs={
+            "original_selection_manifest": original_manifest_path,
+            "original_selected_sources": selection_path,
+            "base_queries_csv": args.base_queries_csv,
+            "base_relevance_csv": args.base_relevance_csv,
+            "inventory_csv": args.inventory_csv,
+        },
+        result_files={
+            "selected_sources_final": final_selection_path,
+            "eligibility_review": rejection_path,
+            "replacement_candidates": candidates_path,
+            "replacement_review": review_path,
+        },
+        extra={
+            "rejected_source_image_id": str(rejected["source_image_id"]),
+            "replacement_source_image_id": replacement_id,
+            "replacement_face_count": len(faces),
+            "selection_before_retrieval": True,
+            "retrieval_results_inspected": False,
+        },
+    )
+    print("EX-026: PRE-RETRIEVAL SOURCE REPLACEMENT RECORDED")
+    print(f"query_id={reject_query_id}")
+    print(f"rejected_source={rejected['source_image_id']}")
+    print(f"replacement_source={replacement_id}")
+    print(f"replacement_review={review_path}")
+    print(f"manifest={manifest_path}")
+    print("status=awaiting_manual_target_face_index_for_replacement")
+    return 0
+
+
+def finalize_queries(args: argparse.Namespace) -> int:
+    output_dir = args.output_dir.resolve()
+    final_selection_path = output_dir / "selected_sources_final.csv"
+    amendment_manifest_path = output_dir / "pre_retrieval_amendment_manifest.json"
+    if final_selection_path.exists() or amendment_manifest_path.exists():
+        require(
+            final_selection_path.is_file() and amendment_manifest_path.is_file(),
+            "Pre-retrieval source amendment is incomplete",
+        )
+        selection_path = final_selection_path
+        manifest_path = amendment_manifest_path
+        manifest_result_name = "selected_sources_final"
+    else:
+        selection_path = output_dir / "selected_sources.csv"
+        manifest_path = output_dir / "selection_review_manifest.json"
+        manifest_result_name = "selected_sources"
     require(selection_path.is_file() and manifest_path.is_file(), "Selection review is incomplete")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     require(manifest["git"]["dirty"] is False, "Selection review was not created from a clean tree")
     require(
-        sha256_file(selection_path) == manifest["results"]["selected_sources"]["sha256"],
+        sha256_file(selection_path) == manifest["results"][manifest_result_name]["sha256"],
         "Selected sources differ from the pre-retrieval manifest",
     )
 
@@ -440,6 +597,10 @@ def main() -> int:
     args = parse_args()
     if args.additional_queries != 9:
         raise ValueError("The frozen robustness protocol requires exactly nine additional queries")
+    if args.reject_query_id is not None:
+        if args.target_indices_csv is not None:
+            raise ValueError("Reject-source and finalization modes cannot run together")
+        return replace_unusable_source(args)
     if args.target_indices_csv is None:
         return prepare_reviews(args)
     return finalize_queries(args)
