@@ -1,6 +1,6 @@
 # Leia primeiro — estado canônico do projeto
 
-Data de referência: **16 de setembro de 2026**.
+Data de referência: **18 de setembro de 2026**.
 
 ## Núcleo ativo
 
@@ -29,13 +29,13 @@ Os CSVs e relatórios produzidos antes desta data contêm resultados históricos
 - AP calculada no Top-10 e apresentada como mAP;
 - ambientes de execução inconsistentes.
 
-Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial atual**. As execuções EX-007 a EX-018 corrigiram o protocolo e produziram os resultados oficiais atuais, reunidos em `docs/resultados_experimentais_congelados.md`.
+Portanto, **nenhuma métrica histórica deve ser tratada como resultado oficial atual**. As execuções EX-007 a EX-027 corrigiram, reproduziram e ampliaram o protocolo; os resultados oficiais atuais estão reunidos em `docs/resultados_experimentais_congelados.md`.
 
 ## Contexto agro
 
 O texto existente apresenta aplicação potencial no meio rural e em eventos. Isso é **contextualização**, não validação agro.
 
-Em 16 de setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como fonte autorizada para um estudo de caso. Após remover três recortes derivados, a EX-019 validou 124 originais; a EX-020 congelou 91 fotografias presentes e 33 ausentes; e a EX-021 sorteou a fonte antes das buscas. A EX-022 indexou 1.590 rostos em 123 fotografias e 124 descritores globais. Na EX-023, face e fusão 0,9/0,1 obtiveram mAP de 0,998235; o contexto isolado obteve 0,797298. Isso demonstra a aplicação no evento e na pessoa avaliados, não desempenho geral em todo o agro. Consulte `docs/protocolo_colecao_agro.md` antes de ampliar essa afirmação.
+Em setembro de 2026, a coleção Agrishow 2022 do Wikimedia Commons foi selecionada como fonte autorizada para um estudo de caso. Após remover três recortes derivados, a EX-019 validou 124 originais; a EX-020 congelou 91 fotografias presentes e 33 ausentes; e a EX-021 sorteou a primeira fonte antes das buscas. A EX-022 indexou 1.590 rostos em 123 fotografias e 124 descritores globais. A EX-025 mediu o efeito da alta prevalência de relevantes por meio de um controle aleatório. A EX-026 ampliou a avaliação para dez fontes, nas quais somente face obteve mAP de 0,987261, contexto isolado 0,850717 e fusão 0,9/0,1 0,986167. A EX-027 acrescentou um caso dirigido com chapéu e sombra; nesse caso específico, a fusão 0,7/0,3 obteve mAP de 0,997749, contra 0,997102 da face. Isso demonstra a aplicação no evento e na pessoa avaliados, não desempenho geral em todo o agro. Consulte `docs/protocolo_colecao_agro.md` antes de ampliar essa afirmação.
 
 Recuperação de maquinário permanece trabalho futuro.
 
@@ -78,4 +78,7 @@ As EX-013 e EX-014 validaram o CBIR global na Holidays com 500 consultas e mAP d
 6. a EX-022 criou e auditou os índices facial e global da Agrishow;
 7. a EX-023 avaliou os cinco métodos sem alterar retrospectivamente os pesos;
 8. a EX-024 recalculou os rankings, analisou os erros e produziu a figura qualitativa com atribuição;
-9. adaptar o manuscrito ao modelo vigente da Revista Principia usando somente os resultados congelados.
+9. a EX-025 estabeleceu o controle aleatório para interpretar a alta proporção de imagens relevantes;
+10. a EX-026 avaliou robustez em dez consultas, com seleção e relevância congeladas;
+11. a EX-027 avaliou separadamente o caso dirigido de chapéu e sombra;
+12. adaptar o manuscrito ao modelo vigente da Revista Principia usando somente os resultados congelados.

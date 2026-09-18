@@ -1,12 +1,12 @@
 # Protocolo e resultados da coleção agro Agrishow 2022
 
-Data de referência: **16 de setembro de 2026**.
+Data de referência: **18 de setembro de 2026**.
 
 ## 1. Estado da decisão
 
 A coleção **Agrishow 2022**, disponível no Wikimedia Commons, foi escolhida para um estudo de caso aplicado ao contexto agro. A fonte, os direitos de uso, os 124 originais, o gabarito, as consultas pareadas, os índices, a avaliação quantitativa e a análise qualitativa estão concluídos.
 
-A afirmação sustentada é: **o sistema foi avaliado em um estudo de caso da Agrishow 2022, com uma pessoa pública e uma consulta sorteada antes das buscas**. Não é correto generalizar esse resultado para outros eventos, pessoas, máquinas ou para todo o domínio agro.
+A afirmação sustentada é: **o sistema foi avaliado em um estudo de caso da Agrishow 2022, com uma pessoa pública, dez consultas de robustez definidas antes das respectivas buscas e um caso dirigido de chapéu e sombra**. Não é correto generalizar esse resultado para outros eventos, pessoas, máquinas ou para todo o domínio agro.
 
 ## 2. Por que esta coleção foi escolhida
 
@@ -147,6 +147,24 @@ A EX-024 recalculou os cinco rankings integrais e reproduziu exatamente o Top-10
 
 A figura qualitativa usa o recorte-consulta e as cinco primeiras fotografias recuperadas pela busca facial. As cinco imagens são relevantes e as caixas amarelas foram inspecionadas sobre o rosto correto. O painel cobre fotografia de grupo, cavalgada, fundo institucional e palco, com seis registros individuais de fotógrafo, fonte, licença, página original e modificação. A figura permanece local em `outputs/experiments/ex-024_agrishow_analysis/agrishow_face_top5.png` até sua incorporação controlada ao manuscrito.
 
+A EX-025 mostrou por que o Top-K precisa ser interpretado com cautela: com 90 relevantes em 123 candidatas, a AP aleatória esperada é 0,741369, e um ranking aleatório tem probabilidade exata de 20,34% de acertar todas as cinco primeiras posições e 3,81% de acertar todas as dez primeiras. Em 200.000 permutações, nenhuma atingiu a AP facial de 0,998235; 14.348 atingiram ou superaram a AP global de 0,797298.
+
+A EX-026 manteve a consulta inicial e selecionou nove fontes adicionais por ordem SHA-256 com semente registrada, antes das buscas. Uma fonte foi recusada na revisão facial prévia porque a pessoa-alvo não podia ser confirmada; sem consultar rankings, ela foi substituída pela próxima fonte ainda não usada na ordem congelada. O protocolo final possui dez consultas, 123 candidatas e 90 relevantes por consulta.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 0,980000 | 0,980000 | 0,054444 | 0,108889 | 0,987261 |
+| 0,0 / 1,0 | 0,940000 | 0,920000 | 0,052222 | 0,102222 | 0,850717 |
+| 0,9 / 0,1 | 0,980000 | 0,980000 | 0,054444 | 0,108889 | 0,986167 |
+| 0,7 / 0,3 | 0,980000 | 0,990000 | 0,054444 | 0,110000 | 0,980514 |
+| 0,5 / 0,5 | 0,980000 | 0,990000 | 0,054444 | 0,110000 | 0,960858 |
+
+Somente face obteve o maior mAP médio. O contexto isolado degradou as dez consultas em relação à face. As fusões melhoraram uma consulta cada, mas também degradaram a maioria delas; portanto, o contexto pode ajudar casos específicos, porém não melhorou o resultado médio.
+
+A EX-027 avaliou separadamente a fonte previamente anotada por chapéu e sombra. A face obteve mAP de 0,997102; o contexto isolado, 0,826134; e as fusões 0,9/0,1, 0,7/0,3 e 0,5/0,5 obtiveram 0,997506, 0,997749 e 0,988609. O pequeno ganho de 0,000647 da fusão 0,7/0,3 sobre a face é específico desse caso dirigido e não altera a conclusão agregada.
+
+Mesmo após essa ampliação, todas as consultas representam a mesma pessoa no mesmo evento, com alta prevalência de relevantes e fotografias possivelmente correlacionadas. O resultado é evidência aplicada no cenário estudado, não validação geral do domínio agro.
+
 ## 7. Aquisição reproduzível
 
 O script `scripts/data/download_agrishow_2022.py` consulta a API do Wikimedia Commons, exige CC BY 2.0 para todos os itens, remove por padrão os três recortes derivados e produz inventário com URL, autoria, licença, dimensões, tamanho e SHA-1.
@@ -181,3 +199,6 @@ O download é sequencial e inclui uma pausa entre solicitações para respeitar 
 | EX-022 | indexar faces e descritores globais | Artur | concluída e aprovada; 1.590 faces em 123 imagens e 124 descritores globais |
 | EX-023 | avaliar os cinco métodos | execução e auditoria concluídas | concluída e aprovada; fonte excluída, 123 candidatas e 90 relevantes |
 | EX-024 | analisar erros e gerar figura qualitativa | execução e inspeção concluídas | concluída e aprovada; rankings reproduzidos, figura e seis atribuições validadas |
+| EX-025 | comparar a consulta inicial com rankings aleatórios | execução e auditoria concluídas | concluída e aprovada; 200.000 permutações e probabilidades exatas de P@K |
+| EX-026 | avaliar robustez em dez consultas | preparação, revisão e auditoria concluídas | concluída e aprovada; dez fontes, 50 rankings e 500 resultados Top-10 |
+| EX-027 | avaliar o caso dirigido de chapéu e sombra | preparação, revisão e auditoria concluídas | concluída e aprovada; consulta separada da amostra de robustez |

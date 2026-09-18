@@ -4,7 +4,7 @@ Protótipo de pesquisa para recuperação de imagens fotográficas por conteúdo
 
 > **Antes de usar resultados ou alterar o escopo, leia [`LEIA_PRIMEIRO.md`](LEIA_PRIMEIRO.md).** A auditoria de 15/09/2026 encerrou a segmentação como linha ativa e identificou correções obrigatórias no protocolo de avaliação. As métricas antigas são históricas, não resultados oficiais atuais.
 
-O estudo de caso agro usa a coleção aberta Agrishow 2022. Direitos, limites éticos, prevenção de vazamento, protocolo e resultados estão em [`docs/protocolo_colecao_agro.md`](docs/protocolo_colecao_agro.md). Esses resultados valem para uma pessoa e uma consulta no evento avaliado, não para todo o domínio agro.
+O estudo de caso agro usa a coleção aberta Agrishow 2022. Direitos, limites éticos, prevenção de vazamento, protocolo e resultados estão em [`docs/protocolo_colecao_agro.md`](docs/protocolo_colecao_agro.md). Esses resultados valem para uma pessoa, dez consultas de robustez e um caso dirigido no mesmo evento; não representam todo o domínio agro.
 
 ## Estado atual
 

@@ -351,3 +351,41 @@ A análise no commit `1bf4a95` recalculou 615 posições — 123 para cada um do
 O contexto global promoveu mais cedo fotografias sem a pessoa-alvo, apesar de manter os dez primeiros acertos. A fusão 0,9/0,1 alterou uma posição do Top-10, mas preservou a AP facial; pesos globais maiores anteciparam erros e empurraram as últimas imagens relevantes para posições posteriores.
 
 A figura qualitativa contém o recorte facial e as cinco primeiras fotografias da busca facial, todas relevantes. As caixas dos rostos foram verificadas visualmente e apontam para a pessoa-alvo nos cinco painéis. O arquivo tem 3.680 × 1.660 pixels e é acompanhado de seis atribuições individuais CC BY 2.0, incluindo fotógrafo, fonte, página original e modificação aplicada.
+
+### 10.20 Controle aleatório da EX-025
+
+A EX-025 quantificou o efeito da alta prevalência de relevância na consulta inicial da Agrishow. Com 90 imagens relevantes entre 123 candidatas, a esperança aleatória exata de AP, Precision@5 e Precision@10 é `90/123 = 0,731707` para Precision e `0,741369` para AP. Foram geradas 200.000 permutações uniformes com a semente `12031681346522691727`, sem usar escores dos modelos para produzir os rankings aleatórios.
+
+A AP simulada teve média 0,741524, desvio-padrão 0,037454 e percentis 2,5% e 97,5% iguais a 0,670118 e 0,815768. A AP facial de 0,998235 não foi atingida em nenhuma permutação; o valor unilateral suavizado foi `4,999975 × 10^-6`. A AP do contexto global, 0,797298, foi igualada ou superada em 14.348 permutações, com valor unilateral suavizado de 0,071745.
+
+A probabilidade hipergeométrica exata de Precision@5 igual a 1 em um ranking aleatório é 0,203402, e a de Precision@10 igual a 1 é 0,038133. Portanto, resultados perfeitos no Top-K precisam ser acompanhados pela AP integral e não devem ser usados isoladamente como prova de desempenho.
+
+### 10.21 Robustez em dez consultas — EX-026
+
+A consulta original foi mantida e nove fontes adicionais foram selecionadas entre as fotografias relevantes pela menor chave SHA-256 formada com a semente `1161755629553718132`, o alvo e o identificador da imagem. A seleção ocorreu antes da recuperação. Na revisão facial prévia, a fonte inicialmente destinada à consulta 5, `agrishow2022_52029759375`, foi recusada porque a identidade não podia ser confirmada na revisão numerada. Sem inspecionar resultados de recuperação, foi usada a próxima fonte ainda não selecionada na ordem SHA-256 congelada, `agrishow2022_52029029111`. A decisão, a justificativa e a ausência de consulta aos rankings estão registradas no manifesto de emenda e no CSV de elegibilidade.
+
+O protocolo final possui dez fontes únicas, 124 rótulos por consulta e 90 relevantes elegíveis depois da exclusão da própria fonte. Os recortes-alvo foram confirmados visualmente e congelados antes da avaliação. A execução reutilizou os índices aprovados na EX-022, avaliou 50 rankings integrais e salvou 500 itens Top-10. Não houve vazamento da fonte, duplicidade, falha ou valor não finito.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 0,980000 | 0,980000 | 0,054444 | 0,108889 | 0,987261 |
+| 0,0 / 1,0 | 0,940000 | 0,920000 | 0,052222 | 0,102222 | 0,850717 |
+| 0,9 / 0,1 | 0,980000 | 0,980000 | 0,054444 | 0,108889 | 0,986167 |
+| 0,7 / 0,3 | 0,980000 | 0,990000 | 0,054444 | 0,110000 | 0,980514 |
+| 0,5 / 0,5 | 0,980000 | 0,990000 | 0,054444 | 0,110000 | 0,960858 |
+
+A AP facial média foi 0,987261, com desvio-padrão amostral 0,029403, mínimo 0,903834 e mediana 0,997053. O pior caso foi a consulta 6, que também obteve Precision@5 e Precision@10 iguais a 0,8. Em comparação com a face, o contexto global degradou as dez consultas; a fusão 0,9/0,1 melhorou uma, empatou duas e degradou sete; as fusões 0,7/0,3 e 0,5/0,5 melhoraram uma e degradaram nove. Nenhuma fusão superou a face em mAP médio.
+
+### 10.22 Caso dirigido com chapéu e sombra — EX-027
+
+A EX-027 avaliou separadamente a fotografia `agrishow2022_52030041698`, já anotada na EX-020 como um caso em que o chapéu projeta sombra sobre o rosto. Essa fonte não foi sorteada e, por isso, o resultado não foi misturado às dez consultas de robustez. A seleção ocorreu por interesse metodológico antes da recuperação. Entre 18 rostos detectados, a pessoa-alvo foi confirmada visualmente no índice 1; o recorte congelado foi redetectado com IoU de 0,709009.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997102 |
+| 0,0 / 1,0 | 1,000000 | 0,800000 | 0,055556 | 0,088889 | 0,826134 |
+| 0,9 / 0,1 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997506 |
+| 0,7 / 0,3 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997749 |
+| 0,5 / 0,5 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,988609 |
+
+Nesse caso específico, a fusão 0,7/0,3 superou a face em 0,000647 de AP. O ganho não deve ser generalizado nem usado para escolher retrospectivamente um peso, pois a avaliação agregada da EX-026 continua favorecendo o baseline facial.

@@ -1,6 +1,6 @@
 # Resultados experimentais oficiais
 
-Data de congelamento: **16 de setembro de 2026**.
+Data de congelamento: **18 de setembro de 2026**.
 
 Este documento é a tabela canônica dos resultados reproduzidos no ambiente definitivo. Números encontrados em relatórios ou rascunhos anteriores não substituem estes resultados.
 
@@ -26,11 +26,11 @@ Este documento é a tabela canônica dos resultados reproduzidos no ambiente def
 | Face/contexto 0,9/0,1 | Gallagher pareado | 20 | 588 | 0,870000 | 0,645000 | 0,566409 | 0,662866 | 0,908721 |
 | Face/contexto 0,7/0,3 | Gallagher pareado | 20 | 588 | 0,820000 | 0,640000 | 0,533433 | 0,657866 | 0,865268 |
 | Face/contexto 0,5/0,5 | Gallagher pareado | 20 | 588 | 0,750000 | 0,595000 | 0,473894 | 0,609914 | 0,778968 |
-| Face | Agrishow 2022 | 1 | 123 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,998235 |
-| Contexto global | Agrishow 2022 | 1 | 123 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,797298 |
-| Face/contexto 0,9/0,1 | Agrishow 2022 | 1 | 123 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,998235 |
-| Face/contexto 0,7/0,3 | Agrishow 2022 | 1 | 123 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997898 |
-| Face/contexto 0,5/0,5 | Agrishow 2022 | 1 | 123 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,993485 |
+| Face | Agrishow 2022 — robustez | 10 | 123 | 0,980000 | 0,980000 | 0,054444 | 0,108889 | 0,987261 |
+| Contexto global | Agrishow 2022 — robustez | 10 | 123 | 0,940000 | 0,920000 | 0,052222 | 0,102222 | 0,850717 |
+| Face/contexto 0,9/0,1 | Agrishow 2022 — robustez | 10 | 123 | 0,980000 | 0,980000 | 0,054444 | 0,108889 | 0,986167 |
+| Face/contexto 0,7/0,3 | Agrishow 2022 — robustez | 10 | 123 | 0,980000 | 0,990000 | 0,054444 | 0,110000 | 0,980514 |
+| Face/contexto 0,5/0,5 | Agrishow 2022 — robustez | 10 | 123 | 0,980000 | 0,990000 | 0,054444 | 0,110000 | 0,960858 |
 
 No protocolo pareado, o baseline somente facial também foi executado no universo global de 588 candidatas. As duas fotografias sem face detectada aparecem apenas no final do ranking e todas as métricas reproduzem exatamente a avaliação facial de 586 candidatas da EX-012.
 
@@ -41,7 +41,7 @@ No protocolo pareado, o baseline somente facial também foi executado no univers
 - **Holidays:** a ResNet50 recupera fotografias visualmente semelhantes?
 - **Gallagher contexto:** a aparência da fotografia-fonte, sem usar o rosto, localiza outras fotografias que contêm a pessoa?
 - **Gallagher fusão:** acrescentar contexto global ao sinal facial melhora a recuperação da pessoa selecionada?
-- **Agrishow 2022:** o fluxo localiza uma pessoa pública em outras fotografias do mesmo evento agro, usando uma fonte sorteada antes das buscas?
+- **Agrishow 2022:** o fluxo localiza uma pessoa pública em outras fotografias do mesmo evento agro, usando dez fontes definidas antes das respectivas buscas?
 
 As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado ao mAP da Holidays como se os métodos fossem concorrentes diretos.
 
@@ -52,9 +52,26 @@ As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado 
 3. Contexto visual isolado não substitui reconhecimento facial para localizar uma pessoa.
 4. Nenhum dos três pesos de fusão superou o baseline facial em média.
 5. A fusão 0,9/0,1 melhorou a AP de uma consulta, não alterou nove e piorou dez; portanto, ajuda casos isolados, mas não é consistentemente benéfica.
-6. No estudo de caso Agrishow, face e fusão 0,9/0,1 empataram em mAP; aumentar o peso global reduziu levemente o resultado.
-7. O estudo Agrishow demonstra a aplicação no evento selecionado, mas uma consulta e uma pessoa não sustentam generalização para todo o domínio agro.
-8. Na Agrishow, o primeiro resultado irrelevante apareceu na posição 90 para face e fusão 0,9/0,1, mas já na posição 17 para contexto global.
+6. No estudo de robustez Agrishow com dez consultas, somente face obteve o maior mAP médio, 0,987261; nenhuma fusão superou esse baseline em média.
+7. O controle aleatório mostrou AP esperada de 0,741369, consequência dos 90 relevantes entre 123 candidatas. A face ficou muito acima desse valor, mas Precision@5 ou Precision@10 perfeitas, isoladamente, não bastam como evidência forte nesse conjunto.
+8. O estudo Agrishow demonstra a aplicação no evento e na pessoa selecionados, mas dez consultas da mesma pessoa e do mesmo evento não sustentam generalização para todo o domínio agro.
+9. No caso dirigido com chapéu e sombra, a fusão 0,7/0,3 superou a face por 0,000647 de AP. Esse resultado é específico do caso e não altera a conclusão média das dez consultas.
+
+## Resultados complementares da Agrishow
+
+### Controle aleatório da consulta inicial — EX-025
+
+Com 90 relevantes em 123 candidatas, a esperança aleatória exata é 0,741369 para AP e 0,731707 para Precision@K. Em 200.000 permutações uniformes, a AP apresentou média 0,741524, desvio-padrão 0,037454 e intervalo empírico entre os percentis 2,5% e 97,5% de 0,670118 a 0,815768. A probabilidade exata de um ranking aleatório obter Precision@5 igual a 1 é 0,203402; para Precision@10 igual a 1, é 0,038133. A AP facial de 0,998235 não foi atingida em nenhuma permutação, enquanto a AP global de 0,797298 foi igualada ou superada em 14.348 das 200.000 permutações.
+
+### Caso dirigido de chapéu e sombra — EX-027
+
+| Configuração face/global | P@5 | P@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997102 |
+| 0,0 / 1,0 | 1,000000 | 0,800000 | 0,055556 | 0,088889 | 0,826134 |
+| 0,9 / 0,1 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997506 |
+| 0,7 / 0,3 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,997749 |
+| 0,5 / 0,5 | 1,000000 | 1,000000 | 0,055556 | 0,111111 | 0,988609 |
 
 ## Limitações obrigatórias
 
@@ -63,7 +80,10 @@ As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado 
 - Holidays possui mediana de uma imagem relevante por consulta, o que reduz Precision@K mesmo quando Recall e mAP são elevados.
 - Os tempos de backend com descritores pré-calculados não representam latência completa de uma imagem nova.
 - Gallagher e Holidays não constituem validação agro; a Agrishow constitui somente um estudo de caso aplicado em um evento agro.
-- A Agrishow usa uma única pessoa, uma consulta sorteada e 90 imagens relevantes entre 123 candidatas; a alta prevalência ajuda a explicar P@5 e P@10 iguais a 1 em todos os métodos.
+- A Agrishow usa uma única pessoa e um único evento; as dez consultas de robustez não são dez identidades nem dez eventos independentes.
+- Cada consulta Agrishow possui 90 imagens relevantes entre 123 candidatas. A alta prevalência eleva as métricas Top-K até para rankings aleatórios, motivo pelo qual a interpretação prioriza AP/mAP e o controle aleatório.
+- Nove fontes adicionais foram escolhidas por regra pseudoaleatória determinística. Uma delas foi recusada na revisão facial anterior à recuperação porque a identidade-alvo não podia ser confirmada; a próxima fonte ainda não usada na ordem congelada foi adotada, com trilha de auditoria.
+- Fotografias produzidas em sequência no mesmo evento podem compartilhar cenário, enquadramento e participantes, portanto não são observações completamente independentes.
 - As figuras com pessoas permanecem somente nos resultados locais e não devem ser publicadas automaticamente.
 
 ## Evidência reprodutível
@@ -78,6 +98,9 @@ As linhas não representam a mesma tarefa. O mAP do LFW não deve ser comparado 
 | EX-022 | índices `ex-022_agrishow_face_index` e `ex-022_agrishow_global_index` | `6aa8dad` |
 | EX-023 | `outputs/experiments/ex-023_agrishow_paired_fusion` | `ecc37f7` |
 | EX-024 | `outputs/experiments/ex-024_agrishow_analysis` | `1bf4a95` |
+| EX-025 | `outputs/experiments/ex-025_agrishow_random_baseline` | `a466b03` |
+| EX-026 | protocolo, avaliação e análise em `outputs/experiments/ex-026_agrishow_*` | `c43d611`, `58fd076` |
+| EX-027 | protocolo e avaliação em `outputs/experiments/ex-027_agrishow_*` | `3d7c16c` |
 
 Os diretórios de evidência são locais e ignorados pelo Git. Cada execução possui manifesto com configuração, hashes, versões do ambiente e commit correspondente.
 
