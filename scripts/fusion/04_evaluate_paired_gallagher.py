@@ -52,6 +52,19 @@ def method_name(face_weight: float, global_weight: float) -> str:
     return f"fusion_{face_weight:.1f}_{global_weight:.1f}".replace(".", "p")
 
 
+def rank_image_codes(
+    scores: np.ndarray,
+    image_ids: list[str],
+    excluded_codes: set[int],
+) -> list[int]:
+    if scores.ndim != 1 or len(scores) != len(image_ids):
+        raise ValueError("Scores and image IDs must describe the same one-dimensional gallery")
+    if not np.isfinite(scores).all():
+        raise ValueError("Ranking scores must be finite before source exclusion")
+    eligible_codes = [code for code in range(len(image_ids)) if code not in excluded_codes]
+    return sorted(eligible_codes, key=lambda code: (-float(scores[code]), image_ids[code]))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate paired face/context retrieval.")
     parser.add_argument(
@@ -86,8 +99,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weights-list", nargs="+", type=parse_weight, default=DEFAULT_WEIGHTS)
     parser.add_argument("--max-queries", type=int, default=None)
     parser.add_argument("--save-visual-examples", action="store_true")
+    parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--dataset-name", default="gallagher")
-    parser.add_argument("--face-query-source", default="validated_crop_from_ex011")
+    parser.add_argument("--face-query-source", default="corrected_annotated_eye_crop")
     parser.add_argument(
         "--global-query-source",
         default="source_photo_descriptor_from_ex015",
@@ -107,6 +121,18 @@ def main() -> int:
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but PyTorch cannot access it")
 
+    results_path = args.output_dir / "fusion_topk_results.csv"
+    per_query_path = args.output_dir / "fusion_metrics_per_query.csv"
+    metrics_path = args.output_dir / "fusion_metrics.csv"
+    run_manifest_path = args.output_dir / "fusion_run_manifest.json"
+    protected_outputs = [results_path, per_query_path, metrics_path, run_manifest_path]
+    if args.save_visual_examples:
+        protected_outputs.append(args.output_dir / "visual_examples" / "fusion_examples.png")
+    existing_outputs = [path for path in protected_outputs if path.exists()]
+    if existing_outputs and not args.overwrite:
+        existing_list = ", ".join(str(path) for path in existing_outputs)
+        raise FileExistsError(f"Evaluation outputs already exist: {existing_list}")
+
     queries = pd.read_csv(args.queries_csv, dtype=str)
     if args.max_queries is not None:
         queries = queries.head(args.max_queries).copy()
@@ -118,6 +144,9 @@ def main() -> int:
         "global_query_path",
         "source_image_id",
         "target_label",
+        "query_face_mode",
+        "query_target_x",
+        "query_target_y",
     }
     missing_query_columns = sorted(required_query_columns - set(queries.columns))
     if missing_query_columns:
@@ -168,23 +197,38 @@ def main() -> int:
     query_bboxes: list[str] = []
     query_face_modes: list[str] = []
     query_face_indices: list[int] = []
+    query_target_xs: list[float] = []
+    query_target_ys: list[float] = []
     face_extraction_ms: list[float] = []
     for index, query in enumerate(queries.itertuples(index=False), start=1):
-        query_face_mode = str(getattr(query, "query_face_mode", "largest") or "largest")
+        query_face_mode = str(query.query_face_mode)
+        if query_face_mode != "annotated_eye_midpoint":
+            raise ValueError(
+                f"Query {query.query_id} does not use annotated-eye target selection: "
+                f"{query_face_mode}"
+            )
         query_face_index_value = getattr(query, "query_face_index", 0)
         query_face_index = int(query_face_index_value) if pd.notna(query_face_index_value) else 0
+        query_target_x = float(query.query_target_x)
+        query_target_y = float(query.query_target_y)
+        if not np.isfinite(query_target_x) or not np.isfinite(query_target_y):
+            raise ValueError(f"Query {query.query_id} has a non-finite annotated target point")
         started = time.perf_counter()
         embedding, bbox = query_embedding_from_image(
             Path(str(query.face_query_path)),
             face_app,
             query_face_mode=query_face_mode,
             query_face_index=query_face_index,
+            query_target_x=query_target_x,
+            query_target_y=query_target_y,
         )
         face_extraction_ms.append((time.perf_counter() - started) * 1000.0)
         query_face_embeddings.append(np.asarray(embedding, dtype=np.float32))
         query_bboxes.append(str(bbox))
         query_face_modes.append(query_face_mode)
         query_face_indices.append(query_face_index)
+        query_target_xs.append(query_target_x)
+        query_target_ys.append(query_target_y)
         print(f"[INFO] extracted target faces: {index}/{len(queries)}")
 
     query_face_matrix = np.vstack(query_face_embeddings).astype(np.float32)
@@ -241,7 +285,6 @@ def main() -> int:
                 face_weight,
                 global_weight,
             )
-            fused = torch.from_numpy(fused_np).to(device)
             batch_excluded_codes: list[set[int]] = []
             for local_index, query in enumerate(
                 queries.iloc[batch_start:batch_end].itertuples(index=False)
@@ -254,23 +297,19 @@ def main() -> int:
                 if not excluded_codes:
                     raise ValueError(f"No source exclusion resolved for {query.query_id}")
                 batch_excluded_codes.append(excluded_codes)
-                fused[local_index, list(excluded_codes)] = -torch.inf
-            ranked_codes_tensor = torch.argsort(fused, dim=1, descending=True)
+            ranked_codes_batch = [
+                rank_image_codes(fused_np[local_index], image_ids, excluded_codes)
+                for local_index, excluded_codes in enumerate(batch_excluded_codes)
+            ]
             synchronize(device)
             elapsed_per_query_ms = (time.perf_counter() - started) * 1000.0 / batch_count
-            ranked_codes_np = ranked_codes_tensor.cpu().numpy()
 
             for local_index, query in enumerate(
                 queries.iloc[batch_start:batch_end].itertuples(index=False)
             ):
                 query_index = batch_start + local_index
                 query_id = str(query.query_id)
-                excluded_codes = batch_excluded_codes[local_index]
-                ranked_codes = [
-                    int(code)
-                    for code in ranked_codes_np[local_index]
-                    if int(code) not in excluded_codes
-                ]
+                ranked_codes = ranked_codes_batch[local_index]
                 rankings_by_method[method][query_id] = [image_ids[code] for code in ranked_codes]
                 backend_times[method][query_id] = elapsed_per_query_ms
                 for rank, image_code in enumerate(ranked_codes[: args.save_topk], start=1):
@@ -288,6 +327,8 @@ def main() -> int:
                             "query_bbox": query_bboxes[query_index],
                             "query_face_mode": query_face_modes[query_index],
                             "query_face_index": query_face_indices[query_index],
+                            "query_target_x": query_target_xs[query_index],
+                            "query_target_y": query_target_ys[query_index],
                             "rank": rank,
                             "image_id": str(candidate["image_id"]),
                             "image_path": str(candidate["image_path"]),
@@ -324,9 +365,6 @@ def main() -> int:
     per_query_out = pd.concat(per_query_frames, ignore_index=True)
     metrics_out = pd.concat(aggregate_frames, ignore_index=True)
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    results_path = args.output_dir / "fusion_topk_results.csv"
-    per_query_path = args.output_dir / "fusion_metrics_per_query.csv"
-    metrics_path = args.output_dir / "fusion_metrics.csv"
     topk.to_csv(results_path, index=False)
     per_query_out.to_csv(per_query_path, index=False)
     metrics_out.to_csv(metrics_path, index=False)
@@ -348,7 +386,7 @@ def main() -> int:
         result_files["visual_examples"] = visual_path
 
     manifest_path = write_run_manifest(
-        args.output_dir / "fusion_run_manifest.json",
+        run_manifest_path,
         script_path=Path(__file__),
         method=f"{args.dataset_name}_paired_face_global_fusion",
         configuration={
@@ -363,7 +401,10 @@ def main() -> int:
             "dataset_name": args.dataset_name,
             "face_query_source": args.face_query_source,
             "global_query_source": args.global_query_source,
-            "query_face_selection": "queries_csv_with_largest_default",
+            "query_face_selection": "annotated-eye midpoint contained by detected bbox",
+            "query_face_tie_break": "nearest bbox center, then smallest area, then bbox coordinates",
+            "ranking_tie_break": "score descending, then image_id ascending",
+            "missing_face_rule": "face unit score zero; global score remains available",
         },
         inputs={
             "queries_csv": args.queries_csv,

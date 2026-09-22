@@ -30,7 +30,30 @@ def sorted_faces(faces) -> list:
     return sorted(faces, key=lambda f: (float(f.bbox[1]), float(f.bbox[0])))
 
 
-def pick_query_face(faces, mode: str = "largest", index: int = 0):
+def _face_bbox_values(face) -> tuple[float, float, float, float]:
+    return tuple(float(value) for value in face.bbox)
+
+
+def _face_contains_point(face, target_x: float, target_y: float) -> bool:
+    x1, y1, x2, y2 = _face_bbox_values(face)
+    return x1 <= target_x <= x2 and y1 <= target_y <= y2
+
+
+def _annotated_point_sort_key(face, target_x: float, target_y: float) -> tuple[float, ...]:
+    x1, y1, x2, y2 = _face_bbox_values(face)
+    center_x = (x1 + x2) / 2.0
+    center_y = (y1 + y2) / 2.0
+    center_distance_squared = (center_x - target_x) ** 2 + (center_y - target_y) ** 2
+    return (center_distance_squared, face_area(face), y1, x1, y2, x2)
+
+
+def pick_query_face(
+    faces,
+    mode: str = "largest",
+    index: int = 0,
+    target_x: float | None = None,
+    target_y: float | None = None,
+):
     if not faces:
         return None
     if mode == "index":
@@ -38,6 +61,24 @@ def pick_query_face(faces, mode: str = "largest", index: int = 0):
         if index < 0 or index >= len(ordered):
             return None
         return ordered[index]
+    if mode == "annotated_eye_midpoint":
+        if target_x is None or target_y is None:
+            raise ValueError("Annotated-eye selection requires target_x and target_y")
+        containing = [
+            face for face in faces if _face_contains_point(face, float(target_x), float(target_y))
+        ]
+        if not containing:
+            return None
+        return min(
+            containing,
+            key=lambda face: _annotated_point_sort_key(
+                face,
+                float(target_x),
+                float(target_y),
+            ),
+        )
+    if mode != "largest":
+        raise ValueError(f"Unsupported query-face mode: {mode}")
     return sorted(faces, key=face_area, reverse=True)[0]
 
 
@@ -62,13 +103,25 @@ def query_embedding_from_image(
     app,
     query_face_mode: str = "largest",
     query_face_index: int = 0,
+    query_target_x: float | None = None,
+    query_target_y: float | None = None,
 ) -> tuple[np.ndarray, str]:
     img = cv2.imread(str(image_path))
     if img is None:
         raise FileNotFoundError(f"Could not read query image: {image_path}")
     faces = app.get(img)
-    face = pick_query_face(faces, mode=query_face_mode, index=query_face_index)
+    face = pick_query_face(
+        faces,
+        mode=query_face_mode,
+        index=query_face_index,
+        target_x=query_target_x,
+        target_y=query_target_y,
+    )
     if face is None:
+        if query_face_mode == "annotated_eye_midpoint":
+            raise RuntimeError(
+                f"No detected face contains the annotated-eye midpoint in query image: {image_path}"
+            )
         raise RuntimeError(f"No face found in query image: {image_path}")
     emb = embedding_from_face(face)
     if emb is None:

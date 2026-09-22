@@ -58,7 +58,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    for output_path in (args.output_csv, args.query_manifest_csv):
+    protocol_manifest_path = args.manifest_dir / "paired_protocol_manifest.json"
+    for output_path in (args.output_csv, args.query_manifest_csv, protocol_manifest_path):
         if output_path.exists() and not args.overwrite:
             raise FileExistsError(f"Output exists; use --overwrite: {output_path}")
 
@@ -70,6 +71,9 @@ def main() -> int:
         "source_image_id",
         "source_image_name",
         "source_face_index",
+        "query_face_mode",
+        "query_target_x",
+        "query_target_y",
     }
     missing = sorted(required - set(face_queries.columns))
     if missing:
@@ -98,6 +102,11 @@ def main() -> int:
     for query in face_queries.itertuples(index=False):
         query_id = str(query.query_id)
         source_image_id = str(query.source_image_id)
+        query_face_mode = str(query.query_face_mode)
+        if query_face_mode != "annotated_eye_midpoint":
+            raise ValueError(
+                f"Query {query_id} does not use annotated-eye target selection: {query_face_mode}"
+            )
         if source_image_id not in face_image_ids:
             raise ValueError(f"Source is absent from the face index: {source_image_id}")
         if source_image_id not in global_paths:
@@ -123,6 +132,9 @@ def main() -> int:
                 "exclude_image_ids": source_image_id,
                 "source_image_name": str(query.source_image_name),
                 "source_face_index": int(query.source_face_index),
+                "query_face_mode": query_face_mode,
+                "query_target_x": float(query.query_target_x),
+                "query_target_y": float(query.query_target_y),
             }
         )
         manifest_rows.append(
@@ -134,6 +146,9 @@ def main() -> int:
                 "face_query_sha256": sha256_file(resolved_face),
                 "global_query_path": global_query_path,
                 "global_query_sha256": sha256_file(resolved_global),
+                "query_face_mode": query_face_mode,
+                "query_target_x": float(query.query_target_x),
+                "query_target_y": float(query.query_target_y),
             }
         )
 
@@ -145,10 +160,13 @@ def main() -> int:
     query_manifest.to_csv(args.query_manifest_csv, index=False)
 
     manifest_path = write_run_manifest(
-        args.manifest_dir / "paired_protocol_manifest.json",
+        protocol_manifest_path,
         script_path=Path(__file__),
         method="gallagher_paired_face_global_protocol",
-        configuration={"selection_source": "ex011_frozen_face_queries"},
+        configuration={
+            "selection_source": "corrected_gallagher_queries",
+            "query_face_selection": "detected bbox containing the annotated-eye midpoint",
+        },
         inputs={
             "face_queries_csv": args.face_queries_csv,
             "relevance_csv": args.relevance_csv,
