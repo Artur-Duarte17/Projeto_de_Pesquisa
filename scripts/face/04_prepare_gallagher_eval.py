@@ -290,7 +290,7 @@ def main() -> int:
             query_rows.append(
                 {
                     "query_id": query_id,
-                    "query_path": str(crop_path.relative_to(ROOT)).replace("\\", "/"),
+                    "query_path": rel_to_root(crop_path),
                     "target_label": identity,
                     "query_type": "face",
                     "source_image_id": source_image_id,
