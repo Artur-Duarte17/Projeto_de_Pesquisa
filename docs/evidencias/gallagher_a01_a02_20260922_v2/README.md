@@ -79,5 +79,5 @@ O manifest EX-035 preserva o hash do Top-10 sem redistribuir suas linhas.
 - Os testes 35/35 foram executados anteriormente e registrados no terminal fornecido pelo usuário; não foram reexecutados nesta consolidação.
 - A revisão documental recalculou médias a partir dos CSVs, mas não reproduziu inferência ou embeddings.
 - Holidays permanece auxiliar, com AP adaptada e sem comparação direta ao benchmark oficial.
-- Agrishow permanece histórico/complementar privado, fora do núcleo do artigo.
+- Estudos de caso encerrados permanecem fora do núcleo do artigo.
 - A01/A02 estão resolvidos, mas continuam abertas as pendências institucionais, éticas, bibliográficas e editoriais.

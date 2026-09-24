@@ -98,6 +98,13 @@ def bbox_string(face) -> str:
     return f"{x1:.1f},{y1:.1f},{x2:.1f},{y2:.1f}"
 
 
+def detect_faces_in_image(image_path: Path, app) -> tuple[np.ndarray, list]:
+    img = cv2.imread(str(image_path))
+    if img is None:
+        raise FileNotFoundError(f"Could not read query image: {image_path}")
+    return img, sorted_faces(app.get(img))
+
+
 def query_embedding_from_image(
     image_path: Path,
     app,
@@ -106,10 +113,7 @@ def query_embedding_from_image(
     query_target_x: float | None = None,
     query_target_y: float | None = None,
 ) -> tuple[np.ndarray, str]:
-    img = cv2.imread(str(image_path))
-    if img is None:
-        raise FileNotFoundError(f"Could not read query image: {image_path}")
-    faces = app.get(img)
+    _, faces = detect_faces_in_image(image_path, app)
     face = pick_query_face(
         faces,
         mode=query_face_mode,

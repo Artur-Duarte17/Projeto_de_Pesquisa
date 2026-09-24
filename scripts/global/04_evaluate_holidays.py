@@ -44,12 +44,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-013_holidays_global_index",
+        default=OUTPUTS_DIR / "final" / "holidays" / "global_index",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-014_holidays_global_evaluation",
+        default=OUTPUTS_DIR / "final" / "holidays" / "evaluation",
     )
     parser.add_argument("--save-topk", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=128)
@@ -242,7 +242,7 @@ def main() -> int:
             "device": args.device,
             "batch_size": args.batch_size,
             "max_queries": args.max_queries,
-            "query_embedding_source": "descriptor_from_ex013_index",
+            "query_embedding_source": "descriptor_from_final_holidays_index",
         },
         inputs={
             "queries_csv": args.queries_csv,

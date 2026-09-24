@@ -20,37 +20,40 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--face-queries-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_face_queries.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_face_queries.csv",
     )
     parser.add_argument(
         "--relevance-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_relevance.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_relevance.csv",
     )
     parser.add_argument(
         "--face-index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-010_gallagher_face_index",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "face_index",
     )
     parser.add_argument(
         "--global-index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-015_gallagher_global_index",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "global_index",
     )
     parser.add_argument(
         "--output-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_fusion_queries.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_fusion_queries.csv",
     )
     parser.add_argument(
         "--query-manifest-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_fusion_query_manifest.csv",
+        default=DATA_DIR
+        / "evaluation"
+        / "gallagher_final"
+        / "gallagher_fusion_query_manifest.csv",
     )
     parser.add_argument(
         "--manifest-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-016_gallagher_fusion_protocol",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "paired_protocol",
     )
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args()

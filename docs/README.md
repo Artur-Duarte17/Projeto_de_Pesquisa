@@ -1,39 +1,27 @@
-# Documentação do projeto
+# Documentação ativa
 
-Leia primeiro o mapa canônico na raiz: [`LEIA_PRIMEIRO.md`](../LEIA_PRIMEIRO.md).
+Esta pasta contém somente documentos que ainda participam da versão final ou da elaboração do artigo.
 
-## Estado dos documentos
+| Documento | Função |
+|---|---|
+| `protocolo_avaliacao.md` | define o protocolo científico e os critérios da execução final |
+| `resultados_experimentais_congelados.md` | registra apenas os resultados vigentes |
+| `relatorio_estado_atual.md` | explica o projeto em linguagem acessível |
+| `bibliografia_anotada.md` | cataloga e comenta as referências estudadas |
+| `sintese_revisao_bibliografica.md` | posiciona a contribuição frente à literatura |
+| `evidencias/gallagher_a01_a02_20260922_v2/` | preserva manifests e métricas seguras da correção Gallagher |
 
-| Documento/pasta | Status | Uso correto |
-|---|---|---|
-| `../LEIA_PRIMEIRO.md` | canônico e atual | ponto de entrada para escopo, alertas e próximos passos |
-| `README.md` da raiz | operacional | estrutura e comandos do software ativo |
-| `protocolo_avaliacao.md` | canônico e atual | definições de exclusão, métricas, ranking e manifestos |
-| `resultados_experimentais_congelados.md` | canônico e atual | tabela oficial de métricas, interpretações e limitações |
-| `protocolo_colecao_agro.md` | canônico e atual | fonte autorizada, direitos, protocolo, resultados e limites do estudo de caso agro |
-| `historico_privado/` | privado; ignorado pelo Git | dossiê completo em DOCX, PDF e Markdown; consultar apenas para história e recuperação |
-| `artigo_sibgrapi_2026/` | rascunho histórico | fonte de texto/figuras; não contém validação agro e não está pronto para submissão |
-| `entregas/` | entregas e rascunhos históricos | preservar; conferir data e protocolo antes de reutilizar resultados |
-| `Referencias/` | acervo bibliográfico local | conferir licença; PDFs de terceiros não devem ir ao GitHub |
+Materiais históricos, privados ou substituídos ficam em `C:\Projeto_de_Pesquisa_arquivo_local`. Eles não devem ser copiados de volta para a árvore ativa sem uma razão específica.
 
-## Fontes históricas
+## Hierarquia de evidência
 
-- [Relatório explicativo acumulado](relatorio_estado_atual.md) — material de apoio; quando houver divergência, prevalecem o protocolo e a tabela congelada.
-- [Plano de revisão bibliográfica](plano_revisao_bibliografica.md).
-- [Referências e ideias da proposta original](referencias_proposta_original.md).
-- [Texto extraído da proposta original](proposta_original_extraida.md).
-- [Síntese da revisão bibliográfica](sintese_revisao_bibliografica.md).
-- [Bibliografia anotada inicial](bibliografia_anotada.md).
-- `entregas/Relatorio_Meta2_CIBIR.docx` — relatório histórico.
-- `entregas/Artigo_CIBIR_Rascunho.docx` — rascunho histórico.
+1. Manifests e arquivos de métricas conferidos.
+2. `resultados_experimentais_congelados.md`.
+3. `protocolo_avaliacao.md`.
+4. Documentos explicativos e revisão bibliográfica.
 
-## Protocolo atual
+Em caso de divergência, os dados e hashes da execução válida prevalecem sobre textos narrativos.
 
-- [Protocolo de avaliação](protocolo_avaliacao.md) — regras obrigatórias para os próximos experimentos.
-- [Resultados experimentais congelados](resultados_experimentais_congelados.md) — números oficiais atuais.
-- [Protocolo e resultados da coleção agro](protocolo_colecao_agro.md) — seleção da Agrishow 2022, condições, resultados e limites do estudo de caso.
-- `tests/test_retrieval_methodology.py` — testes sintéticos do protocolo.
+## Limite atual
 
-## Regra de evidência
-
-Resultados registrados antes da auditoria de 15/09/2026 não são automaticamente válidos para o artigo da Revista Principia. Para números atuais, use somente `resultados_experimentais_congelados.md` e confirme a execução correspondente em `protocolo_avaliacao.md`.
+A organização documental não equivale à aprovação da versão final. Ainda faltam a execução limpa pelo autor, a conferência do teste com álbum familiar e a atualização final do manuscrito em inglês.

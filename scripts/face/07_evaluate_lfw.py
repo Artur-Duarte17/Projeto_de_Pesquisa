@@ -32,22 +32,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--queries-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "lfw_face_queries.csv",
+        default=DATA_DIR / "evaluation" / "lfw_final" / "lfw_face_queries.csv",
     )
     parser.add_argument(
         "--relevance-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "lfw_face_relevance.csv",
+        default=DATA_DIR / "evaluation" / "lfw_final" / "lfw_face_relevance.csv",
     )
     parser.add_argument(
         "--index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-008_lfw_face_index",
+        default=OUTPUTS_DIR / "final" / "lfw" / "face_index",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-009_lfw_face_evaluation",
+        default=OUTPUTS_DIR / "final" / "lfw" / "evaluation",
     )
     parser.add_argument("--save-topk", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=128)
@@ -314,7 +314,7 @@ def main() -> int:
             "device": args.device,
             "batch_size": args.batch_size,
             "max_queries": args.max_queries,
-            "query_embedding_source": "largest_face_embedding_from_ex008_index",
+            "query_embedding_source": "largest_face_embedding_from_final_lfw_index",
         },
         inputs={
             "queries_csv": args.queries_csv,

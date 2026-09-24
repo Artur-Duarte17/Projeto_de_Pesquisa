@@ -32,6 +32,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--global-weight", type=float, default=0.3)
     ap.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     ap.add_argument("--det-size", type=int, default=640)
+    ap.add_argument("--query-face-mode", choices=["largest", "index"], default="largest")
+    ap.add_argument("--query-face-index", type=int, default=0)
     ap.add_argument("--weights", choices=["imagenet", "none"], default="imagenet")
     ap.add_argument("--max-images", type=int, default=None, help="Reserved for CLI compatibility.")
     ap.add_argument("--exclude-image-id", action="append", default=[])
@@ -49,7 +51,12 @@ def main() -> int:
     extractor, transform, device = build_resnet50_feature_extractor(args.device, args.weights)
 
     t0 = now_ms()
-    face_q, query_bbox = query_embedding_from_image(args.query, face_app)
+    face_q, query_bbox = query_embedding_from_image(
+        args.query,
+        face_app,
+        query_face_mode=args.query_face_mode,
+        query_face_index=args.query_face_index,
+    )
     global_q = extract_global_embedding(args.query, extractor, transform, device)
     results = search_fusion(
         args.query,
@@ -91,6 +98,8 @@ def main() -> int:
             "global_weight": args.global_weight,
             "device": args.device,
             "det_size": args.det_size,
+            "query_face_mode": args.query_face_mode,
+            "query_face_index": args.query_face_index,
             "weights": args.weights,
             "exclude_image_ids": sorted(set(args.exclude_image_id)),
         },

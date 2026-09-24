@@ -24,40 +24,43 @@ def parse_args() -> argparse.Namespace:
         "--results-csv",
         type=Path,
         default=OUTPUTS_DIR
-        / "experiments"
-        / "ex-017_gallagher_paired_fusion"
+        / "final"
+        / "gallagher"
+        / "evaluation"
         / "fusion_topk_results.csv",
     )
     parser.add_argument(
         "--per-query-csv",
         type=Path,
         default=OUTPUTS_DIR
-        / "experiments"
-        / "ex-017_gallagher_paired_fusion"
+        / "final"
+        / "gallagher"
+        / "evaluation"
         / "fusion_metrics_per_query.csv",
     )
     parser.add_argument(
         "--aggregate-csv",
         type=Path,
         default=OUTPUTS_DIR
-        / "experiments"
-        / "ex-017_gallagher_paired_fusion"
+        / "final"
+        / "gallagher"
+        / "evaluation"
         / "fusion_metrics.csv",
     )
     parser.add_argument(
         "--queries-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_fusion_queries.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_fusion_queries.csv",
     )
     parser.add_argument(
         "--relevance-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_relevance.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_relevance.csv",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-018_paired_fusion_error_analysis",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "error_analysis",
     )
     parser.add_argument("--primary-fusion", default="fusion_0p9_0p1")
     parser.add_argument("--visual-topk", type=int, default=5)

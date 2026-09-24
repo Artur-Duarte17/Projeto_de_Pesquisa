@@ -3,6 +3,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import cv2
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -10,7 +12,14 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import build_face_app, load_face_index, query_embedding_from_image, search_face_index
+from face_lib import (
+    bbox_string,
+    build_face_app,
+    detect_faces_in_image,
+    embedding_from_face,
+    load_face_index,
+    search_face_index,
+)
 from fusion_lib import search_fusion
 from global_lib import (
     build_resnet50_feature_extractor,
@@ -24,17 +33,17 @@ from project_paths import OUTPUTS_DIR
 UPLOAD_DIR = OUTPUTS_DIR / "app_uploads"
 
 INDEX_PRESETS = {
-    "Gallagher (demo face + global)": (
-        OUTPUTS_DIR / "face_index_gallagher",
-        OUTPUTS_DIR / "global_index_gallagher",
+    "Gallagher final": (
+        OUTPUTS_DIR / "final" / "gallagher" / "face_index",
+        OUTPUTS_DIR / "final" / "gallagher" / "global_index",
     ),
-    "Padrao do projeto": (
-        OUTPUTS_DIR / "face_index",
-        OUTPUTS_DIR / "global_index",
+    "Colecao preparada": (
+        OUTPUTS_DIR / "collections" / "default" / "face",
+        OUTPUTS_DIR / "collections" / "default" / "global",
     ),
     "Personalizado": (
-        OUTPUTS_DIR / "face_index",
-        OUTPUTS_DIR / "global_index",
+        OUTPUTS_DIR / "collections" / "default" / "face",
+        OUTPUTS_DIR / "collections" / "default" / "global",
     ),
 }
 
@@ -112,6 +121,29 @@ def simplified_results(results: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def annotated_faces_preview(image_bgr: np.ndarray, faces: list) -> np.ndarray:
+    preview = image_bgr.copy()
+    height, width = preview.shape[:2]
+    for index, face in enumerate(faces, start=1):
+        x1, y1, x2, y2 = [int(round(float(value))) for value in face.bbox]
+        x1 = max(0, min(width - 1, x1))
+        x2 = max(0, min(width - 1, x2))
+        y1 = max(0, min(height - 1, y1))
+        y2 = max(0, min(height - 1, y2))
+        cv2.rectangle(preview, (x1, y1), (x2, y2), (0, 220, 255), 3)
+        cv2.putText(
+            preview,
+            str(index),
+            (x1, max(24, y1 - 8)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 220, 255),
+            2,
+            cv2.LINE_AA,
+        )
+    return cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+
+
 def main() -> None:
     st.set_page_config(page_title="Recuperacao Fotografica", layout="wide")
     st.title("Recuperacao Fotografica - Face + CBIR Global")
@@ -132,12 +164,6 @@ def main() -> None:
         global_weight = 1.0 - face_weight
 
     st.info(MODE_DESCRIPTIONS[search_mode])
-    if search_mode in {"Buscar pessoa", "Fusao face + global"}:
-        st.warning(
-            "Se a imagem de consulta tiver mais de um rosto, esta versao usa automaticamente "
-            "o maior rosto detectado. A selecao manual do rosto e uma melhoria futura."
-        )
-
     uploaded = st.file_uploader("Imagem de consulta", type=["jpg", "jpeg", "png", "bmp", "webp"])
     if uploaded is None:
         st.info("Envie uma imagem para iniciar a busca.")
@@ -146,14 +172,41 @@ def main() -> None:
     query_path = save_upload(uploaded)
     st.image(str(query_path), caption="Consulta", width=320)
 
+    selected_face = None
+    selected_bbox = None
+    if search_mode in {"Buscar pessoa", "Fusao face + global"}:
+        try:
+            face_app = cached_face_app(device, 640)
+            query_image, detected_faces = detect_faces_in_image(query_path, face_app)
+        except Exception as exc:
+            st.error(f"Falha ao detectar rostos na consulta: {exc}")
+            return
+        if not detected_faces:
+            st.error("Nenhum rosto foi detectado na imagem de consulta.")
+            return
+        st.image(
+            annotated_faces_preview(query_image, detected_faces),
+            caption="Rostos detectados",
+            width=520,
+        )
+        selected_index = st.selectbox(
+            "Pessoa que deve ser procurada",
+            range(len(detected_faces)),
+            format_func=lambda index: f"Rosto {index + 1}",
+        )
+        selected_face = detected_faces[int(selected_index)]
+        selected_bbox = bbox_string(selected_face)
+        st.caption(f"Caixa selecionada: {selected_bbox}")
+
     if not st.button("Buscar"):
         return
 
     try:
         if search_mode == "Buscar pessoa":
             E, meta = cached_face_index(face_index_dir)
-            app = cached_face_app(device, 640)
-            q, _ = query_embedding_from_image(query_path, app)
+            q = embedding_from_face(selected_face)
+            if q is None:
+                raise RuntimeError("O rosto selecionado não possui embedding.")
             results = search_face_index(q, E, meta, topk=topk, threshold=threshold, query_path=query_path)
         elif search_mode == "Buscar imagem semelhante":
             E, meta = cached_global_index(global_index_dir)
@@ -163,9 +216,10 @@ def main() -> None:
         else:
             face_E, face_meta = cached_face_index(face_index_dir)
             global_E, global_meta = cached_global_index(global_index_dir)
-            app = cached_face_app(device, 640)
             extractor, transform, torch_device = cached_resnet(device, "imagenet")
-            face_q, _ = query_embedding_from_image(query_path, app)
+            face_q = embedding_from_face(selected_face)
+            if face_q is None:
+                raise RuntimeError("O rosto selecionado não possui embedding.")
             global_q = extract_global_embedding(query_path, extractor, transform, torch_device)
             results = search_fusion(
                 query_path,

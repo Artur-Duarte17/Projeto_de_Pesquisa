@@ -34,13 +34,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-008_lfw_face_index",
+        default=OUTPUTS_DIR / "final" / "lfw" / "face_index",
     )
-    parser.add_argument("--output-dir", type=Path, default=DATA_DIR / "evaluation")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DATA_DIR / "evaluation" / "lfw_final",
+    )
     parser.add_argument(
         "--manifest-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-009_lfw_protocol",
+        default=OUTPUTS_DIR / "final" / "lfw" / "protocol",
     )
     parser.add_argument("--seed", type=int, default=20260915)
     parser.add_argument("--min-images", type=int, default=2)

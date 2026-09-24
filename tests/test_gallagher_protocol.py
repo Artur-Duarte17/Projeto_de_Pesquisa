@@ -73,6 +73,17 @@ class DummyFace:
 
 
 class GallagherTargetFaceTests(unittest.TestCase):
+    def test_index_mode_uses_deterministic_visual_order(self) -> None:
+        lower = DummyFace([10.0, 100.0, 50.0, 140.0])
+        upper_right = DummyFace([100.0, 10.0, 140.0, 50.0])
+        upper_left = DummyFace([10.0, 10.0, 50.0, 50.0])
+
+        faces = [lower, upper_right, upper_left]
+
+        self.assertIs(pick_query_face(faces, mode="index", index=0), upper_left)
+        self.assertIs(pick_query_face(faces, mode="index", index=1), upper_right)
+        self.assertIs(pick_query_face(faces, mode="index", index=2), lower)
+
     def test_larger_neighbor_does_not_replace_annotated_target(self) -> None:
         larger_neighbor = DummyFace([0.0, 0.0, 200.0, 200.0])
         annotated_target = DummyFace([220.0, 220.0, 270.0, 270.0])

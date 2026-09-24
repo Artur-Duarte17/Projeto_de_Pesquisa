@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import sys
 import tempfile
 import unittest
@@ -28,8 +29,31 @@ from retrieval_common import (
     summarize_rankings,
 )
 
-from random_baseline_lib import expected_random_ap, probability_perfect_topk
 from run_manifest import write_run_manifest
+
+
+def load_script_module(module_name: str, relative_path: str):
+    script_path = ROOT / relative_path
+    spec = importlib.util.spec_from_file_location(module_name, script_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Could not load test target: {script_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+PREPARE_COLLECTION = load_script_module(
+    "prepare_collection_for_tests",
+    "scripts/prepare_collection.py",
+)
+FINAL_GALLAGHER = load_script_module(
+    "run_final_gallagher_for_tests",
+    "scripts/run_final_gallagher.py",
+)
+FINAL_VALIDATION = load_script_module(
+    "run_final_validation_for_tests",
+    "scripts/run_final_validation.py",
+)
 
 
 class InventoryImageIdTests(unittest.TestCase):
@@ -42,14 +66,14 @@ class InventoryImageIdTests(unittest.TestCase):
             second = input_dir / "second.jpg"
             inventory = root / "inventory.csv"
             inventory.write_text(
-                "image_id,file_name\nagrishow_first,first.jpg\nagrishow_second,second.jpg\n",
+                "image_id,file_name\ncollection_first,first.jpg\ncollection_second,second.jpg\n",
                 encoding="utf-8",
             )
 
             mapping = load_inventory_image_ids(inventory, input_dir, [first, second])
 
-            self.assertEqual(mapping[first.resolve()], "agrishow_first")
-            self.assertEqual(mapping[second.resolve()], "agrishow_second")
+            self.assertEqual(mapping[first.resolve()], "collection_first")
+            self.assertEqual(mapping[second.resolve()], "collection_second")
 
     def test_inventory_rejects_missing_indexed_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -58,7 +82,7 @@ class InventoryImageIdTests(unittest.TestCase):
             input_dir.mkdir()
             inventory = root / "inventory.csv"
             inventory.write_text(
-                "image_id,file_name\nagrishow_first,first.jpg\n",
+                "image_id,file_name\ncollection_first,first.jpg\n",
                 encoding="utf-8",
             )
 
@@ -86,6 +110,88 @@ class InventoryImageIdTests(unittest.TestCase):
                     input_dir,
                     [input_dir / "first.jpg", input_dir / "second.jpg"],
                 )
+
+
+class CollectionPreparationTests(unittest.TestCase):
+    def test_commands_use_external_input_and_separate_indexes(self) -> None:
+        commands = PREPARE_COLLECTION.build_commands(
+            python_executable="python.exe",
+            input_dir=Path(r"C:\Albums\Familia"),
+            output_dir=Path(r"C:\Projeto\outputs\collections\familia"),
+            device="cuda",
+            det_size=640,
+            batch_size=16,
+            workers=2,
+            max_images=139,
+        )
+
+        self.assertEqual(len(commands), 2)
+        self.assertIn(r"C:\Albums\Familia", commands[0])
+        self.assertIn(r"C:\Albums\Familia", commands[1])
+        self.assertIn(r"C:\Projeto\outputs\collections\familia\face", commands[0])
+        self.assertIn(r"C:\Projeto\outputs\collections\familia\global", commands[1])
+        self.assertIn("--no-identity-from-parent", commands[0])
+        self.assertIn("--no-label-from-parent", commands[1])
+        self.assertEqual(commands[0][-2:], ["--max-images", "139"])
+        self.assertEqual(commands[1][-2:], ["--max-images", "139"])
+
+    def test_final_gallagher_commands_cover_the_complete_pipeline(self) -> None:
+        commands = FINAL_GALLAGHER.build_commands(
+            python_executable="python.exe",
+            device="cuda",
+            batch_size=32,
+            workers=4,
+            det_size=640,
+            overwrite=False,
+            include_environment_check=True,
+            include_error_analysis=True,
+        )
+
+        scripts = [Path(command[1]).name for command in commands]
+        self.assertEqual(
+            scripts,
+            [
+                "validate_environment.py",
+                "01_index_faces.py",
+                "01_index_global_resnet.py",
+                "04_prepare_gallagher_eval.py",
+                "03_prepare_paired_gallagher.py",
+                "04_evaluate_paired_gallagher.py",
+                "05_analyze_paired_fusion_errors.py",
+            ],
+        )
+        self.assertIn("--require-cuda", commands[0])
+        self.assertTrue(all("--overwrite" not in command for command in commands))
+
+    def test_complete_final_validation_covers_all_scientific_layers(self) -> None:
+        commands = FINAL_VALIDATION.build_commands(
+            python_executable="python.exe",
+            device="cuda",
+            batch_size=32,
+            evaluation_batch_size=128,
+            workers=4,
+            det_size=640,
+            overwrite=False,
+            allow_dirty=False,
+            include_gallagher_error_analysis=True,
+        )
+
+        scripts = [Path(command[1]).name for command in commands]
+        self.assertEqual(
+            scripts,
+            [
+                "validate_environment.py",
+                "01_index_faces.py",
+                "06_prepare_lfw_eval.py",
+                "07_evaluate_lfw.py",
+                "01_index_global_resnet.py",
+                "04_evaluate_holidays.py",
+                "run_final_gallagher.py",
+            ],
+        )
+        self.assertIn("--skip-environment-check", commands[-1])
+        self.assertNotIn("--allow-dirty", commands[-1])
+        self.assertTrue(all("--overwrite" not in command for command in commands))
 
 
 class MetricTests(unittest.TestCase):
@@ -282,15 +388,6 @@ class FusionScoreTests(unittest.TestCase):
         scores = np.zeros((1, 1), dtype=np.float32)
         with self.assertRaises(ValueError):
             fuse_cosine_score_matrices(scores, scores, np.ones((1, 1), dtype=bool), 0.7, 0.4)
-
-
-class RandomBaselineTests(unittest.TestCase):
-    def test_exact_expected_ap_matches_two_item_enumeration(self) -> None:
-        self.assertAlmostEqual(expected_random_ap(total=2, relevant=1), 0.75)
-
-    def test_perfect_topk_probability_uses_sampling_without_replacement(self) -> None:
-        self.assertAlmostEqual(probability_perfect_topk(total=4, relevant=2, k=2), 1 / 6)
-        self.assertEqual(probability_perfect_topk(total=4, relevant=2, k=3), 0.0)
 
 
 class ManifestTests(unittest.TestCase):

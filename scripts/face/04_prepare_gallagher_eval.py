@@ -26,19 +26,31 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DATA_DIR / "raw" / "gallagher" / "metadata" / "face_annotations.csv",
     )
-    ap.add_argument("--index-dir", type=Path, default=OUTPUTS_DIR / "face_index_gallagher")
+    ap.add_argument(
+        "--index-dir",
+        type=Path,
+        default=OUTPUTS_DIR / "final" / "gallagher" / "face_index",
+    )
     ap.add_argument(
         "--gallery-index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-015_gallagher_global_index",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "global_index",
         help="Global gallery whose photographs define Gallagher eligibility.",
     )
-    ap.add_argument("--output-dir", type=Path, default=DATA_DIR / "evaluation")
-    ap.add_argument("--query-crop-dir", type=Path, default=DATA_DIR / "query" / "gallagher")
+    ap.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DATA_DIR / "evaluation" / "gallagher_final",
+    )
+    ap.add_argument(
+        "--query-crop-dir",
+        type=Path,
+        default=DATA_DIR / "query" / "gallagher_final",
+    )
     ap.add_argument(
         "--manifest-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-011_gallagher_protocol",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "face_protocol",
     )
     ap.add_argument("--max-identities", type=int, default=20)
     ap.add_argument("--queries-per-identity", type=int, default=1)

@@ -13,10 +13,8 @@ laboratorio/
 venv/
 env/
 
-# Private publication, history and local administrative workspace
+# Local working and administrative workspace
 .local/
-docs/historico_privado/
-publication_private/
 
 # Datasets and private/local inputs
 data/raw/
@@ -25,6 +23,8 @@ data/private_faces/
 data/query/
 data/annotations/
 data/evaluation/gallagher_*.csv
+data/evaluation/gallagher_final/
+data/evaluation/lfw_final/
 data/evaluation/holidays_*.csv
 data/**/*.zip
 data/**/*.tar
@@ -56,9 +56,6 @@ project_tree.txt
 scripts_list.txt
 docs/fontes_bibliograficas_brutas/
 docs/Referencias/
-docs/entregas/
-docs/artigo_sibgrapi_2026/
-docs/artigo_sibgrapi_2026*.zip
 tmp/
 
 # OS/editor noise

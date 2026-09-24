@@ -70,27 +70,27 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--queries-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_fusion_queries.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_fusion_queries.csv",
     )
     parser.add_argument(
         "--relevance-csv",
         type=Path,
-        default=DATA_DIR / "evaluation" / "gallagher_relevance.csv",
+        default=DATA_DIR / "evaluation" / "gallagher_final" / "gallagher_relevance.csv",
     )
     parser.add_argument(
         "--face-index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-010_gallagher_face_index",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "face_index",
     )
     parser.add_argument(
         "--global-index-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-015_gallagher_global_index",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "global_index",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=OUTPUTS_DIR / "experiments" / "ex-017_gallagher_paired_fusion",
+        default=OUTPUTS_DIR / "final" / "gallagher" / "evaluation",
     )
     parser.add_argument("--save-topk", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=20)
@@ -104,7 +104,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--face-query-source", default="corrected_annotated_eye_crop")
     parser.add_argument(
         "--global-query-source",
-        default="source_photo_descriptor_from_ex015",
+        default="source_photo_descriptor_from_final_global_index",
     )
     return parser.parse_args()
 
