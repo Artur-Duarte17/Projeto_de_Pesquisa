@@ -1,12 +1,12 @@
 # Protocolo de avaliação do sistema de recuperação fotográfica
 
-Data de referência: 15 de setembro de 2026.
+Data de referência: 22 de setembro de 2026.
 
 ## 1. Situação
 
-Este documento define como as próximas avaliações devem ser executadas. Os resultados anteriores à correção metodológica permanecem históricos e não podem ser usados como números finais do artigo.
+Este documento define o protocolo vigente. Os resultados Gallagher anteriores à correção A01/A02 permanecem históricos e não podem ser usados como números finais. A evidência Gallagher atual é a sequência EX-033/EX-034/EX-035, congelada em 22/09/2026.
 
-O código foi preparado para busca facial, busca global e fusão. Os testes sintéticos validam as regras isoladas, mas os índices e experimentos completos ainda precisam ser refeitos no ambiente definitivo.
+O código está preparado para busca facial, busca global e fusão. Os testes sintéticos validam regras isoladas; os manifests, hashes e CSVs da EX-033/034/035 registram a execução completa corrigida. Isso não substitui revisão humana, decisão ética ou alinhamento institucional.
 
 ## 2. Unidade de recuperação
 
@@ -24,6 +24,8 @@ Uma imagem é excluída quando pelo menos uma destas condições é satisfeita:
 4. seu SHA-256 é igual ao SHA-256 da consulta.
 
 A comparação por hash é necessária para a interface, pois o arquivo enviado é copiado para outra pasta. Ela só funciona com índices recriados após a inclusão da coluna `sha256`.
+
+Na EX-035 Gallagher, a exclusão efetiva é por `source_image_id` e por eventuais `exclude_image_ids` explícitos; esse avaliador não aplica exclusão adicional automática por SHA-256. A passagem de 589 para 588 candidatas corresponde à fonte excluída em cada consulta.
 
 As mesmas exclusões são aplicadas ao conjunto de relevância. Assim, a fotografia-fonte não conta como acerto possível nem permanece no denominador de relevantes.
 
@@ -101,6 +103,14 @@ O arquivo `tests/test_retrieval_methodology.py` verifica:
 - exclusão por caminho e por SHA-256;
 - propagação da exclusão para a fusão;
 - criação do manifesto com hashes.
+
+O arquivo `tests/test_gallagher_protocol.py` acrescenta regressões para:
+
+- manter no gabarito uma fotografia anotada mesmo quando o detector não produz face;
+- selecionar a detecção que contém o ponto médio dos olhos anotados, sem preferir um vizinho maior;
+- falhar quando nenhuma caixa contém o alvo, sem fallback para outro rosto.
+
+O terminal preservado da rodada corretiva registra 3/3 regressões Gallagher, 19/19 testes metodológicos e 35/35 testes na suíte completa. Esse registro é evidência de execução anterior; o fechamento documental de 22/09/2026 fez somente revisão estática e não reexecutou os testes.
 
 Comando rápido:
 
@@ -197,11 +207,15 @@ Precision@K utiliza denominador fixo K. Como parte considerável das identidades
 
 ### 10.5 Protocolo congelado da EX-011
 
+**Histórico, substituído pela EX-033.**
+
 As anotações oficiais Gallagher foram cruzadas com as 587 fotografias efetivamente presentes no índice da EX-010. As identidades foram ordenadas pela quantidade decrescente de fotografias anotadas e, em caso de empate, de forma estável. Dentro de cada identidade, os candidatos foram ordenados por nome da imagem e índice da face.
 
 Foram geradas 20 consultas de 20 identidades e 882 relações de relevância. Cada consulta é um recorte construído a partir das coordenadas dos olhos nas anotações oficiais, validado novamente pelo detector facial e associado a `source_image_id`. Três candidatos foram rejeitados por ausência de face detectável no recorte; a seleção avançou para os candidatos seguintes sem reduzir o total de consultas. Todos os 20 recortes possuem tamanho e SHA-256 registrados em `data/evaluation/gallagher_query_crops_manifest.csv`.
 
 ### 10.6 Resultado auditado da EX-012
+
+**Histórico, substituído pela comparação comum da EX-035.**
 
 A avaliação no commit `66d41bc` executou 20 consultas sem falhas. Cada ranking contém 586 fotografias elegíveis depois da exclusão da fonte. Não houve fotografia-fonte no Top-10 nem repetição de `image_id` dentro de uma consulta. O manifesto registrou árvore Git limpa e hashes compatíveis com os CSVs produzidos.
 
@@ -234,15 +248,17 @@ Os metadados contêm 1.491 `image_id` e caminhos únicos, mapeamento contínuo e
 
 ### 10.9 Protocolo congelado da EX-014
 
-O protocolo oficial contém 500 consultas e 991 relações de relevância. A primeira imagem de cada grupo Holidays é a consulta e as demais imagens do mesmo grupo são relevantes. Como todas as consultas já pertencem ao índice aprovado na EX-013, o avaliador reutiliza o descritor global congelado correspondente, exclui explicitamente a fotografia-fonte e ordena integralmente as 1.490 imagens elegíveis. Somente os dez primeiros resultados são armazenados.
+O protocolo local contém 500 consultas e 991 relações de relevância. A primeira imagem de cada grupo Holidays é a consulta e as demais imagens do mesmo grupo são relevantes. Como todas as consultas já pertencem ao índice aprovado na EX-013, o avaliador reutiliza o descritor global congelado correspondente, exclui explicitamente a fotografia-fonte e ordena integralmente as 1.490 imagens elegíveis. Somente os dez primeiros resultados são armazenados.
 
 A multiplicação entre consultas e galeria é executada na GPU em lotes de 128. O `query_time_ms` mede somente esse backend de similaridade, exclusão e ordenação com descritores já calculados; portanto, não representa latência ponta a ponta de uma nova imagem enviada pelo usuário. Precision@5, Precision@10, Recall@5, Recall@10 e AP usam o ranking integral e a relevância oficial.
 
 Em uma verificação com as primeiras 20 consultas, o avaliador otimizado e o avaliador genérico produziram métricas idênticas e o mesmo Top-10 em todas as consultas. A diferença máxima entre scores foi `0,001366`, decorrente da extração CUDA em lotes distintos, sem alteração da ordenação observada. A fotografia-fonte não apareceu nos resultados.
 
-### 10.10 Resultado auditado da EX-014
+### 10.10 Resultado auxiliar da EX-014
 
 A avaliação no commit `c6af569` executou as 500 consultas sem falhas. Cada ranking contém as 1.490 imagens elegíveis depois da exclusão da fonte; foram salvos dez resultados por consulta. Não houve fotografia-fonte, repetição de `image_id` ou valor não finito. O manifesto registrou árvore Git limpa e hashes compatíveis com todos os CSVs e com a figura qualitativa, que também passou por inspeção visual.
+
+Esta é uma avaliação auxiliar do componente global. O projeto calcula AP como média das precisões nas posições relevantes, enquanto a integração oficial Holidays usa outra forma de integração da curva precisão-recall. Portanto, `mAP = 0,842612` é uma métrica local adaptada e não deve ser comparada diretamente ao valor oficial do benchmark. Nenhuma nova avaliação Holidays foi executada no fechamento A01/A02.
 
 | Métrica | Resultado |
 |---|---:|
@@ -256,6 +272,8 @@ A avaliação no commit `c6af569` executou as 500 consultas sem falhas. Cada ran
 A AP mínima foi 0,004215, a mediana foi 1,0 e a máxima foi 1,0; nenhuma consulta teve AP zero. Cada consulta possui entre uma e doze imagens relevantes, com mediana igual a uma. Isso explica por que Precision@5 e Precision@10 são numericamente baixas apesar do Recall e do mAP elevados: depois de recuperar a única imagem relevante, as posições restantes até K contam como não relevantes. O tempo informado mede somente o ranking com descritores pré-calculados, não a extração ponta a ponta de uma imagem nova.
 
 ### 10.11 Protocolo definido para a fusão Gallagher
+
+**Histórico, implementado originalmente nas EX-016/EX-017 e substituído pela sequência corrigida EX-033/EX-034/EX-035 abaixo.**
 
 Cada item será uma única consulta lógica com dois caminhos explicitamente relacionados:
 
@@ -278,11 +296,15 @@ Os metadados possuem 589 identificadores únicos, mapeamento contínuo para a ma
 
 ### 10.13 Resultado auditado da EX-016
 
+**Histórico, substituído pela EX-034.**
+
 O protocolo pareado foi gerado no commit `baf5f83` a partir das 20 consultas congeladas na EX-011. Ele contém 20 identidades-alvo, 20 recortes faciais e 20 fotografias completas, ligadas por `source_image_id`. Existem 19 fotografias-fonte únicas porque uma fotografia contém duas pessoas selecionadas como alvos distintos; isso é esperado em um acervo multi-rosto.
 
 Cada recorte e cada fotografia completa possui SHA-256 conferido contra o arquivo local. Todas as fontes existem nos índices facial e global, todas as consultas possuem relevância e nenhuma fonte permanece no gabarito. O manifesto registrou árvore Git limpa e hashes válidos para o CSV pareado e seu inventário de evidências.
 
 ### 10.14 Resultado auditado da EX-017
+
+**Histórico, substituído pela EX-035.**
 
 A execução no commit `532bb84` avaliou as 20 consultas nas cinco configurações predefinidas, sempre com 588 fotografias elegíveis após excluir a fonte. Foram produzidos 100 rankings integrais e salvos 1.000 resultados. Não houve falha, fotografia-fonte, duplicidade ou valor não finito. O baseline somente facial reproduziu exatamente o Top-10 e todas as métricas da EX-012.
 
@@ -300,6 +322,8 @@ Portanto, este conjunto não fornece evidência de que a soma linear com context
 
 ### 10.15 Resultado auditado da EX-018
 
+**Histórico e derivado da EX-017; não fornece os números Gallagher vigentes.**
+
 A análise no commit `8cb1e12` rotulou os 1.000 resultados Top-10 da EX-017 e comparou a AP de cada método com o baseline facial. Para a fusão principal `0,9/0,1`, uma consulta melhorou, nove permaneceram inalteradas e dez pioraram.
 
 Os casos foram selecionados por regra determinística antes da inspeção visual:
@@ -310,7 +334,38 @@ Os casos foram selecionados por regra determinística antes da inspeção visual
 
 Na maior melhora, o contexto reorganizou fotografias do mesmo ambiente sem alterar quais dez imagens apareciam no Top-10. Na maior degradação, a semelhança do cenário e da composição de grupo promoveu uma imagem incorreta, ilustrando como contexto pode competir com identidade. As quatro figuras foram inspecionadas, mas permanecem somente em `outputs/` porque contêm pessoas identificáveis. O manifesto registrou árvore Git limpa, hashes válidos e os totais esperados para todos os métodos.
 
+### 10.15-A Protocolo Gallagher corrigido — EX-033 e EX-034
+
+A EX-033 constrói a relevância a partir das anotações cruzadas com as 589 fotografias da galeria global da EX-015, sem usar o sucesso do detector como filtro. As 587 fotografias do índice facial são subconjunto dessa galeria. As duas fotografias anotadas sem face detectada permanecem no gabarito e recebem contribuição facial zero durante a fusão.
+
+Foram congeladas 20 consultas de 20 identidades e 884 relações de relevância. Cada consulta usa um recorte baseado nos olhos anotados e seleciona exclusivamente uma caixa que contém o ponto médio desses olhos. Se nenhuma detecção contém o ponto, o candidato é rejeitado; não há fallback para o maior rosto. Quando mais de uma caixa contém o ponto, o desempate usa distância do centro, menor área e coordenadas da caixa.
+
+A EX-034 emparelha os 20 recortes com as fotografias-fonte completas. Existem 19 fontes únicas porque uma fotografia origina consultas de duas identidades. `source_image_id` é excluído tanto do ranking quanto da relevância. Todas as consultas usam os mesmos CSVs congelados e possuem hashes dos arquivos consultados.
+
+Manifests:
+
+- EX-033: commit `b0abf4c0777cd0aa6fce34b96709e43043c3eb7c`, `dirty=false`, SHA-256 `8066afb36f95545c4bea1a0b996a0d40acaef6d801fd8ed75bcf4b8aca8b4222`;
+- EX-034: commit `938911b5ffa117a4341bf35d7e8665e74a2ac49b`, `dirty=false`, SHA-256 `d448900a1300aaf6eed730d66f3c90bec5ebab08e96126c75f34a962cabc513d`.
+
+### 10.15-B Resultado Gallagher vigente — EX-035
+
+A EX-035 executa, na mesma matriz de consultas, galeria e relevância, os baselines `1,0/0,0` e `0,0/1,0` e as fusões `0,9/0,1`, `0,7/0,3` e `0,5/0,5`. Os cossenos são convertidos para `[0,1]`; a contribuição facial é zero quando a fotografia não possui face; a ordenação usa score decrescente e `image_id` crescente como desempate.
+
+Foram verificadas 20 consultas por método, 588 candidatas após excluir a fonte, 100 linhas de métricas por consulta e 1.000 linhas Top-10, sem fonte, duplicidade ou valor não finito. Todos os pontos anotados ficaram dentro das caixas selecionadas, e as caixas da avaliação coincidem com as congeladas na EX-033.
+
+| Configuração face/global | Precision@5 | Precision@10 | Recall@5 | Recall@10 | mAP |
+|---|---:|---:|---:|---:|---:|
+| 1,0 / 0,0 | 0,900000 | 0,680000 | 0,577119 | 0,687856 | 0,951446 |
+| 0,0 / 1,0 | 0,260000 | 0,195000 | 0,203512 | 0,234712 | 0,280864 |
+| 0,9 / 0,1 | 0,900000 | 0,680000 | 0,577119 | 0,687856 | 0,946297 |
+| 0,7 / 0,3 | 0,840000 | 0,675000 | 0,540571 | 0,682856 | 0,901525 |
+| 0,5 / 0,5 | 0,770000 | 0,630000 | 0,481033 | 0,634905 | 0,813358 |
+
+O manifest EX-035 registra o commit `938911b5ffa117a4341bf35d7e8665e74a2ac49b`, `dirty=false` e SHA-256 `a7ee9c119246b2c9b926376c4435ea24cabf72f7496095f74fdc729f60dbb1c8`. Nenhuma fusão superou o baseline facial no mAP agregado. Essa conclusão se limita às 20 consultas selecionadas e não constitui validação agro.
+
 ### 10.16 Protocolo Agrishow congelado
+
+**Histórico/complementar privado, fora do núcleo e da conclusão principal do artigo delimitado.** Sua eventual divulgação depende de decisão ética, institucional e de direitos pessoais. Os resultados são preservados abaixo sem serem usados para sustentar generalização rural ou agrícola.
 
 A Agrishow 2022 foi tratada como estudo de caso aplicado, não como benchmark geral. Foram preservados 124 originais em CC BY 2.0 depois da remoção de três derivados recortados. Antes de qualquer busca, 91 imagens foram marcadas como presença da pessoa-alvo, 33 como ausência e nenhuma permaneceu incerta. Uma única fonte foi sorteada entre as 91 imagens presentes por regra SHA-256 com semente registrada. O recorte facial foi confirmado visualmente e a fotografia completa correspondente foi congelada como consulta global.
 
@@ -447,6 +502,6 @@ Não repetir com parâmetros diferentes depois de observar os resultados. Qualqu
 
 ### 11.5 Preservação e limpeza planejadas — EX-032
 
-Após a auditoria, os resultados agregados serão incorporados aos documentos canônicos e ao dossiê privado. A WIDER mede robustez geral de detecção; não mede reconhecimento da mesma pessoa e não constitui validação agro. Nenhuma imagem, recorte ou caixa desenhada da WIDER será publicada. O artigo poderá usar somente tabelas e gráficos agregados, mantendo a figura visual licenciada da Agrishow.
+Após a auditoria, os resultados agregados serão incorporados aos documentos canônicos e ao dossiê privado. A WIDER mede robustez geral de detecção; não mede reconhecimento da mesma pessoa e não constitui validação agro. Nenhuma imagem, recorte ou caixa desenhada da WIDER será publicada. Agrishow permanece histórico/complementar privado; nenhuma figura com pessoas deve ser publicada sem resolução ética, institucional e de direitos pessoais.
 
 Antes da limpeza, o dossiê será renderizado, inspecionado e sincronizado nas cópias local e OneDrive. A lista literal de exclusão será simulada e arquivada. Somente então poderão ser removidos imagens, arquivos compactados, anotações reproduzíveis, predições completas e caches WIDER, com registro do espaço recuperado e confirmação de preservação de LFW, Gallagher, Holidays, ambiente GPU e evidências pequenas.

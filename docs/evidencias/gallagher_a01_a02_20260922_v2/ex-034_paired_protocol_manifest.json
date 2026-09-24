@@ -1,0 +1,91 @@
+{
+  "configuration": {
+    "query_face_selection": "detected bbox containing the annotated-eye midpoint",
+    "selection_source": "corrected_gallagher_queries"
+  },
+  "created_at_utc": "2026-09-22T14:44:59.231443+00:00",
+  "extra": {
+    "queries": 20,
+    "unique_sources": 19,
+    "unique_target_identities": 20
+  },
+  "git": {
+    "commit": "938911b5ffa117a4341bf35d7e8665e74a2ac49b",
+    "dirty": false
+  },
+  "inputs": {
+    "face_index_manifest": {
+      "bytes": 1594,
+      "exists": true,
+      "path": "outputs/experiments/ex-010_gallagher_face_index/face_index_manifest.json",
+      "sha256": "b2a435843dfc53f655f4551343e8976ef1af179442e7c65daf5da595e7d94341",
+      "type": "file"
+    },
+    "face_metadata": {
+      "bytes": 284587,
+      "exists": true,
+      "path": "outputs/experiments/ex-010_gallagher_face_index/face_metadata.csv",
+      "sha256": "9347e4fa2f5ee3875ac5efe5cb9f438c15e3d5a4219a5f710a68fc7cdbceb8be",
+      "type": "file"
+    },
+    "face_queries_csv": {
+      "bytes": 4129,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_face_queries.csv",
+      "sha256": "a6c856176788c25b3af037ce028572dc8ee045840813d5c09a75b868d48a5558",
+      "type": "file"
+    },
+    "global_index_manifest": {
+      "bytes": 1590,
+      "exists": true,
+      "path": "outputs/experiments/ex-015_gallagher_global_index/global_index_manifest.json",
+      "sha256": "5931effb7635e05ac8b7bfa4cc37e58d30c8343ab519542172ee9985229dc599",
+      "type": "file"
+    },
+    "global_metadata": {
+      "bytes": 84193,
+      "exists": true,
+      "path": "outputs/experiments/ex-015_gallagher_global_index/global_metadata.csv",
+      "sha256": "0d5c33ff7ab7b9d769ba51a00e78b90bca141726e68b3afe9640a7b05133a69e",
+      "type": "file"
+    },
+    "relevance_csv": {
+      "bytes": 32796,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_relevance.csv",
+      "sha256": "7728a6541b0378e646de49d47a51127bf0c28ac5633706d6e9c4bbad4062c56d",
+      "type": "file"
+    }
+  },
+  "method": "gallagher_paired_face_global_protocol",
+  "results": {
+    "paired_queries": {
+      "bytes": 5039,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_fusion_queries.csv",
+      "sha256": "d391efb0ade805a888c6871bb1d4bb81efe24b653ab4aaa19b0ad8f02fc95b93",
+      "type": "file"
+    },
+    "paired_query_hashes": {
+      "bytes": 6591,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_fusion_query_manifest.csv",
+      "sha256": "1d7d4c70e674dcaa2c93fc60ba5513debb59ab8ceb8a77da40a9c5a29473e4b8",
+      "type": "file"
+    }
+  },
+  "runtime": {
+    "packages": {
+      "insightface": "0.2.1",
+      "numpy": "2.2.6",
+      "onnxruntime-gpu": "1.23.2",
+      "pandas": "2.3.3",
+      "torch": "2.11.0+cu128",
+      "torchvision": "0.26.0+cu128"
+    },
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.20"
+  },
+  "schema_version": "1.0",
+  "script": "scripts/fusion/03_prepare_paired_gallagher.py"
+}

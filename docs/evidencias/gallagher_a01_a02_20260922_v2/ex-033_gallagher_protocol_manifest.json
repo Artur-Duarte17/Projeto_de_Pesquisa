@@ -1,0 +1,99 @@
+{
+  "configuration": {
+    "crop_scale": 6.0,
+    "det_size": 640,
+    "detection_validation": true,
+    "device": "cuda",
+    "max_identities": 20,
+    "min_relevant": 3,
+    "queries_per_identity": 1,
+    "query_face_selection": "detected bbox containing the annotated-eye midpoint",
+    "query_face_tie_break": "nearest bbox center, then smallest area, then bbox coordinates",
+    "relevance_source": "all annotated photographs in the eligible global gallery",
+    "selection": "identity frequency descending, then image name and face index"
+  },
+  "created_at_utc": "2026-09-22T14:42:30.836250+00:00",
+  "extra": {
+    "eligible_gallery_images": 589,
+    "expected_queries": 20,
+    "gallery_images_without_detected_faces": 2,
+    "mapped_annotation_rows": 931,
+    "queries": 20,
+    "relevance_rows": 884,
+    "selected_identities": 20,
+    "skipped_crops": 3,
+    "unmapped_gallery_annotation_rows": 0
+  },
+  "git": {
+    "commit": "b0abf4c0777cd0aa6fce34b96709e43043c3eb7c",
+    "dirty": false
+  },
+  "inputs": {
+    "annotations": {
+      "bytes": 79013,
+      "exists": true,
+      "path": "data/raw/gallagher/metadata/face_annotations.csv",
+      "sha256": "d4e040970298f86477d04c965af5a782eedd18ca6ea67a5a1cba1a3536b67f7e",
+      "type": "file"
+    },
+    "face_metadata": {
+      "bytes": 284587,
+      "exists": true,
+      "path": "outputs/experiments/ex-010_gallagher_face_index/face_metadata.csv",
+      "sha256": "9347e4fa2f5ee3875ac5efe5cb9f438c15e3d5a4219a5f710a68fc7cdbceb8be",
+      "type": "file"
+    },
+    "gallery_metadata": {
+      "bytes": 84193,
+      "exists": true,
+      "path": "outputs/experiments/ex-015_gallagher_global_index/global_metadata.csv",
+      "sha256": "0d5c33ff7ab7b9d769ba51a00e78b90bca141726e68b3afe9640a7b05133a69e",
+      "type": "file"
+    }
+  },
+  "method": "gallagher_face_protocol",
+  "results": {
+    "queries": {
+      "bytes": 4129,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_face_queries.csv",
+      "sha256": "a6c856176788c25b3af037ce028572dc8ee045840813d5c09a75b868d48a5558",
+      "type": "file"
+    },
+    "query_crops_manifest": {
+      "bytes": 4702,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_query_crops_manifest.csv",
+      "sha256": "c4ff0a93975984dfb14991854a56482aac9af32cf9ebef65762e6e638ec7abae",
+      "type": "file"
+    },
+    "relevance": {
+      "bytes": 32796,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_relevance.csv",
+      "sha256": "7728a6541b0378e646de49d47a51127bf0c28ac5633706d6e9c4bbad4062c56d",
+      "type": "file"
+    },
+    "skipped": {
+      "bytes": 190,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_prepare_skipped.csv",
+      "sha256": "82ac0f641ffb36463b26580bfd95c90a97ac536e511529f07e7d4f6bfa07ecff",
+      "type": "file"
+    }
+  },
+  "runtime": {
+    "packages": {
+      "insightface": "0.2.1",
+      "numpy": "2.2.6",
+      "onnxruntime-gpu": "1.23.2",
+      "pandas": "2.3.3",
+      "torch": "2.11.0+cu128",
+      "torchvision": "0.26.0+cu128"
+    },
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.20"
+  },
+  "schema_version": "1.0",
+  "script": "scripts/face/04_prepare_gallagher_eval.py"
+}

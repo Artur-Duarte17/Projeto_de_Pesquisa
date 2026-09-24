@@ -17,7 +17,7 @@ O objetivo cientifico da v1 e comparar tres formas de recuperacao fotografica:
 2. Busca pela imagem inteira.
 3. Fusao entre busca por rosto e busca pela imagem inteira.
 
-O sistema ja tem resultados experimentais nas tres partes. A busca facial funcionou bem para encontrar pessoas. A busca global funcionou bem em uma base propria de CBIR chamada **INRIA Holidays**. A fusao simples foi testada, mas ainda nao superou a busca facial isolada no cenario de procurar pessoas.
+O sistema ja tem resultados experimentais nas tres partes. A busca facial funcionou bem para encontrar pessoas. A busca global possui uma avaliacao auxiliar na **INRIA Holidays**, calculada com a metrica adaptada do projeto. A fusao simples foi testada no protocolo Gallagher corrigido, mas nao superou a busca facial isolada no cenario de procurar pessoas.
 
 Isso nao invalida o projeto. Pelo contrario: mostra um resultado importante para artigo, porque indica que cada tecnica serve melhor para um tipo de consulta.
 
@@ -285,29 +285,30 @@ cada rosto = um embedding proprio
 
 Isso permite encontrar uma pessoa mesmo quando ela aparece em uma foto de grupo.
 
-### 8.3 Resultado facial no Gallagher
+### 8.3 Resultado facial vigente no Gallagher
 
-A avaliacao facial no Gallagher usou 20 consultas.
+A avaliacao facial vigente usa as 20 consultas corrigidas da EX-033/EX-034 e o mesmo universo global da EX-035. O gabarito vem das anotacoes cruzadas com 589 fotografias, independentemente de o detector ter encontrado rosto. Depois de excluir a fonte, cada ranking possui 588 candidatas.
 
 Metricas:
 
 ```text
-Precision@5:  0.8700
-Precision@10: 0.6450
-Recall@5:     0.5664
-Recall@10:    0.6629
-mAP:          0.9139
-Tempo medio:  615,704 ms por consulta
+Precision@5:  0.9000
+Precision@10: 0.6800
+Recall@5:     0.5771
+Recall@10:    0.6879
+mAP:          0.9514
 ```
 
 Interpretacao simples:
 
-- **Precision@5 = 0.8700** significa que, entre as 5 primeiras fotos retornadas, a maior parte estava correta.
-- **Precision@10 = 0.6450** usa denominador fixo dez e inclui identidades com menos de dez respostas relevantes.
-- **Recall@10 = 0.6629** significa que, dentro do limite de 10 resultados, o sistema encontrou uma parte relevante das fotos corretas.
-- **mAP = 0.9139** mostra que os resultados corretos tendem a aparecer bem ranqueados no protocolo atual.
+- **Precision@5 = 0.9000** significa que, entre as 5 primeiras fotos retornadas, a maior parte estava correta.
+- **Precision@10 = 0.6800** usa denominador fixo dez e inclui identidades com menos de dez respostas relevantes.
+- **Recall@10 = 0.6879** significa que, dentro do limite de 10 resultados, o sistema encontrou uma parte relevante das fotos corretas.
+- **mAP = 0.9514** mostra que os resultados corretos tendem a aparecer bem ranqueados neste protocolo.
 
-Conclusao: a busca facial esta funcionando bem para o objetivo de encontrar pessoas.
+As duas fotos da identidade 2 sem face detectada permanecem relevantes. A consulta `gallagher_id6_q1` agora usa a caixa que contem o ponto medio dos olhos anotados, em vez do rosto vizinho. Os valores anteriores da EX-012 e EX-017 permanecem historicos.
+
+Conclusao delimitada: a busca facial funciona bem para encontrar pessoas nas 20 consultas avaliadas; isso nao demonstra generalizacao para outros albuns ou eventos.
 
 ## 9. Busca global com ResNet50
 
@@ -335,7 +336,7 @@ Esse modelo e adequado como baseline academico porque e uma CNN conhecida e ampl
 
 ### 9.2 Resultado global no INRIA Holidays
 
-A avaliacao global no INRIA Holidays usou 500 consultas.
+A avaliacao global local no INRIA Holidays usou 500 consultas. Ela e auxiliar: a AP do projeto e calculada de forma diferente da integracao oficial do benchmark.
 
 Metricas:
 
@@ -350,12 +351,12 @@ Tempo medio do ranking: 0,704 ms por consulta
 
 Interpretacao simples:
 
-- O **mAP = 0.8426** e forte para a tarefa de CBIR global.
+- O **mAP local = 0.8426** indica bom ordenamento segundo a metrica adaptada do projeto, mas nao deve ser comparado diretamente ao mAP oficial da Holidays.
 - O **Recall@10 = 0.9176** mostra que o sistema encontrou a maioria das imagens relevantes dentro dos 10 primeiros resultados.
 - A Precision@10 parece baixa, mas isso acontece porque muitos grupos do Holidays tem apenas 1 ou 2 imagens relevantes. Se a consulta tem poucas respostas corretas possiveis, o restante do Top-10 conta como falso positivo.
 - O tempo informado mede somente similaridade e ordenacao com descritores ja calculados; nao inclui a extracao do descritor de uma imagem nova.
 
-Conclusao: o modulo global com ResNet50 esta funcionando bem na tarefa apropriada para ele, que e encontrar imagens visualmente semelhantes.
+Conclusao: o modulo global com ResNet50 apresenta evidencia auxiliar positiva para similaridade visual. Nenhuma nova avaliacao Holidays foi executada na correcao A01/A02.
 
 ### 9.3 Resultado global contextual no Gallagher para buscar pessoa
 
@@ -368,7 +369,7 @@ Precision@5:  0.2600
 Precision@10: 0.1950
 Recall@5:     0.2035
 Recall@10:    0.2347
-mAP:          0.2808
+mAP:          0.280864
 ```
 
 Interpretacao:
@@ -400,31 +401,31 @@ Pesos testados:
 0.5 face / 0.5 global
 ```
 
-### 10.2 Resultado atual da fusao no Gallagher
+### 10.2 Resultado vigente da fusao no Gallagher
 
-O protocolo pareado usa o recorte validado para a busca facial e a fotografia-fonte completa para o contexto global. A fonte e excluida de todos os rankings.
+O protocolo pareado corrigido usa o recorte ligado ao alvo anotado para a busca facial e a fotografia-fonte completa para o contexto global. A mesma fonte e excluida do ranking e da relevancia em todas as configuracoes.
 
 Tabela comparativa:
 
 | Metodo | Precision@5 | Precision@10 | Recall@10 | mAP |
 | --- | ---: | ---: | ---: | ---: |
-| Face isolado | 0.8700 | 0.6450 | 0.6629 | 0.9139 |
-| Contexto global isolado | 0.2600 | 0.1950 | 0.2347 | 0.2808 |
-| Fusao 0.9/0.1 | 0.8700 | 0.6450 | 0.6629 | 0.9087 |
-| Fusao 0.7/0.3 | 0.8200 | 0.6400 | 0.6579 | 0.8653 |
-| Fusao 0.5/0.5 | 0.7500 | 0.5950 | 0.6099 | 0.7790 |
+| Face isolado | 0.9000 | 0.6800 | 0.6879 | 0.951446 |
+| Contexto global isolado | 0.2600 | 0.1950 | 0.2347 | 0.280864 |
+| Fusao 0.9/0.1 | 0.9000 | 0.6800 | 0.6879 | 0.946297 |
+| Fusao 0.7/0.3 | 0.8400 | 0.6750 | 0.6829 | 0.901525 |
+| Fusao 0.5/0.5 | 0.7700 | 0.6300 | 0.6349 | 0.813358 |
 
 ### 10.3 Interpretacao da fusao
 
-Neste cenario, a fusao simples nao melhorou o resultado facial.
+Neste cenario corrigido, a fusao simples nao melhorou o mAP do resultado facial.
 
-Isso acontece porque a tarefa do Gallagher e encontrar pessoas. Para essa tarefa, o embedding facial e o sinal mais importante. O embedding global da imagem inteira pode adicionar ruido, principalmente quando a consulta e um recorte de rosto e o banco contem fotos completas.
+Na comparacao pareada, o componente facial recebe o recorte do alvo e o componente global recebe a fotografia-fonte completa. O contexto da cena pode ajudar ou prejudicar consultas individuais, mas, em media, nao superou o sinal facial neste conjunto.
 
 Essa conclusao e boa para o artigo porque mostra uma comparacao experimental real:
 
 ```text
 Facial funciona melhor para identidade.
-Global funciona melhor para similaridade visual geral.
+Global possui evidencia auxiliar para similaridade visual geral.
 Fusao simples nem sempre melhora; depende do tipo de consulta e do cenario.
 ```
 
@@ -504,7 +505,7 @@ Em termos do cronograma original, o projeto esta no fim da etapa de fusao e entr
 
 ## 14. Estado cientifico do projeto
 
-O projeto ja tem um nucleo experimental publicavel em forma inicial, porque possui:
+O projeto ja tem um nucleo experimental corrigido e documentado, porque possui:
 
 - um problema claro: recuperacao fotografica por conteudo;
 - duas trilhas tecnicas: face e CBIR global;
@@ -517,24 +518,23 @@ O projeto ja tem um nucleo experimental publicavel em forma inicial, porque poss
 
 O ponto mais importante para o artigo e nao vender a fusao como se ela sempre melhorasse. O resultado correto e:
 
-> Na avaliacao pareada atual, a fusao simples nao superou o modulo facial no cenario de busca por identidade, enquanto o CBIR global apresentou bom desempenho na base Holidays.
+> Na avaliacao Gallagher corrigida, a fusao simples nao superou o modulo facial no cenario de busca por identidade. A Holidays fornece avaliacao auxiliar do componente global com metrica adaptada, sem comparacao direta ao benchmark oficial.
 
-Essa frase e cientificamente honesta e defensavel.
+Essa frase e sustentada pelos artefatos atuais, dentro das limitacoes descritas. Agrishow permanece estudo historico/complementar privado e nao integra a conclusao principal.
 
 ## 15. O que ainda falta
 
 ### 15.1 Curto prazo
 
-Proximas tarefas recomendadas:
+Proximas tarefas obrigatorias antes da redacao ou submissao:
 
-1. Rodar e ajustar a interface Streamlit minima.
-2. Garantir que ela consiga fazer pelo menos:
-   - busca por pessoa;
-   - busca por imagem semelhante;
-   - exibicao de resultados com score.
-3. Separar exemplos visuais bons para relatorio/artigo.
-4. Criar uma tabela final de resultados no README ou em `docs/`.
-5. Comecar a estrutura do artigo ou TCC.
+1. Obter alinhamento da coordenacao/orientacao sobre modalidade, calendario, aceite, banca e deposito institucional.
+2. Resolver licencas, base de tratamento e decisao institucional/etica sobre biometria e divulgacao.
+3. Revisar referencias, metadados e delimitacao da contribuicao com validacao humana dos autores.
+4. Confirmar compatibilidade editorial e politica de repositorio institucional.
+5. Definir o que pode ser divulgado; fotografias e recortes nao devem ser publicados automaticamente.
+
+A interface e outras melhorias tecnicas podem ser retomadas depois dessas decisoes. Nenhum artigo foi iniciado neste fechamento documental.
 
 ### 15.2 Medio prazo
 
@@ -573,12 +573,13 @@ preparo de bases;
 controle de arquivos grandes fora do Git.
 ```
 
-A conclusao tecnica atual e:
+A conclusao tecnica atual, delimitada, e:
 
 ```text
-A busca facial e o melhor metodo para encontrar pessoas.
-O CBIR global com ResNet50 e adequado para encontrar imagens visualmente semelhantes.
-A fusao simples entre face e contexto global nao melhorou, em media, a busca por pessoa no Gallagher.
+A busca facial obteve o maior mAP nas 20 consultas Gallagher corrigidas.
+O CBIR global com ResNet50 possui avaliacao auxiliar para similaridade visual, com metrica Holidays adaptada.
+A fusao simples entre face e contexto global nao superou, em media, a busca facial no Gallagher corrigido.
+Agrishow permanece historico/complementar privado e nao sustenta a conclusao principal.
 ```
 
-Portanto, o projeto esta pronto para entrar na fase de demonstracao com interface minima e organizacao dos resultados para escrita academica.
+Portanto, A01/A02 e a consolidacao experimental Gallagher estao encerradas, mas o projeto ainda nao esta pronto para submissao. Permanecem pendencias institucionais, eticas, documentais, bibliograficas e editoriais. A redacao academica deve comecar somente depois das decisoes correspondentes e da validacao humana dos autores.

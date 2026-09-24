@@ -1,0 +1,151 @@
+{
+  "configuration": {
+    "batch_size": 20,
+    "dataset_name": "gallagher_corrected_a01_a02",
+    "det_size": 640,
+    "device": "cuda",
+    "face_query_source": "corrected_annotated_eye_crop",
+    "global_query_source": "source_photo_descriptor_from_ex015",
+    "max_queries": null,
+    "metric_ks": [
+      5,
+      10
+    ],
+    "missing_face_rule": "face unit score zero; global score remains available",
+    "query_face_selection": "annotated-eye midpoint contained by detected bbox",
+    "query_face_tie_break": "nearest bbox center, then smallest area, then bbox coordinates",
+    "ranking_depth": "all_eligible_images",
+    "ranking_tie_break": "score descending, then image_id ascending",
+    "save_topk": 10,
+    "weights_list": [
+      [
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.9,
+        0.1
+      ],
+      [
+        0.7,
+        0.3
+      ],
+      [
+        0.5,
+        0.5
+      ]
+    ]
+  },
+  "created_at_utc": "2026-09-22T14:45:51.334491+00:00",
+  "extra": {
+    "dataset_name": "gallagher_corrected_a01_a02",
+    "eligible_gallery_images": 588,
+    "failed_queries": 0,
+    "images_without_detected_faces": 2,
+    "queries": 20
+  },
+  "git": {
+    "commit": "938911b5ffa117a4341bf35d7e8665e74a2ac49b",
+    "dirty": false
+  },
+  "inputs": {
+    "face_embeddings": {
+      "bytes": 2668672,
+      "exists": true,
+      "path": "outputs/experiments/ex-010_gallagher_face_index/face_embeddings.npy",
+      "sha256": "a531cf578e74fa0dfd40b433bd46d7aa9a6907c35fb6fb05d05f284455258763",
+      "type": "file"
+    },
+    "face_index_manifest": {
+      "bytes": 1594,
+      "exists": true,
+      "path": "outputs/experiments/ex-010_gallagher_face_index/face_index_manifest.json",
+      "sha256": "b2a435843dfc53f655f4551343e8976ef1af179442e7c65daf5da595e7d94341",
+      "type": "file"
+    },
+    "face_metadata": {
+      "bytes": 284587,
+      "exists": true,
+      "path": "outputs/experiments/ex-010_gallagher_face_index/face_metadata.csv",
+      "sha256": "9347e4fa2f5ee3875ac5efe5cb9f438c15e3d5a4219a5f710a68fc7cdbceb8be",
+      "type": "file"
+    },
+    "global_embeddings": {
+      "bytes": 4825216,
+      "exists": true,
+      "path": "outputs/experiments/ex-015_gallagher_global_index/global_embeddings.npy",
+      "sha256": "e6c18ca022b9c064b1dc11ffa0989e1f2c381b4561ebc47aa55234e656695a1f",
+      "type": "file"
+    },
+    "global_index_manifest": {
+      "bytes": 1590,
+      "exists": true,
+      "path": "outputs/experiments/ex-015_gallagher_global_index/global_index_manifest.json",
+      "sha256": "5931effb7635e05ac8b7bfa4cc37e58d30c8343ab519542172ee9985229dc599",
+      "type": "file"
+    },
+    "global_metadata": {
+      "bytes": 84193,
+      "exists": true,
+      "path": "outputs/experiments/ex-015_gallagher_global_index/global_metadata.csv",
+      "sha256": "0d5c33ff7ab7b9d769ba51a00e78b90bca141726e68b3afe9640a7b05133a69e",
+      "type": "file"
+    },
+    "queries_csv": {
+      "bytes": 5039,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_fusion_queries.csv",
+      "sha256": "d391efb0ade805a888c6871bb1d4bb81efe24b653ab4aaa19b0ad8f02fc95b93",
+      "type": "file"
+    },
+    "relevance_csv": {
+      "bytes": 32796,
+      "exists": true,
+      "path": "data/evaluation/gallagher_corr_a01_a02_20260922_v2/gallagher_relevance.csv",
+      "sha256": "7728a6541b0378e646de49d47a51127bf0c28ac5633706d6e9c4bbad4062c56d",
+      "type": "file"
+    }
+  },
+  "method": "gallagher_corrected_a01_a02_paired_face_global_fusion",
+  "results": {
+    "aggregate_metrics": {
+      "bytes": 1065,
+      "exists": true,
+      "path": "outputs/experiments/ex-035_gallagher_paired_fusion_a01_a02_20260922_v2/fusion_metrics.csv",
+      "sha256": "b4a271dbc2ca8c15436cf18d2c2cdcba2f5b48d3f279f590e4b43bb10c52c639",
+      "type": "file"
+    },
+    "per_query_metrics": {
+      "bytes": 13734,
+      "exists": true,
+      "path": "outputs/experiments/ex-035_gallagher_paired_fusion_a01_a02_20260922_v2/fusion_metrics_per_query.csv",
+      "sha256": "111039208e5bc9f37b292f5cc0241de574fd56f7629d5885a8182aeda255dce6",
+      "type": "file"
+    },
+    "saved_topk": {
+      "bytes": 395095,
+      "exists": true,
+      "path": "outputs/experiments/ex-035_gallagher_paired_fusion_a01_a02_20260922_v2/fusion_topk_results.csv",
+      "sha256": "31eb9b6e8e811349d9aa06aaf295e27ae37f74a22f41e1b1641541d0fede7a12",
+      "type": "file"
+    }
+  },
+  "runtime": {
+    "packages": {
+      "insightface": "0.2.1",
+      "numpy": "2.2.6",
+      "onnxruntime-gpu": "1.23.2",
+      "pandas": "2.3.3",
+      "torch": "2.11.0+cu128",
+      "torchvision": "0.26.0+cu128"
+    },
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.20"
+  },
+  "schema_version": "1.0",
+  "script": "scripts/fusion/04_evaluate_paired_gallagher.py"
+}
