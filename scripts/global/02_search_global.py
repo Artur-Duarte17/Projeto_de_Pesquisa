@@ -8,16 +8,16 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from global_lib import (
+from retrieval.adapters.global_model import (
     build_resnet50_feature_extractor,
     describe_torch_device,
     extract_global_embedding,
-    load_global_index,
-    search_global_index,
 )
 from project_paths import OUTPUTS_DIR
-from retrieval_common import now_ms, save_visual_grid
-from run_manifest import write_run_manifest
+from retrieval.adapters.files import now_ms, save_visual_grid
+from retrieval.adapters.index_store import load_global_index
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.adapters.search_gateway import search_global_index
 
 
 def parse_args() -> argparse.Namespace:

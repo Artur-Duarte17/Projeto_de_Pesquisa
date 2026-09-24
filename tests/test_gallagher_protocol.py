@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import pick_query_face
+from retrieval.domain.face_policy import pick_query_face
 
 
 def load_script_module(module_name: str, relative_path: str):

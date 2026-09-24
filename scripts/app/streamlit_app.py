@@ -12,22 +12,12 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import (
-    bbox_string,
-    build_face_app,
-    detect_faces_in_image,
-    embedding_from_face,
-    load_face_index,
-    search_face_index,
-)
-from fusion_lib import search_fusion
-from global_lib import (
-    build_resnet50_feature_extractor,
-    extract_global_embedding,
-    load_global_index,
-    search_global_index,
-)
 from project_paths import OUTPUTS_DIR
+from retrieval.adapters.face_model import build_face_app, detect_faces_in_image
+from retrieval.adapters.global_model import build_resnet50_feature_extractor, extract_global_embedding
+from retrieval.adapters.index_store import load_face_index, load_global_index
+from retrieval.adapters.search_gateway import search_face_index, search_fusion, search_global_index
+from retrieval.domain.face_policy import bbox_string, embedding_from_face
 
 
 UPLOAD_DIR = OUTPUTS_DIR / "app_uploads"

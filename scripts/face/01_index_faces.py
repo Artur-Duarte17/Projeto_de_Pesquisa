@@ -13,9 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import build_face_app, embedding_from_face, sorted_faces
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import (
+from retrieval.adapters.face_model import build_face_app
+from retrieval.adapters.files import (
     list_images,
     load_inventory_image_ids,
     parent_label,
@@ -23,7 +23,8 @@ from retrieval_common import (
     sha256_file,
     stable_image_id,
 )
-from run_manifest import write_run_manifest
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.domain.face_policy import embedding_from_face, sorted_faces
 
 
 def parse_args() -> argparse.Namespace:

@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR
-from retrieval_common import stable_image_id
+from retrieval.adapters.files import stable_image_id
 
 DATASET_PAGE = "https://thoth.inrialpes.fr/~jegou/data.php.html"
 ARCHIVES = [

@@ -12,10 +12,10 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from fusion_lib import classify_metric_delta
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import relevance_from_csv, resolve_stored_path
-from run_manifest import write_run_manifest
+from retrieval.adapters.files import relevance_from_csv, resolve_stored_path
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.domain.fusion import classify_metric_delta
 
 
 def parse_args() -> argparse.Namespace:

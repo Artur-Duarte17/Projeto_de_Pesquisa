@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import OUTPUTS_DIR
-from run_manifest import write_run_manifest
+from retrieval.adapters.manifest import write_run_manifest
 
 
 def parse_args() -> argparse.Namespace:

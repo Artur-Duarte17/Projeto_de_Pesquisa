@@ -14,19 +14,18 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import build_face_app, load_face_index, query_embedding_from_image
-from fusion_lib import fuse_cosine_score_matrices
-from global_lib import load_global_index
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import (
+from retrieval.adapters.face_model import build_face_app, query_embedding_from_image
+from retrieval.adapters.files import relevance_from_csv, save_visual_grid
+from retrieval.adapters.index_store import load_face_index, load_global_index
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.domain.fusion import fuse_cosine_score_matrices
+from retrieval.domain.metrics import (
     aggregate_metrics,
     apply_relevance_exclusions,
     parse_image_ids,
-    relevance_from_csv,
-    save_visual_grid,
     summarize_rankings,
 )
-from run_manifest import write_run_manifest
 
 
 DEFAULT_WEIGHTS = [(1.0, 0.0), (0.0, 1.0), (0.9, 0.1), (0.7, 0.3), (0.5, 0.5)]

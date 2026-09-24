@@ -12,8 +12,8 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import resolve_stored_path
-from run_manifest import write_run_manifest
+from retrieval.adapters.files import resolve_stored_path
+from retrieval.adapters.manifest import write_run_manifest
 
 
 QUERY_COLUMNS = (

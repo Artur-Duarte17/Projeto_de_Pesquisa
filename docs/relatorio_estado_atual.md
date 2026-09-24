@@ -41,6 +41,8 @@ Isso é um resultado científico válido: dentro do protocolo avaliado, adiciona
 - testes metodológicos e manifestos com hashes;
 - preparação de uma coleção indicada pelo usuário, sem copiar as fotografias.
 
+O código compartilhado agora segue uma [arquitetura hexagonal leve](arquitetura_software.md): regras de recuperação, casos de uso e acesso a modelos/arquivos foram separados, sem mudar os comandos públicos.
+
 Materiais encerrados, privados ou substituídos foram retirados da árvore ativa e preservados em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24_pre_finalizacao`.
 
 ## 5. Como a versão final será validada
@@ -48,7 +50,7 @@ Materiais encerrados, privados ou substituídos foram retirados da árvore ativa
 O autor executará, depois da revisão e do commit, um único orquestrador:
 
 ```powershell
-laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py
+laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1
 ```
 
 Esse fluxo:
@@ -61,6 +63,7 @@ Esse fluxo:
 6. registra manifestos, hashes, contagens e métricas.
 
 Os scripts de download não fazem parte dessa execução. Eles servem apenas para adquirir dados ausentes; as bases já existentes serão reutilizadas.
+O destino deve ser novo ou vazio e ficar fora de `outputs/final`, que preserva a execução anterior. A opção `--run-root` também isola os protocolos e recortes; ela e a retirada dos antigos arquivos de compatibilidade foram cobertas pela suíte atual de 37 testes. Isso não substitui a execução longa.
 
 ## 6. Teste com o álbum familiar
 
@@ -72,10 +75,11 @@ As fotografias, embeddings e resultados do álbum não serão versionados nem us
 
 ## 7. O que ainda não foi comprovado
 
-As mudanças de organização e os novos orquestradores ainda não foram executados. Portanto, neste momento:
+A execução científica completa terminou na versão anterior, no commit `3cfba6e`. Ela é a referência para comparação, não a validação da arquitetura nova. Neste momento:
 
-- Artur executou a suíte automatizada em 24/09/2026: 27 testes passaram, sem falhas;
-- a reprodução completa LFW, Holidays e Gallagher ainda precisa ser rodada;
+- Artur executou a suíte da arquitetura atual em 24/09/2026: 37 testes passaram, sem falhas;
+- o destino isolado dos orquestradores passou nos testes automatizados, mas ainda não foi usado em uma execução científica completa;
+- a reprodução completa LFW, Holidays e Gallagher precisa ser repetida para a arquitetura nova, sem sobrescrever a referência;
 - o álbum familiar ainda precisa ser preparado e testado;
 - as novas métricas precisam ser comparadas com os resultados congelados;
 - o projeto ainda não está liberado para iniciar a versão final do artigo.

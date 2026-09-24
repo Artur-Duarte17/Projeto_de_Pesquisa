@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 
-from face_lib import search_face_index
-from global_lib import search_global_index
-from retrieval_common import cosine_to_unit
+from retrieval.domain.similarity import cosine_to_unit
 
 
 def classify_metric_delta(delta: float, tolerance: float = 1e-12) -> str:
@@ -123,45 +119,3 @@ def combine_face_global_results(
             "bbox",
         ]
     ]
-
-
-def search_fusion(
-    query_path: Path,
-    query_face_emb,
-    query_global_emb,
-    face_embeddings,
-    face_metadata,
-    global_embeddings,
-    global_metadata,
-    topk: int | None,
-    face_weight: float,
-    global_weight: float,
-    threshold: float = -1.0,
-    exclude_image_ids: set[str] | None = None,
-) -> pd.DataFrame:
-    face_limit = int(face_metadata["image_id"].nunique()) if not face_metadata.empty else topk
-    global_limit = len(global_metadata) if not global_metadata.empty else topk
-    face_results = search_face_index(
-        query_face_emb,
-        face_embeddings,
-        face_metadata,
-        topk=face_limit,
-        threshold=threshold,
-        query_path=query_path,
-        exclude_image_ids=exclude_image_ids,
-    )
-    global_results = search_global_index(
-        query_global_emb,
-        global_embeddings,
-        global_metadata,
-        topk=global_limit,
-        query_path=query_path,
-        exclude_image_ids=exclude_image_ids,
-    )
-    return combine_face_global_results(
-        face_results,
-        global_results,
-        face_weight=face_weight,
-        global_weight=global_weight,
-        topk=topk,
-    )

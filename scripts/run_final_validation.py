@@ -10,13 +10,37 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from run_manifest import write_run_manifest
+from retrieval.adapters.run_paths import require_empty_target, resolve_run_root
+from retrieval.adapters.manifest import write_run_manifest
 
 
 FINAL_ROOT = OUTPUTS_DIR / "final"
 LFW_ROOT = FINAL_ROOT / "lfw"
 LFW_PROTOCOL = DATA_DIR / "evaluation" / "lfw_final"
 HOLIDAYS_ROOT = FINAL_ROOT / "holidays"
+
+
+class ValidationPaths:
+    def __init__(self, root: Path, lfw: Path, lfw_protocol: Path, holidays: Path) -> None:
+        self.root = root
+        self.lfw = lfw
+        self.lfw_protocol = lfw_protocol
+        self.holidays = holidays
+
+
+def paths_for_run(run_root: Path | None = None) -> ValidationPaths:
+    root = resolve_run_root(
+        run_root,
+        project_root=ROOT,
+        outputs_root=OUTPUTS_DIR,
+        baseline_root=FINAL_ROOT,
+    )
+    return ValidationPaths(
+        root=root,
+        lfw=root / "lfw",
+        lfw_protocol=LFW_PROTOCOL if run_root is None else root / "protocols" / "lfw",
+        holidays=root / "holidays",
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -32,6 +56,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--det-size", type=int, default=640)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument(
+        "--run-root",
+        type=Path,
+        default=None,
+        help="Fresh directory under outputs/ for an isolated run; never overwrites outputs/final.",
+    )
     parser.add_argument("--allow-dirty", action="store_true")
     parser.add_argument("--skip-gallagher-error-analysis", action="store_true")
     return parser.parse_args()
@@ -63,7 +93,9 @@ def build_commands(
     overwrite: bool,
     allow_dirty: bool,
     include_gallagher_error_analysis: bool,
+    run_root: Path | None = None,
 ) -> list[list[str]]:
+    paths = paths_for_run(run_root)
     lfw_images = DATA_DIR / "raw" / "lfw" / "lfw_home" / "lfw_funneled"
     holidays_images = DATA_DIR / "raw" / "holidays" / "images"
     commands = [
@@ -71,7 +103,7 @@ def build_commands(
             python_executable,
             str(ROOT / "scripts" / "validate_environment.py"),
             "--output",
-            str(FINAL_ROOT / "environment_report.json"),
+            str(paths.root / "environment_report.json"),
             *(["--require-cuda"] if device == "cuda" else []),
         ],
         [
@@ -80,7 +112,7 @@ def build_commands(
             "--input-dir",
             str(lfw_images),
             "--output-dir",
-            str(LFW_ROOT / "face_index"),
+            str(paths.lfw / "face_index"),
             "--device",
             device,
             "--det-size",
@@ -91,11 +123,11 @@ def build_commands(
                 python_executable,
                 str(ROOT / "scripts" / "face" / "06_prepare_lfw_eval.py"),
                 "--index-dir",
-                str(LFW_ROOT / "face_index"),
+                str(paths.lfw / "face_index"),
                 "--output-dir",
-                str(LFW_PROTOCOL),
+                str(paths.lfw_protocol),
                 "--manifest-dir",
-                str(LFW_ROOT / "protocol"),
+                str(paths.lfw / "protocol"),
             ],
             overwrite,
         ),
@@ -103,13 +135,13 @@ def build_commands(
             python_executable,
             str(ROOT / "scripts" / "face" / "07_evaluate_lfw.py"),
             "--queries-csv",
-            str(LFW_PROTOCOL / "lfw_face_queries.csv"),
+            str(paths.lfw_protocol / "lfw_face_queries.csv"),
             "--relevance-csv",
-            str(LFW_PROTOCOL / "lfw_face_relevance.csv"),
+            str(paths.lfw_protocol / "lfw_face_relevance.csv"),
             "--index-dir",
-            str(LFW_ROOT / "face_index"),
+            str(paths.lfw / "face_index"),
             "--output-dir",
-            str(LFW_ROOT / "evaluation"),
+            str(paths.lfw / "evaluation"),
             "--device",
             device,
             "--batch-size",
@@ -121,7 +153,7 @@ def build_commands(
             "--input-dir",
             str(holidays_images),
             "--output-dir",
-            str(HOLIDAYS_ROOT / "global_index"),
+            str(paths.holidays / "global_index"),
             "--device",
             device,
             "--batch-size",
@@ -138,9 +170,9 @@ def build_commands(
             "--relevance-csv",
             str(DATA_DIR / "evaluation" / "holidays_relevance.csv"),
             "--index-dir",
-            str(HOLIDAYS_ROOT / "global_index"),
+            str(paths.holidays / "global_index"),
             "--output-dir",
-            str(HOLIDAYS_ROOT / "evaluation"),
+            str(paths.holidays / "evaluation"),
             "--device",
             device,
             "--batch-size",
@@ -158,6 +190,7 @@ def build_commands(
             "--det-size",
             str(det_size),
             "--skip-environment-check",
+            *(["--run-root", str(paths.root)] if run_root is not None else []),
             *(["--overwrite"] if overwrite else []),
             *(["--allow-dirty"] if allow_dirty else []),
             *(
@@ -181,21 +214,27 @@ def required_inputs() -> list[Path]:
     ]
 
 
-def protected_outputs() -> list[Path]:
+def protected_outputs(run_root: Path | None = None) -> list[Path]:
+    paths = paths_for_run(run_root)
     return [
-        FINAL_ROOT / "environment_report.json",
-        LFW_ROOT / "face_index" / "face_embeddings.npy",
-        LFW_ROOT / "evaluation" / "face_metrics.csv",
-        HOLIDAYS_ROOT / "global_index" / "global_embeddings.npy",
-        HOLIDAYS_ROOT / "evaluation" / "global_metrics.csv",
-        FINAL_ROOT / "gallagher" / "final_pipeline_manifest.json",
-        FINAL_ROOT / "final_validation_manifest.json",
-        LFW_PROTOCOL / "lfw_face_queries.csv",
+        paths.root / "environment_report.json",
+        paths.lfw / "face_index" / "face_embeddings.npy",
+        paths.lfw / "evaluation" / "face_metrics.csv",
+        paths.holidays / "global_index" / "global_embeddings.npy",
+        paths.holidays / "evaluation" / "global_metrics.csv",
+        paths.root / "gallagher" / "final_pipeline_manifest.json",
+        paths.root / "final_validation_manifest.json",
+        paths.lfw_protocol / "lfw_face_queries.csv",
     ]
 
 
 def main() -> int:
     args = parse_args()
+    if args.run_root is not None and args.overwrite:
+        raise ValueError("--run-root cannot be combined with --overwrite; choose a fresh directory")
+    paths = paths_for_run(args.run_root)
+    if args.run_root is not None:
+        require_empty_target(paths.root)
     numeric_values = (
         args.batch_size,
         args.evaluation_batch_size,
@@ -214,7 +253,7 @@ def main() -> int:
     if missing:
         joined = ", ".join(str(path) for path in missing)
         raise FileNotFoundError(f"Required final-validation inputs are missing: {joined}")
-    existing = [path for path in protected_outputs() if path.exists()]
+    existing = [path for path in protected_outputs(args.run_root) if path.exists()]
     if existing and not args.overwrite:
         joined = ", ".join(str(path) for path in existing)
         raise FileExistsError(f"Final outputs already exist; use --overwrite: {joined}")
@@ -229,13 +268,14 @@ def main() -> int:
         overwrite=args.overwrite,
         allow_dirty=args.allow_dirty,
         include_gallagher_error_analysis=not args.skip_gallagher_error_analysis,
+        run_root=args.run_root,
     )
     for command in commands:
         print(f"[RUN] {subprocess.list2cmdline(command)}")
         subprocess.run(command, cwd=ROOT, check=True)
 
     manifest_path = write_run_manifest(
-        FINAL_ROOT / "final_validation_manifest.json",
+        paths.root / "final_validation_manifest.json",
         script_path=Path(__file__),
         method="complete_final_scientific_validation",
         configuration={
@@ -244,6 +284,8 @@ def main() -> int:
             "evaluation_batch_size": args.evaluation_batch_size,
             "workers": args.workers,
             "det_size": args.det_size,
+            "run_root": str(paths.root),
+            "isolated_run": args.run_root is not None,
             "datasets": ["LFW", "INRIA Holidays", "Gallagher"],
             "dataset_acquisition_included": False,
         },
@@ -256,17 +298,17 @@ def main() -> int:
             "gallagher_annotations": required_inputs()[5],
         },
         result_files={
-            "environment": FINAL_ROOT / "environment_report.json",
-            "lfw_index_manifest": LFW_ROOT / "face_index" / "face_index_manifest.json",
-            "lfw_protocol_manifest": LFW_ROOT / "protocol" / "lfw_protocol_manifest.json",
-            "lfw_metrics": LFW_ROOT / "evaluation" / "face_metrics.csv",
-            "holidays_index_manifest": HOLIDAYS_ROOT / "global_index" / "global_index_manifest.json",
-            "holidays_metrics": HOLIDAYS_ROOT / "evaluation" / "global_metrics.csv",
-            "gallagher_pipeline_manifest": FINAL_ROOT / "gallagher" / "final_pipeline_manifest.json",
-            "gallagher_metrics": FINAL_ROOT / "gallagher" / "evaluation" / "fusion_metrics.csv",
+            "environment": paths.root / "environment_report.json",
+            "lfw_index_manifest": paths.lfw / "face_index" / "face_index_manifest.json",
+            "lfw_protocol_manifest": paths.lfw / "protocol" / "lfw_protocol_manifest.json",
+            "lfw_metrics": paths.lfw / "evaluation" / "face_metrics.csv",
+            "holidays_index_manifest": paths.holidays / "global_index" / "global_index_manifest.json",
+            "holidays_metrics": paths.holidays / "evaluation" / "global_metrics.csv",
+            "gallagher_pipeline_manifest": paths.root / "gallagher" / "final_pipeline_manifest.json",
+            "gallagher_metrics": paths.root / "gallagher" / "evaluation" / "fusion_metrics.csv",
         },
     )
-    print(f"[OK] Complete final validation: {FINAL_ROOT}")
+    print(f"[OK] Complete final validation: {paths.root}")
     print(f"[OK] Final validation manifest: {manifest_path}")
     return 0
 

@@ -5,6 +5,7 @@ Esta pasta contém somente documentos que ainda participam da versão final ou d
 | Documento | Função |
 |---|---|
 | `protocolo_avaliacao.md` | define o protocolo científico e os critérios da execução final |
+| `arquitetura_software.md` | explica a estrutura do código, a escolha da arquitetura e seus limites |
 | `resultados_experimentais_congelados.md` | registra apenas os resultados vigentes |
 | `relatorio_estado_atual.md` | explica o projeto em linguagem acessível |
 | `bibliografia_anotada.md` | cataloga e comenta as referências estudadas |

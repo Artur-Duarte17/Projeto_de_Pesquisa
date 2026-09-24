@@ -14,22 +14,24 @@ Antes de usar resultados ou executar experimentos, leia [LEIA_PRIMEIRO.md](LEIA_
 
 O protocolo Gallagher foi corrigido e reavaliado nas execuções EX-033, EX-034 e EX-035. Entre as cinco configurações avaliadas, a busca somente facial obteve o maior mAP (`0,951446`). Nenhuma fusão testada superou esse baseline.
 
-Esses resultados continuam válidos como evidência já produzida. A liberação da versão final ainda depende de uma execução limpa do fluxo vigente e de um teste privado de aceitação com um álbum real. Não interprete a organização atual como aprovação automática para publicação.
+Esses resultados continuam válidos como evidência já produzida. Artur executou o fluxo científico completo antes da reorganização arquitetural; **a estrutura nova ainda não foi executada nem comparada com aquela referência**. Também falta o teste privado de aceitação com um álbum real. Não interprete a organização atual como aprovação automática para publicação.
 
 ## Estrutura ativa
 
+- `scripts/retrieval/`: regras compartilhadas, busca e adaptadores; veja [arquitetura de software](docs/arquitetura_software.md).
 - `scripts/face/`: indexação, busca, avaliação facial e protocolo Gallagher.
 - `scripts/global/`: indexação, busca e avaliação por imagem inteira.
 - `scripts/fusion/`: busca combinada e avaliação pareada Gallagher.
 - `scripts/data/`: aquisição das bases Gallagher e INRIA Holidays.
 - `scripts/app/`: interface local em Streamlit.
 - `tests/`: testes metodológicos do sistema ativo.
-- `requirements/`: ambiente reproduzível.
+- `requirements/`: dependências diretas e único lock do ambiente reproduzível.
 - `docs/`: protocolo, resultados, revisão bibliográfica e evidências seguras.
 - `data/`: entradas locais; fotografias e arquivos privados ficam fora do Git.
 - `outputs/`: índices, métricas e manifestos gerados; fica fora do Git.
 
 Código, documentos e experimentos encerrados são preservados fora desta árvore em `C:\Projeto_de_Pesquisa_arquivo_local`.
+As saídas exploratórias anteriores à execução final também foram movidas para esse arquivo histórico; `outputs/final/` e `outputs/experiments/` continuam no projeto por conterem a referência e suas evidências.
 
 ## Ambiente de referência
 
@@ -41,7 +43,7 @@ uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe -r requirements
 laboratorio/cibir_gpu/Scripts/python.exe scripts/validate_environment.py --require-cuda
 ```
 
-O arquivo `requirements/experiment-gpu.in` contém as dependências diretas. Artur regenerou o lock em 24/09/2026; a resolução terminou com 83 pacotes e retirou `gdown` e suas dependências exclusivas.
+O arquivo `requirements/experiment-gpu.in` contém as dependências diretas. Artur regenerou o lock em 24/09/2026; a resolução terminou com 83 pacotes e retirou `gdown` e suas dependências exclusivas. Os antigos cinco arquivos `app.txt`, `face.txt`, `fusion.txt`, `global.txt` e `prep.txt` eram apenas apontadores idênticos para esse mesmo lock e foram removidos.
 
 ## Testes automatizados
 
@@ -51,17 +53,19 @@ laboratorio/cibir_gpu/Scripts/python.exe -m unittest discover -s tests -p "test_
 
 Os testes verificam regras de ranking, exclusão da imagem-fonte, métricas, seleção da pessoa-alvo e integridade do protocolo. Eles não substituem a execução com modelos e fotografias reais.
 
-Artur executou esta suíte em 24/09/2026: **27 testes passaram**, sem falhas.
+Artur executou a suíte da estrutura atual em 24/09/2026: **37 testes passaram**, incluindo fronteiras da arquitetura, busca, protocolo Gallagher e isolamento do destino da validação. Testes unitários não equivalem a uma execução científica com modelos e datasets; a reexecução completa da arquitetura atual ainda está pendente.
 
 ## Reprodução científica final
 
-Depois que as alterações forem revisadas e commitadas em uma árvore limpa, toda a validação científica final será executada com um único comando:
+Depois que as alterações arquiteturais forem revisadas, testadas e commitadas em uma árvore limpa, a validação científica final deverá ser repetida em uma raiz nova sob `outputs/`, sem tocar na referência anterior. Exemplo, depois de escolher um nome ainda não usado:
 
 ```powershell
-laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py
+laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1
 ```
 
 O orquestrador valida o ambiente, reexecuta a avaliação facial LFW, a avaliação global INRIA Holidays e o protocolo Gallagher corrigido, e grava um manifesto que liga todas as saídas. A aquisição dos datasets não é refeita: os baixadores são utilitários de preparação, não etapas da reprodução final. O fluxo recusa por padrão uma árvore Git suja e saídas finais preexistentes.
+
+As saídas anteriores em `outputs/final/` permanecem intactas. `--run-root` redireciona também os protocolos LFW/Gallagher e os recortes de consulta; exige um diretório novo ou vazio, dentro de `outputs/` e fora de `outputs/final/`, e não pode ser combinado com `--overwrite`. Sem `--run-root`, o comportamento antigo permanece e o comando recusa as saídas já existentes.
 
 O subfluxo Gallagher continua disponível isoladamente em `scripts/run_final_gallagher.py`, mas o comando acima é o critério de liberação da versão completa.
 

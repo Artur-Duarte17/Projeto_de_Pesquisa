@@ -48,7 +48,6 @@ snapshots/
 *.pickle
 *.joblib
 !outputs/.gitkeep
-!reports/.gitkeep
 
 # Local/generated inventories
 outputs_list.txt

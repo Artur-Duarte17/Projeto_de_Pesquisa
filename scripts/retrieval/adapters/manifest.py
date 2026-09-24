@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from retrieval_common import rel_to_root, sha256_file
+from retrieval.adapters.files import rel_to_root, sha256_file
 
 
 def _package_version(name: str) -> str | None:
@@ -67,7 +67,7 @@ def write_run_manifest(
     result_files: Mapping[str, Path],
     extra: Mapping[str, Any] | None = None,
 ) -> Path:
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[3]
     manifest = {
         "schema_version": "1.0",
         "created_at_utc": datetime.now(timezone.utc).isoformat(),

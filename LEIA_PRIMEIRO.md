@@ -38,11 +38,11 @@ A EX-035 avaliou 20 consultas, 588 candidatas por ranking e cinco configuraçõe
 - manuscrito SIBGRAPI e entregas intermediárias;
 - geradores antigos de documentos.
 
-Esse material foi preservado em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24_pre_finalizacao`, junto com um bundle completo do Git e o estado não commitado anterior à organização.
+Esse material foi preservado em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24_pre_finalizacao`, junto com um bundle completo do Git e o estado não commitado anterior à organização. Saídas exploratórias e materiais locais antigos também foram movidos para lá; a referência `outputs/final/` e as evidências `outputs/experiments/` ficaram na árvore ativa.
 
 ## Evidência, execução e publicação
 
-Os resultados EX-033/034/035 são evidência produzida e auditada. Entretanto, antes da redação final do artigo ainda será realizada uma execução limpa da versão organizada. O autor executará o orquestrador `scripts/run_final_validation.py`; as saídas LFW, Holidays e Gallagher serão conferidas por hashes, manifestos, contagens e métricas.
+Os resultados EX-033/034/035 são evidência produzida e auditada. Artur executou a validação completa da versão organizada antes da nova separação arquitetural. Depois da reorganização e da retirada dos arquivos de compatibilidade, **Artur executou 37 testes automatizados, todos aprovados**. Eles verificam regras e contratos cobertos, mas ainda não demonstram equivalência experimental com a referência. O autor executará `scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1` (ou outro nome ainda não usado) em uma árvore limpa; as saídas LFW, Holidays e Gallagher serão conferidas por métricas, contagens, IDs e hashes pertinentes.
 
 Depois haverá um teste privado de aceitação com um álbum familiar. Esse teste responderá se a aplicação funciona como produto em uma coleção real, mas não substituirá a avaliação científica Gallagher.
 
@@ -58,4 +58,4 @@ Depois haverá um teste privado de aceitação com um álbum familiar. Esse test
 
 ## Próximo marco
 
-O lock de dependências foi regenerado e Artur executou a suíte ativa: **27 testes passaram em 24/09/2026**. O próximo marco é executar e conferir a validação científica completa com LFW, Holidays e Gallagher; depois, fazer o teste privado de aceitação com o álbum familiar. A aprovação dos testes automatizados ainda não demonstra que o fluxo completo termina com os modelos e imagens reais.
+O lock de dependências foi regenerado e Artur executou a suíte da arquitetura atual: **37 testes passaram em 24/09/2026**. A validação científica completa anterior terminou no commit `3cfba6e`, antes da nova arquitetura; não comprova sua equivalência experimental. O próximo marco é preservar a referência, executar a validação científica em destino isolado, comparar os resultados da arquitetura reorganizada e, depois, fazer o teste privado de aceitação com o álbum familiar.

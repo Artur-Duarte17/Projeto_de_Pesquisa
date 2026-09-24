@@ -7,7 +7,7 @@ Data: 25/06/2026
 Este documento resume o conteudo util extraido dos arquivos em:
 
 ```text
-docs/fontes_bibliograficas_brutas/
+C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24_pre_finalizacao\moved_from_active\docs\fontes_bibliograficas_brutas\
 ```
 
 Esses arquivos foram tratados como material bruto de apoio. Eles nao devem ser citados no artigo. O que deve ser citado sao os artigos, livros, relatorios tecnicos e paginas oficiais que eles apontam.

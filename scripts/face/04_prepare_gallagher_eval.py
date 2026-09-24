@@ -12,9 +12,10 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from face_lib import bbox_string, build_face_app, pick_query_face
-from retrieval_common import rel_to_root, resolve_stored_path, sha256_file
-from run_manifest import write_run_manifest
+from retrieval.adapters.face_model import build_face_app
+from retrieval.adapters.files import rel_to_root, resolve_stored_path, sha256_file
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.domain.face_policy import bbox_string, pick_query_face
 
 
 def parse_args() -> argparse.Namespace:

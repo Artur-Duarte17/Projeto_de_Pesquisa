@@ -14,15 +14,15 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import load_face_index
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import (
+from retrieval.adapters.files import relevance_from_csv
+from retrieval.adapters.index_store import load_face_index
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.domain.metrics import (
     aggregate_metrics,
     apply_relevance_exclusions,
     parse_image_ids,
-    relevance_from_csv,
 )
-from run_manifest import write_run_manifest
 
 
 def parse_args() -> argparse.Namespace:

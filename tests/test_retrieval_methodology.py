@@ -15,21 +15,26 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import search_face_index
-from fusion_lib import classify_metric_delta, fuse_cosine_score_matrices, search_fusion
-from global_lib import extract_global_embeddings_batch, search_global_index
-from retrieval_common import (
-    apply_relevance_exclusions,
-    average_precision,
+from retrieval.adapters.files import (
     build_query_exclusions,
     load_inventory_image_ids,
+    sha256_file,
+)
+from retrieval.adapters.global_model import extract_global_embeddings_batch
+from retrieval.adapters.manifest import write_run_manifest
+from retrieval.adapters.search_gateway import (
+    search_face_index,
+    search_fusion,
+    search_global_index,
+)
+from retrieval.domain.fusion import classify_metric_delta, fuse_cosine_score_matrices
+from retrieval.domain.metrics import (
+    apply_relevance_exclusions,
+    average_precision,
     precision_at_k,
     select_results_for_storage,
-    sha256_file,
     summarize_rankings,
 )
-
-from run_manifest import write_run_manifest
 
 
 def load_script_module(module_name: str, relative_path: str):
@@ -192,6 +197,190 @@ class CollectionPreparationTests(unittest.TestCase):
         self.assertIn("--skip-environment-check", commands[-1])
         self.assertNotIn("--allow-dirty", commands[-1])
         self.assertTrue(all("--overwrite" not in command for command in commands))
+
+
+class IsolatedFinalRunTests(unittest.TestCase):
+    @staticmethod
+    def option(command: list[str], flag: str) -> str:
+        return command[command.index(flag) + 1]
+
+    def test_default_run_paths_keep_the_existing_layout(self) -> None:
+        validation = FINAL_VALIDATION.paths_for_run()
+        gallagher = FINAL_GALLAGHER.paths_for_run()
+
+        self.assertEqual(validation.root, ROOT / "outputs" / "final")
+        self.assertEqual(validation.lfw_protocol, ROOT / "data" / "evaluation" / "lfw_final")
+        self.assertEqual(gallagher.root, validation.root)
+        self.assertEqual(gallagher.final, validation.root / "gallagher")
+        self.assertEqual(
+            gallagher.evaluation, ROOT / "data" / "evaluation" / "gallagher_final"
+        )
+        self.assertEqual(gallagher.query, ROOT / "data" / "query" / "gallagher_final")
+
+    def test_custom_run_root_is_shared_and_redirects_every_generated_path(self) -> None:
+        requested = Path("outputs/validation_runs/architecture_candidate")
+        root = (ROOT / requested).resolve()
+        validation = FINAL_VALIDATION.paths_for_run(requested)
+        gallagher = FINAL_GALLAGHER.paths_for_run(requested)
+
+        self.assertEqual(validation.root, root)
+        self.assertEqual(validation.lfw_protocol, root / "protocols" / "lfw")
+        self.assertEqual(gallagher.root, root)
+        self.assertEqual(gallagher.final, root / "gallagher")
+        self.assertEqual(gallagher.evaluation, root / "protocols" / "gallagher")
+        self.assertEqual(gallagher.query, root / "queries" / "gallagher")
+        self.assertEqual(gallagher.environment, root / "environment_report.json")
+        validation_protected = FINAL_VALIDATION.protected_outputs(requested)
+        gallagher_protected = FINAL_GALLAGHER.protected_outputs(requested)
+        self.assertIn(root / "final_validation_manifest.json", validation_protected)
+        self.assertIn(root / "gallagher" / "final_pipeline_manifest.json", gallagher_protected)
+        for protected in (*validation_protected, *gallagher_protected):
+            self.assertTrue(protected.is_relative_to(root))
+
+        validation_commands = FINAL_VALIDATION.build_commands(
+            python_executable="python.exe",
+            device="cuda",
+            batch_size=32,
+            evaluation_batch_size=128,
+            workers=4,
+            det_size=640,
+            overwrite=False,
+            allow_dirty=False,
+            include_gallagher_error_analysis=True,
+            run_root=requested,
+        )
+        self.assertEqual(len(validation_commands), 7)
+        self.assertEqual(
+            self.option(validation_commands[0], "--output"),
+            str(root / "environment_report.json"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[1], "--output-dir"),
+            str(root / "lfw" / "face_index"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[2], "--output-dir"),
+            str(root / "protocols" / "lfw"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[2], "--manifest-dir"),
+            str(root / "lfw" / "protocol"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[3], "--queries-csv"),
+            str(root / "protocols" / "lfw" / "lfw_face_queries.csv"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[3], "--relevance-csv"),
+            str(root / "protocols" / "lfw" / "lfw_face_relevance.csv"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[3], "--output-dir"),
+            str(root / "lfw" / "evaluation"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[4], "--output-dir"),
+            str(root / "holidays" / "global_index"),
+        )
+        self.assertEqual(
+            self.option(validation_commands[5], "--output-dir"),
+            str(root / "holidays" / "evaluation"),
+        )
+        self.assertEqual(self.option(validation_commands[6], "--run-root"), str(root))
+        self.assertIn("--skip-environment-check", validation_commands[6])
+
+        gallagher_commands = FINAL_GALLAGHER.build_commands(
+            python_executable="python.exe",
+            device="cuda",
+            batch_size=32,
+            workers=4,
+            det_size=640,
+            overwrite=False,
+            include_environment_check=True,
+            include_error_analysis=True,
+            run_root=requested,
+        )
+        self.assertEqual(len(gallagher_commands), 7)
+        self.assertEqual(
+            self.option(gallagher_commands[0], "--output"),
+            str(root / "environment_report.json"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[1], "--output-dir"),
+            str(root / "gallagher" / "face_index"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[2], "--output-dir"),
+            str(root / "gallagher" / "global_index"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[3], "--output-dir"),
+            str(root / "protocols" / "gallagher"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[3], "--query-crop-dir"),
+            str(root / "queries" / "gallagher"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[3], "--manifest-dir"),
+            str(root / "gallagher" / "face_protocol"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[4], "--output-csv"),
+            str(root / "protocols" / "gallagher" / "gallagher_fusion_queries.csv"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[4], "--query-manifest-csv"),
+            str(root / "protocols" / "gallagher" / "gallagher_fusion_query_manifest.csv"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[5], "--output-dir"),
+            str(root / "gallagher" / "evaluation"),
+        )
+        self.assertEqual(
+            self.option(gallagher_commands[6], "--output-dir"),
+            str(root / "gallagher" / "error_analysis"),
+        )
+
+        generated_flags = (
+            "--output", "--output-dir", "--output-csv", "--query-manifest-csv",
+            "--query-crop-dir", "--manifest-dir",
+        )
+        for command in (*validation_commands, *gallagher_commands):
+            self.assertNotIn("--overwrite", command)
+            for flag in generated_flags:
+                if flag in command:
+                    self.assertTrue(
+                        Path(self.option(command, flag)).is_relative_to(root),
+                        f"{Path(command[1]).name} sends {flag} outside the isolated run",
+                    )
+
+    def test_run_root_rejects_baseline_and_unsafe_locations(self) -> None:
+        unsafe_roots = (
+            ROOT,
+            ROOT / "data",
+            Path("outputs"),
+            Path("outputs/final"),
+            Path("outputs/final/accidental_child"),
+        )
+        for unsafe in unsafe_roots:
+            with self.subTest(root=unsafe):
+                with self.assertRaises(ValueError):
+                    FINAL_VALIDATION.paths_for_run(unsafe)
+                with self.assertRaises(ValueError):
+                    FINAL_GALLAGHER.paths_for_run(unsafe)
+
+    def test_nonempty_target_is_rejected_before_revalidation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "candidate"
+            FINAL_VALIDATION.require_empty_target(target)
+            target.mkdir()
+            FINAL_GALLAGHER.require_empty_target(target)
+            (target / "previous_partial_run.txt").write_text("preserve", encoding="utf-8")
+            with self.assertRaises(FileExistsError):
+                FINAL_VALIDATION.require_empty_target(target)
+            with self.assertRaises(FileExistsError):
+                FINAL_GALLAGHER.require_empty_target(target)
 
 
 class MetricTests(unittest.TestCase):

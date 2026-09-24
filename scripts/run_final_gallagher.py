@@ -10,12 +10,45 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from run_manifest import write_run_manifest
+from retrieval.adapters.run_paths import require_empty_target, resolve_run_root
+from retrieval.adapters.manifest import write_run_manifest
 
 
 FINAL_ROOT = OUTPUTS_DIR / "final" / "gallagher"
 EVALUATION_DIR = DATA_DIR / "evaluation" / "gallagher_final"
 QUERY_DIR = DATA_DIR / "query" / "gallagher_final"
+
+
+class GallagherPaths:
+    def __init__(
+        self,
+        root: Path,
+        final: Path,
+        evaluation: Path,
+        query: Path,
+        environment: Path,
+    ) -> None:
+        self.root = root
+        self.final = final
+        self.evaluation = evaluation
+        self.query = query
+        self.environment = environment
+
+
+def paths_for_run(run_root: Path | None = None) -> GallagherPaths:
+    root = resolve_run_root(
+        run_root,
+        project_root=ROOT,
+        outputs_root=OUTPUTS_DIR,
+        baseline_root=OUTPUTS_DIR / "final",
+    )
+    return GallagherPaths(
+        root=root,
+        final=root / "gallagher",
+        evaluation=EVALUATION_DIR if run_root is None else root / "protocols" / "gallagher",
+        query=QUERY_DIR if run_root is None else root / "queries" / "gallagher",
+        environment=root / "environment_report.json",
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,6 +60,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--det-size", type=int, default=640)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument(
+        "--run-root",
+        type=Path,
+        default=None,
+        help="Fresh directory under outputs/; Gallagher outputs go to <run-root>/gallagher.",
+    )
     parser.add_argument("--allow-dirty", action="store_true")
     parser.add_argument("--skip-environment-check", action="store_true")
     parser.add_argument("--skip-error-analysis", action="store_true")
@@ -58,11 +97,13 @@ def build_commands(
     overwrite: bool,
     include_environment_check: bool,
     include_error_analysis: bool,
+    run_root: Path | None = None,
 ) -> list[list[str]]:
+    paths = paths_for_run(run_root)
     images = DATA_DIR / "raw" / "gallagher" / "images"
-    face_index = FINAL_ROOT / "face_index"
-    global_index = FINAL_ROOT / "global_index"
-    evaluation = FINAL_ROOT / "evaluation"
+    face_index = paths.final / "face_index"
+    global_index = paths.final / "global_index"
+    evaluation = paths.final / "evaluation"
     commands: list[list[str]] = []
     if include_environment_check:
         commands.append(
@@ -70,7 +111,7 @@ def build_commands(
                 python_executable,
                 str(ROOT / "scripts" / "validate_environment.py"),
                 "--output",
-                str(OUTPUTS_DIR / "final" / "environment_report.json"),
+                str(paths.environment),
                 *(["--require-cuda"] if device == "cuda" else []),
             ]
         )
@@ -113,11 +154,11 @@ def build_commands(
                     "--gallery-index-dir",
                     str(global_index),
                     "--output-dir",
-                    str(EVALUATION_DIR),
+                    str(paths.evaluation),
                     "--query-crop-dir",
-                    str(QUERY_DIR),
+                    str(paths.query),
                     "--manifest-dir",
-                    str(FINAL_ROOT / "face_protocol"),
+                    str(paths.final / "face_protocol"),
                     "--device",
                     device,
                     "--det-size",
@@ -130,19 +171,19 @@ def build_commands(
                     python_executable,
                     str(ROOT / "scripts" / "fusion" / "03_prepare_paired_gallagher.py"),
                     "--face-queries-csv",
-                    str(EVALUATION_DIR / "gallagher_face_queries.csv"),
+                    str(paths.evaluation / "gallagher_face_queries.csv"),
                     "--relevance-csv",
-                    str(EVALUATION_DIR / "gallagher_relevance.csv"),
+                    str(paths.evaluation / "gallagher_relevance.csv"),
                     "--face-index-dir",
                     str(face_index),
                     "--global-index-dir",
                     str(global_index),
                     "--output-csv",
-                    str(EVALUATION_DIR / "gallagher_fusion_queries.csv"),
+                    str(paths.evaluation / "gallagher_fusion_queries.csv"),
                     "--query-manifest-csv",
-                    str(EVALUATION_DIR / "gallagher_fusion_query_manifest.csv"),
+                    str(paths.evaluation / "gallagher_fusion_query_manifest.csv"),
                     "--manifest-dir",
-                    str(FINAL_ROOT / "paired_protocol"),
+                    str(paths.final / "paired_protocol"),
                 ],
                 overwrite,
             ),
@@ -151,9 +192,9 @@ def build_commands(
                     python_executable,
                     str(ROOT / "scripts" / "fusion" / "04_evaluate_paired_gallagher.py"),
                     "--queries-csv",
-                    str(EVALUATION_DIR / "gallagher_fusion_queries.csv"),
+                    str(paths.evaluation / "gallagher_fusion_queries.csv"),
                     "--relevance-csv",
-                    str(EVALUATION_DIR / "gallagher_relevance.csv"),
+                    str(paths.evaluation / "gallagher_relevance.csv"),
                     "--face-index-dir",
                     str(face_index),
                     "--global-index-dir",
@@ -185,29 +226,38 @@ def build_commands(
                 "--aggregate-csv",
                 str(evaluation / "fusion_metrics.csv"),
                 "--queries-csv",
-                str(EVALUATION_DIR / "gallagher_fusion_queries.csv"),
+                str(paths.evaluation / "gallagher_fusion_queries.csv"),
                 "--relevance-csv",
-                str(EVALUATION_DIR / "gallagher_relevance.csv"),
+                str(paths.evaluation / "gallagher_relevance.csv"),
                 "--output-dir",
-                str(FINAL_ROOT / "error_analysis"),
+                str(paths.final / "error_analysis"),
             ]
         )
     return commands
 
 
-def protected_outputs() -> list[Path]:
+def protected_outputs(run_root: Path | None = None) -> list[Path]:
+    paths = paths_for_run(run_root)
     return [
-        FINAL_ROOT / "face_index" / "face_embeddings.npy",
-        FINAL_ROOT / "global_index" / "global_embeddings.npy",
-        FINAL_ROOT / "evaluation" / "fusion_metrics.csv",
-        FINAL_ROOT / "final_pipeline_manifest.json",
-        EVALUATION_DIR / "gallagher_face_queries.csv",
-        EVALUATION_DIR / "gallagher_fusion_queries.csv",
+        paths.final / "face_index" / "face_embeddings.npy",
+        paths.final / "global_index" / "global_embeddings.npy",
+        paths.final / "evaluation" / "fusion_metrics.csv",
+        paths.final / "final_pipeline_manifest.json",
+        paths.evaluation / "gallagher_face_queries.csv",
+        paths.evaluation / "gallagher_fusion_queries.csv",
     ]
 
 
 def main() -> int:
     args = parse_args()
+    if args.run_root is not None and args.overwrite:
+        raise ValueError("--run-root cannot be combined with --overwrite; choose a fresh directory")
+    paths = paths_for_run(args.run_root)
+    if args.run_root is not None:
+        for target in (paths.final, paths.evaluation, paths.query):
+            require_empty_target(target)
+        if not args.skip_environment_check:
+            require_empty_target(paths.environment)
     if args.batch_size <= 0 or args.workers <= 0 or args.det_size <= 0:
         raise ValueError("batch-size, workers and det-size must be positive")
     if git_is_dirty() and not args.allow_dirty:
@@ -219,7 +269,7 @@ def main() -> int:
     annotations = DATA_DIR / "raw" / "gallagher" / "metadata" / "face_annotations.csv"
     if not images.is_dir() or not annotations.is_file():
         raise FileNotFoundError("Gallagher images or official annotations are missing")
-    existing = [path for path in protected_outputs() if path.exists()]
+    existing = [path for path in protected_outputs(args.run_root) if path.exists()]
     if existing and not args.overwrite:
         joined = ", ".join(str(path) for path in existing)
         raise FileExistsError(f"Final outputs already exist; use --overwrite: {joined}")
@@ -233,24 +283,25 @@ def main() -> int:
         overwrite=args.overwrite,
         include_environment_check=not args.skip_environment_check,
         include_error_analysis=not args.skip_error_analysis,
+        run_root=args.run_root,
     )
     for command in commands:
         print(f"[RUN] {subprocess.list2cmdline(command)}")
         subprocess.run(command, cwd=ROOT, check=True)
 
     result_files = {
-        "face_index_manifest": FINAL_ROOT / "face_index" / "face_index_manifest.json",
-        "global_index_manifest": FINAL_ROOT / "global_index" / "global_index_manifest.json",
-        "face_protocol_manifest": FINAL_ROOT / "face_protocol" / "gallagher_protocol_manifest.json",
-        "paired_protocol_manifest": FINAL_ROOT / "paired_protocol" / "paired_protocol_manifest.json",
-        "fusion_run_manifest": FINAL_ROOT / "evaluation" / "fusion_run_manifest.json",
-        "fusion_metrics": FINAL_ROOT / "evaluation" / "fusion_metrics.csv",
-        "fusion_metrics_per_query": FINAL_ROOT / "evaluation" / "fusion_metrics_per_query.csv",
+        "face_index_manifest": paths.final / "face_index" / "face_index_manifest.json",
+        "global_index_manifest": paths.final / "global_index" / "global_index_manifest.json",
+        "face_protocol_manifest": paths.final / "face_protocol" / "gallagher_protocol_manifest.json",
+        "paired_protocol_manifest": paths.final / "paired_protocol" / "paired_protocol_manifest.json",
+        "fusion_run_manifest": paths.final / "evaluation" / "fusion_run_manifest.json",
+        "fusion_metrics": paths.final / "evaluation" / "fusion_metrics.csv",
+        "fusion_metrics_per_query": paths.final / "evaluation" / "fusion_metrics_per_query.csv",
     }
     if not args.skip_environment_check:
-        result_files["environment"] = OUTPUTS_DIR / "final" / "environment_report.json"
+        result_files["environment"] = paths.environment
     manifest_path = write_run_manifest(
-        FINAL_ROOT / "final_pipeline_manifest.json",
+        paths.final / "final_pipeline_manifest.json",
         script_path=Path(__file__),
         method="final_corrected_gallagher_pipeline",
         configuration={
@@ -258,13 +309,15 @@ def main() -> int:
             "batch_size": args.batch_size,
             "workers": args.workers,
             "det_size": args.det_size,
+            "run_root": str(paths.root),
+            "isolated_run": args.run_root is not None,
             "environment_check": not args.skip_environment_check,
             "error_analysis": not args.skip_error_analysis,
         },
         inputs={"images": images, "annotations": annotations},
         result_files=result_files,
     )
-    print(f"[OK] Final Gallagher pipeline: {FINAL_ROOT}")
+    print(f"[OK] Final Gallagher pipeline: {paths.final}")
     print(f"[OK] Final manifest: {manifest_path}")
     return 0
 

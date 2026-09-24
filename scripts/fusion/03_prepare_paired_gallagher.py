@@ -11,8 +11,8 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval_common import resolve_stored_path, sha256_file
-from run_manifest import write_run_manifest
+from retrieval.adapters.files import resolve_stored_path, sha256_file
+from retrieval.adapters.manifest import write_run_manifest
 
 
 def parse_args() -> argparse.Namespace:
