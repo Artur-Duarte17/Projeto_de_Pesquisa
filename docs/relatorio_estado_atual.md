@@ -45,9 +45,9 @@ O código compartilhado agora segue uma [arquitetura hexagonal leve](arquitetura
 
 Materiais encerrados, privados ou substituídos foram retirados da árvore ativa e preservados em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24_pre_finalizacao`.
 
-## 5. Como a versão final será validada
+## 5. Como a arquitetura atual foi validada
 
-O autor executará, depois da revisão e do commit, um único orquestrador:
+Artur executou, depois do commit `954d749` e com a árvore limpa, o orquestrador:
 
 ```powershell
 laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1
@@ -62,8 +62,9 @@ Esse fluxo:
 5. avalia as cinco configurações Gallagher;
 6. registra manifestos, hashes, contagens e métricas.
 
-Os scripts de download não fazem parte dessa execução. Eles servem apenas para adquirir dados ausentes; as bases já existentes serão reutilizadas.
-O destino deve ser novo ou vazio e ficar fora de `outputs/final`, que preserva a execução anterior. A opção `--run-root` também isola os protocolos e recortes; ela e a retirada dos antigos arquivos de compatibilidade foram cobertas pela suíte atual de 37 testes. Isso não substitui a execução longa.
+Os scripts de download não fizeram parte dessa execução; as bases existentes foram reutilizadas. O destino `outputs/validation_runs/arquitetura_v1` foi usado e não deve ser reutilizado em outra execução. Ele manteve protocolos e recortes separados da referência `outputs/final`.
+
+A execução terminou com manifestos no commit limpo `954d749`. A checagem de hashes dos quatro índices e seus metadados encontrou igualdade com a execução anterior. As métricas científicas agregadas e por consulta de LFW, Holidays e Gallagher, além de IDs, ordem e escores dos Top-10 salvos, coincidiram. Tempos de processamento e caminhos dos recortes variaram como esperado. Os rankings completos não são salvos, de modo que a ordem além do Top-10 não foi comparada diretamente; as métricas que usam o ranking integral coincidiram.
 
 ## 6. Teste com o álbum familiar
 
@@ -75,13 +76,12 @@ As fotografias, embeddings e resultados do álbum não serão versionados nem us
 
 ## 7. O que ainda não foi comprovado
 
-A execução científica completa terminou na versão anterior, no commit `3cfba6e`. Ela é a referência para comparação, não a validação da arquitetura nova. Neste momento:
+A execução científica completa da arquitetura atual terminou no commit `954d749` e foi comparada à referência do commit `3cfba6e`. Neste momento:
 
 - Artur executou a suíte da arquitetura atual em 24/09/2026: 37 testes passaram, sem falhas;
-- o destino isolado dos orquestradores passou nos testes automatizados, mas ainda não foi usado em uma execução científica completa;
-- a reprodução completa LFW, Holidays e Gallagher precisa ser repetida para a arquitetura nova, sem sobrescrever a referência;
+- a reprodução completa LFW, Holidays e Gallagher foi concluída em destino isolado, com resultados científicos equivalentes nos artefatos verificados;
 - o álbum familiar ainda precisa ser preparado e testado;
-- as novas métricas precisam ser comparadas com os resultados congelados;
+- a interface precisa ser verificada com uma coleção própria e escolha explícita do rosto-alvo;
 - o projeto ainda não está liberado para iniciar a versão final do artigo.
 
 ## 8. Critério de encerramento técnico

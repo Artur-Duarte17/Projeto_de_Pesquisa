@@ -14,7 +14,7 @@ Antes de usar resultados ou executar experimentos, leia [LEIA_PRIMEIRO.md](LEIA_
 
 O protocolo Gallagher foi corrigido e reavaliado nas execuções EX-033, EX-034 e EX-035. Entre as cinco configurações avaliadas, a busca somente facial obteve o maior mAP (`0,951446`). Nenhuma fusão testada superou esse baseline.
 
-Esses resultados continuam válidos como evidência já produzida. Artur executou o fluxo científico completo antes da reorganização arquitetural; **a estrutura nova ainda não foi executada nem comparada com aquela referência**. Também falta o teste privado de aceitação com um álbum real. Não interprete a organização atual como aprovação automática para publicação.
+Esses resultados continuam válidos como evidência já produzida. Artur reexecutou o fluxo científico completo após a reorganização, no commit limpo `954d749`, e os resultados científicos verificados coincidiram com os da referência anterior. Ainda falta o teste privado de aceitação com um álbum real. A reprodução não equivale, por si só, à aprovação para publicação.
 
 ## Estrutura ativa
 
@@ -53,11 +53,11 @@ laboratorio/cibir_gpu/Scripts/python.exe -m unittest discover -s tests -p "test_
 
 Os testes verificam regras de ranking, exclusão da imagem-fonte, métricas, seleção da pessoa-alvo e integridade do protocolo. Eles não substituem a execução com modelos e fotografias reais.
 
-Artur executou a suíte da estrutura atual em 24/09/2026: **37 testes passaram**, incluindo fronteiras da arquitetura, busca, protocolo Gallagher e isolamento do destino da validação. Testes unitários não equivalem a uma execução científica com modelos e datasets; a reexecução completa da arquitetura atual ainda está pendente.
+Artur executou a suíte da estrutura atual em 24/09/2026: **37 testes passaram**, incluindo fronteiras da arquitetura, busca, protocolo Gallagher e isolamento do destino da validação. A execução científica completa foi realizada separadamente, com modelos e datasets reais, e comparada com a referência.
 
 ## Reprodução científica final
 
-Depois que as alterações arquiteturais forem revisadas, testadas e commitadas em uma árvore limpa, a validação científica final deverá ser repetida em uma raiz nova sob `outputs/`, sem tocar na referência anterior. Exemplo, depois de escolher um nome ainda não usado:
+Artur executou o comando abaixo em 24/09/2026, com a árvore Git limpa no commit `954d749`:
 
 ```powershell
 laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1
@@ -65,7 +65,7 @@ laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-r
 
 O orquestrador valida o ambiente, reexecuta a avaliação facial LFW, a avaliação global INRIA Holidays e o protocolo Gallagher corrigido, e grava um manifesto que liga todas as saídas. A aquisição dos datasets não é refeita: os baixadores são utilitários de preparação, não etapas da reprodução final. O fluxo recusa por padrão uma árvore Git suja e saídas finais preexistentes.
 
-As saídas anteriores em `outputs/final/` permanecem intactas. `--run-root` redireciona também os protocolos LFW/Gallagher e os recortes de consulta; exige um diretório novo ou vazio, dentro de `outputs/` e fora de `outputs/final/`, e não pode ser combinado com `--overwrite`. Sem `--run-root`, o comportamento antigo permanece e o comando recusa as saídas já existentes.
+As saídas anteriores em `outputs/final/` permanecem intactas. A nova execução está em `outputs/validation_runs/arquitetura_v1/`: os quatro índices e metadados, os gabaritos LFW e Gallagher, as métricas científicas e os Top-10 salvos foram conferidos com a referência. Tempos e caminhos dos recortes variaram; os rankings completos não são persistidos para comparação direta linha a linha. **Não repita o comando acima no mesmo destino**, pois ele exige uma pasta nova ou vazia. Para outra execução, escolha um novo nome sob `outputs/validation_runs/`.
 
 O subfluxo Gallagher continua disponível isoladamente em `scripts/run_final_gallagher.py`, mas o comando acima é o critério de liberação da versão completa.
 

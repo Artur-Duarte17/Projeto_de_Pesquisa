@@ -47,6 +47,12 @@ Esses números representam tarefas diferentes e não são comparações diretas 
 
 As evidências leves da correção estão em `docs/evidencias/gallagher_a01_a02_20260922_v2/`.
 
+## Reprodução após a reorganização do código
+
+Artur executou o fluxo completo em 24/09/2026 no commit limpo `954d74959f42f7eda3765df49023e8af193ce1cd`, preservando a referência anterior do commit `3cfba6e34fd54eded12782470504c6a65c79d6c2`. O novo manifesto local está em `outputs/validation_runs/arquitetura_v1/final_validation_manifest.json` (SHA-256 `1EEFC2845EF80F9263137E3C9079A664ABF478A36979457F1B63008123888EB0`). Esses arquivos de saída são locais e ignorados pelo Git; o caminho não anuncia disponibilidade pública.
+
+Os 13 manifestos da nova execução registraram o novo commit e `dirty=false`. Foram conferidas as referências a arquivos, seus tamanhos e hashes: nenhuma divergência. Os quatro índices (embeddings e metadados), os gabaritos LFW, a relevância Gallagher e os recortes de consulta tiveram hashes iguais aos da referência. As métricas científicas agregadas e por consulta de LFW, Holidays e dos cinco métodos Gallagher também coincidiram. IDs, posições e escores dos Top-10 salvos foram iguais; somente tempos e caminhos dos recortes variaram. Os rankings completos não foram persistidos para comparação direta posição a posição além do Top-10, embora as métricas calculadas a partir deles tenham coincidido. Portanto, esta reprodução confirma os valores acima nos artefatos verificados, sem criar um resultado científico novo.
+
 ## Limitações obrigatórias
 
 - Gallagher usa 20 identidades entre as mais frequentes e uma consulta por identidade.
@@ -55,6 +61,6 @@ As evidências leves da correção estão em `docs/evidencias/gallagher_a01_a02_
 - Os resultados não demonstram desempenho em qualquer domínio profissional específico.
 - O teste futuro com álbum familiar será privado e terá caráter de aceitação do sistema, não de benchmark científico.
 
-## Regra para substituir estes números
+## Regra para alterar estes números
 
-Uma nova execução só poderá substituir a tabela se usar o protocolo corrigido, entradas congeladas, árvore Git limpa, hashes verificáveis, manifestos completos e auditoria equivalente. Até essa conferência, os valores acima permanecem os resultados oficiais vigentes.
+A reprodução pós-arquitetura confirmou a tabela, sem substituí-la. Uma futura mudança de valores só poderá substituí-la se usar protocolo corrigido, entradas congeladas, árvore Git limpa, hashes verificáveis, manifestos completos e auditoria equivalente. Até lá, os valores acima permanecem os resultados oficiais vigentes.

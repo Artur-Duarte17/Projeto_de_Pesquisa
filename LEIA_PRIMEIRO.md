@@ -42,7 +42,7 @@ Esse material foi preservado em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24
 
 ## Evidência, execução e publicação
 
-Os resultados EX-033/034/035 são evidência produzida e auditada. Artur executou a validação completa da versão organizada antes da nova separação arquitetural. Depois da reorganização e da retirada dos arquivos de compatibilidade, **Artur executou 37 testes automatizados, todos aprovados**. Eles verificam regras e contratos cobertos, mas ainda não demonstram equivalência experimental com a referência. O autor executará `scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1` (ou outro nome ainda não usado) em uma árvore limpa; as saídas LFW, Holidays e Gallagher serão conferidas por métricas, contagens, IDs e hashes pertinentes.
+Os resultados EX-033/034/035 são evidência produzida e auditada. Depois da reorganização, **Artur executou 37 testes automatizados, todos aprovados**, e a validação completa LFW/Holidays/Gallagher no commit limpo `954d749`. A nova execução está em `outputs/validation_runs/arquitetura_v1/`, preservando a referência anterior em `outputs/final/`. Os índices, gabaritos e recortes relevantes têm hashes iguais; métricas por consulta, IDs, posições e escores dos Top-10 salvos coincidiram. Apenas tempos de execução e caminhos de recortes mudaram. Os rankings completos não são persistidos, portanto não houve comparação direta de cada posição além do Top-10.
 
 Depois haverá um teste privado de aceitação com um álbum familiar. Esse teste responderá se a aplicação funciona como produto em uma coleção real, mas não substituirá a avaliação científica Gallagher.
 
@@ -58,4 +58,4 @@ Depois haverá um teste privado de aceitação com um álbum familiar. Esse test
 
 ## Próximo marco
 
-O lock de dependências foi regenerado e Artur executou a suíte da arquitetura atual: **37 testes passaram em 24/09/2026**. A validação científica completa anterior terminou no commit `3cfba6e`, antes da nova arquitetura; não comprova sua equivalência experimental. O próximo marco é preservar a referência, executar a validação científica em destino isolado, comparar os resultados da arquitetura reorganizada e, depois, fazer o teste privado de aceitação com o álbum familiar.
+O lock de dependências foi regenerado, os **37 testes passaram** e a reprodução científica da arquitetura atual foi concluída e conferida em 24/09/2026. A referência antiga pertence ao commit `3cfba6e`; a nova execução, ao commit `954d749`. O próximo marco técnico é o teste privado de aceitação com o álbum familiar, incluindo a interface e a escolha explícita da pessoa a buscar.
