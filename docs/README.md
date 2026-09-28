@@ -27,4 +27,4 @@ Em caso de divergência, os dados e hashes da execução válida prevalecem sobr
 
 ## Limite atual
 
-A organização documental não equivale à aprovação da versão final. Ainda faltam a execução limpa pelo autor, a conferência do teste com álbum familiar e a atualização final do manuscrito em inglês.
+O fechamento técnico e documental foi concluído em 28/09/2026: testes, aceitação privada e reprodução completa foram executados pelo assistente com autorização de Artur. Os resultados atuais pertencem ao commit limpo `91a2a28`, não à execução anterior. O relatório de fechamento registra a cobertura e seus limites. Ainda faltam redação e validação humana do artigo em inglês e decisões institucionais, éticas, autorais e editoriais; não há liberação para submissão.

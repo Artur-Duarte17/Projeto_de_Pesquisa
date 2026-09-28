@@ -1,99 +1,107 @@
 # Estado atual do projeto
 
-Data de referência: **24 de setembro de 2026**.
+Data de referência: **28 de setembro de 2026**.
 
-## 1. O que o sistema faz
+## 1. O que é este projeto
 
-O sistema procura fotografias dentro de uma coleção por três caminhos:
+É uma **pesquisa experimental com uma aplicação local de demonstração**.
+A aplicação mostra que o método pode ser usado; a pesquisa mede e compara
+os métodos sob regras controladas. Não é um serviço publicado na internet,
+um produto comercial pronto ou um artigo já aceito.
 
-1. **Busca facial:** usa o rosto escolhido na consulta para localizar outras fotos da mesma pessoa.
-2. **Busca global:** compara a aparência da imagem inteira, sem identificar uma pessoa específica.
-3. **Fusão tardia:** combina as pontuações da busca facial e da busca global.
+O fechamento técnico e documental está concluído no escopo testado. A etapa
+seguinte é escrever e validar o artigo em inglês, com as decisões institucionais
+e de uso dos dados separadas da aprovação dos testes.
 
-Os modelos já vêm pré-treinados. O projeto não treina uma rede neural nova; ele detecta rostos, extrai vetores numéricos, cria índices e avalia rankings de recuperação.
+## 2. O que a aplicação faz
 
-## 2. Pergunta científica
+1. Prepara os índices a partir da pasta de fotografias e suas subpastas, sem
+   copiar nem modificar os originais.
+2. Recebe uma foto de referência e permite escolher qual pessoa procurar.
+3. Retorna fotografias completas por semelhança facial ou visual.
+4. Permite atualizar o mesmo álbum, navegar pelos resultados e remover seus
+   índices mediante confirmação, sem apagar as fotografias.
+5. Oferece um perfil de Pesquisa, ativado explicitamente, com fusão experimental
+   e índices científicos/personalizados.
 
-> Em coleções fotográficas com múltiplas pessoas, acrescentar contexto visual global por fusão tardia melhora a recuperação baseada em identidade facial?
+O padrão é Uso pessoal, sem Gallagher automático. HEIC/HEIF são suportados;
+JPEGs excepcionalmente grandes usam leitura global reduzida e controlada.
+Não existe teto de 50 resultados: a galeria tem 24 fotos por página.
+Existem limites reais de memória, tempo e dimensões de imagem.
 
-O Gallagher é a base central para responder essa pergunta. O LFW verifica o componente facial e o INRIA Holidays verifica o componente de imagem inteira. Essas tarefas são diferentes e suas métricas não devem ser comparadas diretamente.
+O sistema usa modelos já treinados. Não aprende novas classes de pessoas nem
+treina uma rede neste projeto: detecta rostos, extrai descritores e compara vetores.
 
-## 3. Resultado vigente
+## 3. Pergunta e resultado científico
 
-A auditoria encontrou dois problemas no protocolo Gallagher anterior:
+> Em coleções com múltiplas pessoas, acrescentar contexto visual global por
+> fusão tardia melhora a recuperação baseada em identidade facial?
 
-- fotos relevantes eram excluídas do gabarito quando o detector não encontrava um rosto;
-- uma consulta usava o rosto de uma pessoa vizinha, e não o rosto da pessoa-alvo.
+Gallagher é a avaliação principal. LFW verifica o componente facial em um
+protocolo customizado; Holidays verifica o componente global com AP adaptada.
+As métricas dessas tarefas não são diretamente comparáveis.
 
-As correções A01 e A02 eliminaram esses problemas. A reavaliação EX-035 utilizou 20 consultas, 588 candidatas por ranking e cinco configurações predefinidas. O maior mAP foi obtido pela busca somente facial (`0,951446`). Nenhuma fusão testada superou esse baseline.
+Na execução atual, a busca facial obteve mAP **0,952261**. As três fusões
+obtiveram 0,946274, 0,901460 e 0,813297. Nenhuma superou a média facial.
+A fusão 0,9/0,1 melhorou duas consultas, empatou nove e piorou nove:
+o resultado não significa que contexto nunca possa ajudar.
 
-Isso é um resultado científico válido: dentro do protocolo avaliado, adicionar o contexto global da maneira testada não melhorou o resultado agregado.
+A conclusão vale somente para as vinte consultas do protocolo, não para
+qualquer álbum, todas as pessoas, o domínio agropecuário ou larga escala.
+Os valores e todas as comparações estão em [resultados experimentais](resultados_experimentais_congelados.md).
 
-## 4. O que integra a versão final
+## 4. O que a auditoria encontrou e o que foi resolvido
 
-- indexação e recuperação facial;
-- indexação e recuperação global;
-- fusão tardia;
-- protocolo Gallagher corrigido;
-- verificações auxiliares LFW e INRIA Holidays;
-- interface local em Streamlit;
-- seleção explícita da pessoa em consultas com vários rostos;
-- testes metodológicos e manifestos com hashes;
-- preparação de uma coleção indicada pelo usuário, sem copiar as fotografias.
+A auditoria anterior encontrou fotos relevantes retiradas do gabarito por
+falha de detecção e uma consulta usando o rosto vizinho. As correções A01/A02
+separaram relevância de detecção e vincularam o rosto ao ponto dos olhos anotados.
+Ambas foram novamente verificadas na reprodução atual.
 
-O código compartilhado agora segue uma [arquitetura hexagonal leve](arquitetura_software.md): regras de recuperação, casos de uso e acesso a modelos/arquivos foram separados, sem mudar os comandos públicos.
+A aceitação desta rodada encontrou outro defeito: selecionar CUDA não ativava
+a GPU nos modelos faciais. O adaptador foi corrigido e agora confirma os
+provedores reais. Isso alterou alguns números; os antigos ficaram preservados
+como referência, sem serem misturados aos atuais.
 
-Materiais encerrados, privados ou substituídos foram retirados da árvore ativa e preservados em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24_pre_finalizacao`.
+As diferenças de AP Holidays, duplicatas, dependência entre consultas,
+limites do gabarito e ausência de calibração da fusão estão documentadas,
+não escondidas nem transformadas em alegações de generalização.
 
-## 5. Como a arquitetura atual foi validada
+## 5. O que realmente foi executado
 
-Artur executou, depois do commit `954d749` e com a árvore limpa, o orquestrador:
+Com autorização de Artur, o assistente executou:
 
-```powershell
-laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1
-```
+- 93 testes automatizados, todos aprovados.
+- Preparação, busca, seleção da pessoa, paginação, atualização e remoção de
+  um álbum exclusivo de validação, com modelos e fotos reais.
+- Aceitação com 171 imagens familiares, incluindo 59 HEIC e um JPEG de
+  aproximadamente 200 megapixels, sem falhas de leitura.
+- Os três comandos de busca com os índices científicos novos.
+- Reprodução completa LFW/Holidays/Gallagher em destino novo, no commit limpo
+  `91a2a28360ded41fd86abf3371c989d571bf95bd`.
+- Conferência dos 13 manifestos, hashes, contagens, médias e resultados por consulta.
 
-Esse fluxo:
+Os 207 arquivos originais da coleção e os dois álbuns existentes ficaram intactos.
+Somente os índices dos álbuns exclusivos de teste foram removidos; são regeneráveis.
+As fotos familiares não entraram no Git nem nas tabelas científicas.
+O teste não mediu acurácia de identidade familiar.
 
-1. confere o ambiente e a GPU;
-2. recria o índice facial e a avaliação LFW;
-3. recria o índice global e a avaliação Holidays;
-4. recria os índices e o protocolo Gallagher corrigido;
-5. avalia as cinco configurações Gallagher;
-6. registra manifestos, hashes, contagens e métricas.
+A execução válida está em `outputs/validation_runs/fechamento_20260928_cuda/`.
+As referências anteriores continuam preservadas. O [fechamento completo](fechamento_tecnico_2026.md)
+explica verificações, tentativas interrompidas e limites de cobertura.
 
-Os scripts de download não fizeram parte dessa execução; as bases existentes foram reutilizadas. O destino `outputs/validation_runs/arquitetura_v1` foi usado e não deve ser reutilizado em outra execução. Ele manteve protocolos e recortes separados da referência `outputs/final`.
+## 6. Organização e pendências
 
-A execução terminou com manifestos no commit limpo `954d749`. A checagem de hashes dos quatro índices e seus metadados encontrou igualdade com a execução anterior. As métricas científicas agregadas e por consulta de LFW, Holidays e Gallagher, além de IDs, ordem e escores dos Top-10 salvos, coincidiram. Tempos de processamento e caminhos dos recortes variaram como esperado. Os rankings completos não são salvos, de modo que a ordem além do Top-10 não foi comparada diretamente; as métricas que usam o ranking integral coincidiram.
+O código compartilhado mantém a [arquitetura hexagonal leve](arquitetura_software.md),
+com apresentação, casos de uso, regras de recuperação e adaptadores separados.
+Não houve outra mudança de arquitetura. Materiais substituídos permanecem em
+`C:/Projeto_de_Pesquisa_arquivo_local/2026-09-24_pre_finalizacao/`.
 
-## 6. Teste com o álbum familiar
+Não foi comprovada ausência de qualquer defeito ou funcionamento em toda máquina.
+Não houve benchmark de carga, nova instalação do zero, avaliação demográfica
+ou aprovação jurídica/ética. Dados e modelos continuam com restrições próprias,
+descritas em [dados, modelos e privacidade](dados_modelos_privacidade.md).
 
-O álbum de 139 fotografias será um teste privado de aceitação, não uma nova base científica. Ele responderá a uma pergunta prática: uma pessoa consegue indicar sua própria coleção, escolher alguém em uma foto e receber resultados úteis?
-
-O álbum pode permanecer na pasta escolhida pelo autor. `scripts/prepare_collection.py` recebe esse caminho, cria índices em `outputs/collections/` e não copia as fotografias. Na aplicação, o usuário escolhe explicitamente o rosto que deseja procurar quando há várias pessoas na consulta.
-
-As fotografias, embeddings e resultados do álbum não serão versionados nem usados no artigo como evidência científica.
-
-## 7. O que ainda não foi comprovado
-
-A execução científica completa da arquitetura atual terminou no commit `954d749` e foi comparada à referência do commit `3cfba6e`. Neste momento:
-
-- Artur executou a suíte da arquitetura atual em 24/09/2026: 37 testes passaram, sem falhas;
-- a reprodução completa LFW, Holidays e Gallagher foi concluída em destino isolado, com resultados científicos equivalentes nos artefatos verificados;
-- o álbum familiar ainda precisa ser preparado e testado;
-- a interface precisa ser verificada com uma coleção própria e escolha explícita do rosto-alvo;
-- o projeto ainda não está liberado para iniciar a versão final do artigo.
-
-## 8. Critério de encerramento técnico
-
-A versão poderá ser considerada tecnicamente consolidada quando:
-
-1. o lock de dependências estiver regenerado;
-2. todos os testes automatizados passarem;
-3. o orquestrador final terminar sem erro em uma árvore Git limpa;
-4. manifests, hashes, contagens e métricas forem conferidos;
-5. divergências em relação às execuções válidas anteriores forem explicadas;
-6. o teste privado com o álbum funcionar nos três modos relevantes;
-7. nenhuma fotografia ou dado biométrico privado aparecer no Git.
-
-Somente depois desse fechamento a redação final em inglês deverá usar os números da nova execução.
+Antes da submissão, continuam necessários: redação e validação humana do artigo;
+confirmações de TC, aceite, entrega e calendário; decisão institucional sobre
+dados/biometria; aprovação da autoria; e conformidade com a revista e o depósito
+institucional. Não houve push, contato externo, publicação ou submissão.

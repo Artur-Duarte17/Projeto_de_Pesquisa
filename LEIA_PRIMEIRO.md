@@ -1,6 +1,6 @@
 # Leia primeiro — estado canônico do projeto
 
-Data de referência: **24 de setembro de 2026**.
+Data de referência: **28 de setembro de 2026**.
 
 ## Objetivo atual
 
@@ -17,7 +17,7 @@ As correções A01 e A02 foram implementadas antes da reavaliação:
 - o gabarito de relevância passou a incluir todas as fotografias anotadas da galeria global, sem depender do sucesso do detector facial;
 - a pessoa-alvo da consulta passou a ser escolhida pela caixa facial que contém o ponto médio dos olhos anotados, sem fallback para um rosto vizinho.
 
-A EX-035 avaliou 20 consultas, 588 candidatas por ranking e cinco configurações predefinidas. O maior mAP foi o baseline somente facial (`0,951446`). Nenhuma fusão testada o superou.
+A reprodução de fechamento avaliou 20 consultas, 588 candidatas por ranking e cinco configurações predefinidas. O maior mAP foi o baseline somente facial (`0,952261`), seguido pela fusão 0,9/0,1 (`0,946274`). Nenhuma fusão testada o superou. A EX-035 e a reprodução de 24/09 continuam preservadas como referências anteriores; os valores atuais e as diferenças estão em `docs/resultados_experimentais_congelados.md`.
 
 ## O que permanece ativo
 
@@ -42,9 +42,11 @@ Esse material foi preservado em `C:\Projeto_de_Pesquisa_arquivo_local\2026-09-24
 
 ## Evidência, execução e publicação
 
-Os resultados EX-033/034/035 são evidência produzida e auditada. Depois da reorganização, **Artur executou 37 testes automatizados, todos aprovados**, e a validação completa LFW/Holidays/Gallagher no commit limpo `954d749`. A nova execução está em `outputs/validation_runs/arquitetura_v1/`, preservando a referência anterior em `outputs/final/`. Os índices, gabaritos e recortes relevantes têm hashes iguais; métricas por consulta, IDs, posições e escores dos Top-10 salvos coincidiram. Apenas tempos de execução e caminhos de recortes mudaram. Os rankings completos não são persistidos, portanto não houve comparação direta de cada posição além do Top-10.
+O fechamento de 28/09 foi executado pelo assistente com autorização de Artur: **93 testes passaram**, a aceitação integrada com 171 imagens familiares passou e a reprodução LFW/Holidays/Gallagher terminou no commit limpo `91a2a28360ded41fd86abf3371c989d571bf95bd`. As saídas estão em `outputs/validation_runs/fechamento_20260928_cuda/`.
 
-Depois haverá um teste privado de aceitação com um álbum familiar. Esse teste responderá se a aplicação funciona como produto em uma coleção real, mas não substituirá a avaliação científica Gallagher.
+A aceitação revelou um defeito de seleção do dispositivo: o InsightFace 0.2.1 não ativava CUDA apenas com `ctx_id=0`. O adaptador foi corrigido; os manifestos agora registram os provedores reais e os hashes dos pesos. Ativar CUDA alterou descritores faciais e algumas métricas, mas preservou a conclusão principal. Não houve novos modelos, treinamento ou mudança do gabarito.
+
+O álbum familiar foi usado apenas para aceitação funcional privada. Os 207 arquivos originais e os dois álbuns preexistentes ficaram intactos. Os índices do álbum exclusivo de validação foram removidos, podendo ser recriados. Isso não é uma medida de acurácia familiar nem substitui Gallagher. Consulte `docs/fechamento_tecnico_2026.md` para cobertura e limitações.
 
 ## Regras que não podem ser quebradas
 
@@ -54,8 +56,8 @@ Depois haverá um teste privado de aceitação com um álbum familiar. Esse test
 4. Não usar `large scale` no título ou nas conclusões.
 5. Não versionar fotografias, embeddings ou dados biométricos.
 6. Não submeter o mesmo manuscrito simultaneamente a mais de um local.
-7. Não declarar um teste como executado enquanto o autor não o tiver executado e conferido.
+7. Não declarar um teste como executado sem evidência de execução e conferência; registrar quando a execução foi assistida e autorizada pelo autor.
 
 ## Próximo marco
 
-O lock de dependências foi regenerado, os **37 testes passaram** e a reprodução científica da arquitetura atual foi concluída e conferida em 24/09/2026. A referência antiga pertence ao commit `3cfba6e`; a nova execução, ao commit `954d749`. O próximo marco técnico é o teste privado de aceitação com o álbum familiar, incluindo a interface e a escolha explícita da pessoa a buscar.
+O fechamento técnico e documental foi concluído no escopo testado. O próximo marco é a preparação do artigo em inglês, com revisão e validação pelos autores humanos. Antes da submissão, continuam necessárias as decisões institucionais de TC/calendário, a elegibilidade ética e de uso dos dados, a aprovação da autoria e a compatibilidade editorial. O funcionamento do software não resolve essas decisões nem garante aceite.

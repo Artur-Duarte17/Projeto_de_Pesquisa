@@ -71,8 +71,9 @@ científicos e fusão não são alternativas automáticas quando faltam álbuns
 pessoais. A interface reutiliza a análise da referência e a última busca,
 invalidando resultados quando mudam a consulta, a pessoa, os parâmetros ou os
 arquivos de índices. Alterações de exibição e paginação não precisam recalcular
-o ranking. Esses comportamentos têm testes propostos na suíte; sua adição não
-constitui, por si só, comprovação de execução ou de desempenho.
+o ranking. Esses comportamentos tiveram testes automatizados e aceitação
+integrada com modelos e fotografias reais em 28/09/2026; a comprovação é
+delimitada no relatório de fechamento e não é um benchmark de desempenho.
 
 ## Fronteiras científicas e limites
 
@@ -80,4 +81,4 @@ Os protocolos **LFW, INRIA Holidays e Gallagher** preservam suas regras específ
 
 Esta é uma aplicação **leve e parcial** do padrão. O domínio e a aplicação ainda usam `numpy` e `pandas`; a indexação e a avaliação ainda têm orquestração nos pontos de entrada; não há uma interface formal para todo adaptador. Essa escolha mantém contratos concretos e evita abstrações que o projeto ainda não precisa.
 
-Artur executou a suíte automatizada da estrutura atual após a adição de `--run-root` e a remoção das APIs de compatibilidade: **37 testes passaram em 24/09/2026**. Em seguida, executou LFW, Holidays e Gallagher no commit limpo `954d749`; os resultados científicos verificados coincidiram com os da execução anterior em `3cfba6e`. Isso sustenta que a reorganização preservou o comportamento medido nos protocolos, mas não testa a experiência de uso da interface com um álbum próprio. A verificação com álbum privado responderá a essa pergunta diferente, sem substituir a reprodução das métricas acadêmicas.
+Artur validou a migração com 37 testes e reprodução limpa no commit `954d749`, em 24/09/2026. Em 28/09, o assistente executou a candidata `91a2a28`, com sua autorização: 93 testes, aceitação integrada com álbum privado e reprodução científica completa aprovados. A seleção explícita dos provedores CUDA corrigiu um defeito do adaptador InsightFace 0.2.1; as regras do domínio não foram alteradas. Houve diferenças numéricas nos descritores faciais, documentadas sem alegar igualdade entre executores. Consulte [o fechamento técnico](fechamento_tecnico_2026.md) e [os resultados atuais](resultados_experimentais_congelados.md). A aceitação da interface não substitui a evidência científica nem aprova uso público dos dados.

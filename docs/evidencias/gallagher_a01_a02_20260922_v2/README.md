@@ -48,7 +48,9 @@ Os hashes acima identificam os arquivos originais no momento da validação. `ap
 | `ex-035_fusion_metrics.csv` | `3874c8beedbe59dc0ef31b664175f5f560fee45e1bf742331367fde0b472a47e` |
 | `ex-035_fusion_metrics_per_query.csv` | `826245d0ea3996f21663d60a71865f741bf80da4280798ad8a9a00336ce634b5` |
 
-## Resultado vigente
+## Resultado da EX-035 — referência anterior
+
+Este pacote permanece inalterado como evidência da correção de 22/09. A reprodução de fechamento com CUDA verificado, em 28/09, fornece os números atuais em [resultados experimentais](../../resultados_experimentais_congelados.md). Não misture os valores das duas execuções em uma tabela do artigo.
 
 | Configuração | mAP |
 |---|---:|

@@ -12,9 +12,9 @@ Antes de usar resultados ou executar experimentos, leia [LEIA_PRIMEIRO.md](LEIA_
 
 ## Estado da versão
 
-O protocolo Gallagher foi corrigido e reavaliado nas execuções EX-033, EX-034 e EX-035. Entre as cinco configurações avaliadas, a busca somente facial obteve o maior mAP (`0,951446`). Nenhuma fusão testada superou esse baseline.
+O protocolo Gallagher corrigido foi reproduzido em 28/09/2026 com CUDA efetivamente ativado nos modelos faciais. Entre as cinco configurações avaliadas, a busca somente facial obteve o maior mAP (`0,952261`). Nenhuma fusão testada superou esse baseline.
 
-Esses resultados continuam válidos como evidência já produzida. Artur reexecutou o fluxo científico completo após a reorganização, no commit limpo `954d749`, e os resultados científicos verificados coincidiram com os da referência anterior. Ainda falta o teste privado de aceitação com um álbum real. A reprodução não equivale, por si só, à aprovação para publicação.
+O fechamento técnico está concluído no escopo testado: 93 testes aprovados, aceitação integrada com modelos e fotos reais e reprodução científica completa no commit limpo `91a2a28`. A execução foi assistida e autorizada por Artur. Veja [o fechamento e seus limites](docs/fechamento_tecnico_2026.md). Isso não equivale à aprovação ética, institucional ou editorial para publicação.
 
 ## Estrutura ativa
 
@@ -43,7 +43,9 @@ uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe -r requirements
 laboratorio/cibir_gpu/Scripts/python.exe scripts/validate_environment.py --require-cuda
 ```
 
-O arquivo `requirements/experiment-gpu.in` contém as dependências diretas. Artur regenerou o lock em 24/09/2026; a resolução terminou com 83 pacotes e retirou `gdown` e suas dependências exclusivas. Os antigos cinco arquivos `app.txt`, `face.txt`, `fusion.txt`, `global.txt` e `prep.txt` eram apenas apontadores idênticos para esse mesmo lock e foram removidos.
+O arquivo `requirements/experiment-gpu.in` contém as dependências diretas. O lock atual inclui 82 versões fixadas e duas rodas CUDA por URL (PyTorch e torchvision), todas conferidas com o ambiente em 28/09. `uv pip check` aprovou os 88 pacotes instalados; quatro pacotes antigos de aquisição permanecem no ambiente, mas não são dependências da versão ativa. Nada foi instalado ou removido neste fechamento. Os antigos cinco apontadores idênticos para esse lock foram removidos na organização anterior.
+
+O adaptador facial configura explicitamente os provedores ONNX em detecção e reconhecimento. CUDA indisponível ou não ativado gera erro com orientação para escolher CPU; não há mais execução facial silenciosamente rotulada como CUDA. Os modelos continuam os mesmos, sem treinamento adicional.
 
 ## Testes automatizados
 
@@ -53,19 +55,19 @@ laboratorio/cibir_gpu/Scripts/python.exe -m unittest discover -s tests -p "test_
 
 Os testes verificam regras de ranking, exclusão da imagem-fonte, métricas, seleção da pessoa-alvo e integridade do protocolo. Eles não substituem a execução com modelos e fotografias reais.
 
-Artur executou a suíte da estrutura atual em 24/09/2026: **37 testes passaram**, incluindo fronteiras da arquitetura, busca, protocolo Gallagher e isolamento do destino da validação. A execução científica completa foi realizada separadamente, com modelos e datasets reais, e comparada com a referência.
+Em 28/09/2026, **93 testes passaram**, incluindo arquitetura, ranking, protocolo Gallagher, álbuns, estado da interface, HEIC, JPEGs grandes e seleção/proveniência dos provedores. A execução com modelos e dados reais foi realizada separadamente. Os três comandos de busca também foram executados com os índices novos, retornando dez fotografias distintas e excluindo a fonte.
 
 ## Reprodução científica final
 
-Artur executou o comando abaixo em 24/09/2026, com a árvore Git limpa no commit `954d749`:
+O assistente executou o comando abaixo em 28/09/2026, com autorização de Artur e árvore Git limpa no commit `91a2a28360ded41fd86abf3371c989d571bf95bd`:
 
 ```powershell
-laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/arquitetura_v1
+laboratorio/cibir_gpu/Scripts/python.exe scripts/run_final_validation.py --run-root outputs/validation_runs/fechamento_20260928_cuda
 ```
 
 O orquestrador valida o ambiente, reexecuta a avaliação facial LFW, a avaliação global INRIA Holidays e o protocolo Gallagher corrigido, e grava um manifesto que liga todas as saídas. A aquisição dos datasets não é refeita: os baixadores são utilitários de preparação, não etapas da reprodução final. O fluxo recusa por padrão uma árvore Git suja e saídas finais preexistentes.
 
-As saídas anteriores em `outputs/final/` permanecem intactas. A nova execução está em `outputs/validation_runs/arquitetura_v1/`: os quatro índices e metadados, os gabaritos LFW e Gallagher, as métricas científicas e os Top-10 salvos foram conferidos com a referência. Tempos e caminhos dos recortes variaram; os rankings completos não são persistidos para comparação direta linha a linha. **Não repita o comando acima no mesmo destino**, pois ele exige uma pasta nova ou vazia. Para outra execução, escolha um novo nome sob `outputs/validation_runs/`.
+As referências em `outputs/final/` e `outputs/validation_runs/arquitetura_v1/` permanecem intactas. Os 13 manifestos novos, 92 referências a arquivos e 15.265 imagens-fonte indexadas tiveram hashes conferidos. Os descritores globais foram idênticos à referência; os faciais e algumas métricas mudaram após a correção de CUDA. As diferenças e os resultados por consulta estão [documentados](docs/resultados_experimentais_congelados.md). Os rankings completos não são persistidos para comparação direta linha a linha. **Não repita o comando acima no mesmo destino**: escolha uma pasta nova sob `outputs/validation_runs/`.
 
 O subfluxo Gallagher continua disponível isoladamente em `scripts/run_final_gallagher.py`, mas o comando acima é o critério de liberação da versão completa.
 
@@ -83,8 +85,8 @@ laboratorio/cibir_gpu/Scripts/python.exe -m streamlit run scripts/app/streamlit_
 
 ### 2. Preparar ou atualizar pela interface
 
-1. Abra **Meus álbuns** e selecione **Preparar / atualizar**.
-2. Escolha **Adicionar novo álbum**, dê um nome e cole o endereço da pasta com as fotos.
+1. Abra **Meus álbuns** e clique em **Adicionar álbum**; se ainda não houver álbuns, o formulário inicial já estará disponível.
+2. Dê um nome e cole o endereço da pasta com as fotos.
 3. Clique em **Preparar álbum** e aguarde o término. As subpastas também são lidas.
 4. Em **Buscar fotos**, selecione o álbum, envie a foto de consulta, escolha a pessoa e clique em **Buscar fotos no álbum**.
 
@@ -213,7 +215,7 @@ uso público, redistribuição ou disponibilização comercial.
 
 Não versione fotografias, recortes faciais, embeddings, modelos baixados ou resultados que exponham pessoas. `data/raw/`, `data/query/`, `outputs/`, `.local/` e `laboratorio/` permanecem ignorados pelo Git.
 
-O álbum familiar será usado somente em teste local de aceitação. Ele não integra a evidência principal do artigo e não será redistribuído.
+O álbum familiar foi usado somente em teste local de aceitação. Ele não integra a evidência principal do artigo e não será redistribuído. As fotografias originais ficaram intactas.
 
 ## Documentos canônicos
 
@@ -223,3 +225,5 @@ O álbum familiar será usado somente em teste local de aceitação. Ele não in
 - [Resultados oficiais atuais](docs/resultados_experimentais_congelados.md)
 - [Síntese bibliográfica](docs/sintese_revisao_bibliografica.md)
 - [Evidências seguras Gallagher](docs/evidencias/gallagher_a01_a02_20260922_v2/README.md)
+- [Fechamento técnico e científico](docs/fechamento_tecnico_2026.md)
+- [Dados, modelos, privacidade e uso de IA](docs/dados_modelos_privacidade.md)

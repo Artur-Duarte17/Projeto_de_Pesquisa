@@ -1,6 +1,6 @@
 # Protocolo vigente de avaliação
 
-Data de referência: **24 de setembro de 2026**.
+Data de referência: **28 de setembro de 2026**.
 
 ## 1. Pergunta científica
 
@@ -23,6 +23,8 @@ As configurações Gallagher são predefinidas:
 - face/contexto `0,5/0,5`.
 
 Os cossenos são convertidos para `[0,1]` antes da soma ponderada. Uma fotografia sem rosto detectado recebe contribuição facial zero, mas continua elegível pelo componente global.
+
+Esse remapeamento não é calibração estatística nem probabilidade. O descritor global representa a imagem inteira, incluindo pessoas e objetos, não somente seu fundo. Os pesos são fixos nesta comparação, sem escolha otimizada em um conjunto independente.
 
 ## 4. Consultas Gallagher
 
@@ -67,6 +69,8 @@ Saídas existentes não podem ser sobrescritas sem `--overwrite`. A execução f
 
 Os manifests e métricas seguros estão em `docs/evidencias/gallagher_a01_a02_20260922_v2/`.
 
+Esse pacote documenta a correção de 22/09, como referência preservada. Os números atuais vêm de `outputs/validation_runs/fechamento_20260928_cuda/`, commit limpo `91a2a28`, após ativação efetiva de CUDA nos modelos faciais. O registro canônico é `docs/resultados_experimentais_congelados.md`; não misturar as execuções.
+
 ## 9. Validação da versão final
 
 A aprovação técnica exigirá três camadas:
@@ -75,7 +79,7 @@ A aprovação técnica exigirá três camadas:
 2. **Validação científica completa:** recriação dos índices e avaliações LFW e Holidays, seguida da criação dos índices Gallagher, protocolo corrigido e avaliação pareada a partir das entradas atuais.
 3. **Teste privado de aceitação:** uso da aplicação com uma pasta externa de fotografias familiares, sem incorporar essas imagens à evidência científica.
 
-O autor executará os comandos. A revisão confirmará códigos de saída, contagens, hashes, manifestos e consistência com o protocolo.
+As três camadas foram executadas em 28/09 pelo assistente, com autorização de Artur: 93 testes aprovados, reprodução científica completa e aceitação privada aprovadas. A conferência verificou códigos de saída, contagens, hashes, manifestos e consistência com o protocolo. A validação científica final do texto pelos autores humanos não é substituída por essa execução assistida.
 
 ## 10. Teste privado com álbum familiar
 
@@ -84,6 +88,8 @@ O álbum será indicado por caminho externo. Os indexadores percorrerão recursi
 A aplicação permite que o usuário escolha explicitamente a pessoa quando a consulta possui múltiplos rostos. Usar automaticamente o maior rosto não é aceitável para esse cenário.
 
 As fotografias, recortes e embeddings não entram no Git nem no artigo. A fotografia consultada deve ser excluída dos resultados por caminho ou SHA-256. Falhas serão registradas, não substituídas silenciosamente.
+
+O teste realizado utilizou 171 imagens (59 HEIC e 112 JPEG), com escolha da pessoa, três modos de busca, paginação, atualização no mesmo destino e remoção do álbum exclusivo de validação. Os 207 arquivos originais e os dois álbuns existentes ficaram intactos. O relatório de aceitação não é um gabarito de identidade familiar nem estima sua acurácia.
 
 ## 11. Critérios de saída
 
@@ -97,3 +103,19 @@ A versão estará pronta para a redação final somente quando:
 - a seleção de rosto da aplicação funcionar em consulta multi-rosto;
 - o teste privado de aceitação demonstrar o fluxo completo de uso;
 - README e documentos canônicos corresponderem ao comportamento real.
+
+Esses critérios técnicos foram atendidos no fechamento de 28/09. Veja `docs/fechamento_tecnico_2026.md` para cobertura e limites. Continuam separados os critérios humanos, éticos, institucionais e editoriais para submissão.
+
+## 12. Limites dos protocolos auxiliares
+
+LFW usa recuperação customizada condicionada à detecção e não o protocolo oficial de verificação em pares. Não há garantia de ausência de sobreposição com o pré-treinamento do modelo.
+
+Holidays permanece auxiliar. A AP local é a média das precisões nas posições relevantes, dividida pelo total de relevantes; o avaliador oficial integra trapézios. Não se apresentam os dois valores como equivalentes. A cópia local tem três pares byte a byte idênticos em grupos diferentes. O avaliador exclui a fonte por ID/caminho, enquanto a busca interativa exclui também cópias por SHA-256: não há alegação de equivalência universal entre essas rotas.
+
+As ordenações auxiliares são vetorizadas pelo PyTorch; não se promete desempate idêntico em todo equipamento. A regra explícita score decrescente/ID crescente descrita para Gallagher não deve ser estendida automaticamente a esses avaliadores.
+
+## 13. Limites da conclusão principal
+
+As vinte consultas representam identidades selecionadas por frequência em um único álbum, com dezenove fotos-fonte. Duas consultas compartilham uma foto, e todas compartilham galeria e contexto. A população-alvo é a identidade anotada segundo os critérios originais, não qualquer pessoa visível.
+
+A análise pareada é descritiva, completa para essas consultas e sem alegação de independência, significância estatística ou generalização populacional. O estudo não identifica a causa da diferença entre métodos, não calibra pesos e não mede larga escala. A interface é demonstração/exploração; seus filtros e modos de consulta não substituem o protocolo controlado.
