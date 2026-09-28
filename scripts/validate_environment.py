@@ -25,6 +25,7 @@ PACKAGES = (
     "tqdm",
     "matplotlib",
     "pillow",
+    "pillow-heif",
     "scikit-learn",
     "streamlit",
     "kagglehub",

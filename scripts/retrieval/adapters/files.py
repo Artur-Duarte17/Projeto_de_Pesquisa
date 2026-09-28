@@ -9,10 +9,11 @@ import cv2
 import numpy as np
 import pandas as pd
 
+from retrieval.adapters.image_io import read_image_bgr
 from retrieval.domain.metrics import parse_image_ids
 
 ROOT = Path(__file__).resolve().parents[3]
-IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
+IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".bmp", ".webp", ".heic", ".heif")
 
 
 def list_images(folder: Path, max_images: int | None = None) -> list[Path]:
@@ -112,7 +113,7 @@ def parent_label(path: Path) -> str:
 
 
 def read_image_size(path: Path) -> tuple[int, int]:
-    img = cv2.imread(str(path))
+    img = read_image_bgr(path)
     if img is None:
         return 0, 0
     h, w = img.shape[:2]
@@ -215,7 +216,7 @@ def save_visual_grid(
         ax.axis("off")
     for ax, row in zip(axes_arr, subset.itertuples(index=False)):
         img_path = resolve_stored_path(str(getattr(row, "image_path")))
-        img = cv2.imread(str(img_path))
+        img = read_image_bgr(img_path)
         if img is None:
             ax.set_title("missing")
             continue

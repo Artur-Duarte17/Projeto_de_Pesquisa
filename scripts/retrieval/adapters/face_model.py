@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import cv2
 import numpy as np
 
+from retrieval.adapters.image_io import read_image_bgr
 from retrieval.domain.face_policy import (
     bbox_string,
     embedding_from_face,
@@ -26,7 +26,7 @@ def build_face_app(device: str = "cpu", det_size: int = 640):
 
 
 def detect_faces_in_image(image_path: Path, app) -> tuple[np.ndarray, list]:
-    img = cv2.imread(str(image_path))
+    img = read_image_bgr(image_path)
     if img is None:
         raise FileNotFoundError(f"Could not read query image: {image_path}")
     return img, sorted_faces(app.get(img))

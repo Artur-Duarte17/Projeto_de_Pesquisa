@@ -7,7 +7,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from PIL import Image
 from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -28,6 +27,7 @@ from retrieval.adapters.files import (
     sha256_file,
     stable_image_id,
 )
+from retrieval.adapters.image_io import open_image, oriented_rgb
 from retrieval.adapters.manifest import write_run_manifest
 
 
@@ -53,9 +53,10 @@ def parse_args() -> argparse.Namespace:
 
 def prepare_image(image_path: Path, transform) -> dict[str, object]:
     try:
-        with Image.open(image_path) as image:
-            width, height = image.size
-            tensor = transform(image.convert("RGB"))
+        with open_image(image_path) as image:
+            rgb = oriented_rgb(image, image_path)
+            width, height = rgb.size
+            tensor = transform(rgb)
         return {
             "image_path": image_path,
             "tensor": tensor,

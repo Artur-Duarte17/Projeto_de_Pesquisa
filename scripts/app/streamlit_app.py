@@ -16,6 +16,7 @@ from project_paths import OUTPUTS_DIR
 from retrieval.adapters.face_model import build_face_app, detect_faces_in_image
 from retrieval.adapters.global_model import build_resnet50_feature_extractor, extract_global_embedding
 from retrieval.adapters.index_store import load_face_index, load_global_index
+from retrieval.adapters.image_preview import load_gallery_preview
 from retrieval.adapters.search_gateway import search_face_index, search_fusion, search_global_index
 from retrieval.domain.face_policy import bbox_string, embedding_from_face
 
@@ -92,7 +93,11 @@ def show_gallery(results: pd.DataFrame) -> None:
             img_path = Path(str(row.image_path))
             if not img_path.is_absolute():
                 img_path = ROOT / img_path
-            st.image(str(img_path), caption=f"#{row.rank} score={float(row.score):.3f}", use_container_width=True)
+            try:
+                preview = load_gallery_preview(img_path)
+                st.image(preview, caption=f"#{row.rank} score={float(row.score):.3f}", use_container_width=True)
+            except (OSError, ValueError, cv2.error, RuntimeError) as exc:
+                st.warning(f"Prévia indisponível para {img_path.name}: {exc}")
             st.caption(Path(str(row.image_path)).name)
 
 
@@ -154,13 +159,17 @@ def main() -> None:
         global_weight = 1.0 - face_weight
 
     st.info(MODE_DESCRIPTIONS[search_mode])
-    uploaded = st.file_uploader("Imagem de consulta", type=["jpg", "jpeg", "png", "bmp", "webp"])
+    uploaded = st.file_uploader("Imagem de consulta", type=["jpg", "jpeg", "png", "bmp", "webp", "heic", "heif"])
     if uploaded is None:
         st.info("Envie uma imagem para iniciar a busca.")
         return
 
     query_path = save_upload(uploaded)
-    st.image(str(query_path), caption="Consulta", width=320)
+    try:
+        st.image(load_gallery_preview(query_path), caption="Consulta", width=320)
+    except (OSError, ValueError, cv2.error, RuntimeError) as exc:
+        st.error(f"Não foi possível abrir a imagem de consulta: {exc}")
+        return
 
     selected_face = None
     selected_bbox = None

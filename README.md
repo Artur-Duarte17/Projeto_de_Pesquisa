@@ -83,6 +83,17 @@ laboratorio/cibir_gpu/Scripts/python.exe scripts/prepare_collection.py `
 ```
 
 O preparador não copia as fotografias. Ele cria os índices `face` e `global`, omite nomes derivados das pastas e grava um manifesto da coleção.
+Aceita JPG, JPEG, PNG, BMP, WebP, HEIC e HEIF em subpastas. Para HEIC/HEIF, instale
+`pillow-heif==1.8.0` no ambiente do projeto antes de preparar a coleção. Vídeos não
+são indexados. Se já existir uma coleção preparada antes desse suporte, use um novo
+`--output-dir` para incluir os HEIC; índices antigos não se atualizam sozinhos.
+
+O ambiente local foi criado com `uv` e não inclui `pip`. Para adicionar apenas o
+leitor HEIC, sem recriar o ambiente:
+
+```powershell
+uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe pillow-heif==1.8.0
+```
 
 ### 2. Abrir a aplicação
 

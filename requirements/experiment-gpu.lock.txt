@@ -197,9 +197,13 @@ pillow==12.2.0
     #   imageio
     #   insightface
     #   matplotlib
+    #   pillow-heif
     #   scikit-image
     #   streamlit
     #   torchvision
+    # from https://pypi.org/simple
+pillow-heif==1.8.0
+    # via -r requirements/experiment-gpu.in
     # from https://pypi.org/simple
 protobuf==7.36.1
     # via

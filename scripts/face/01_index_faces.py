@@ -4,7 +4,6 @@ import argparse
 import sys
 from pathlib import Path
 
-import cv2
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -23,6 +22,7 @@ from retrieval.adapters.files import (
     sha256_file,
     stable_image_id,
 )
+from retrieval.adapters.image_io import read_image_bgr
 from retrieval.adapters.manifest import write_run_manifest
 from retrieval.domain.face_policy import embedding_from_face, sorted_faces
 
@@ -71,7 +71,7 @@ def main() -> int:
     n_no_emb = 0
 
     for img_path in tqdm(image_paths, desc="Indexing faces", unit="img"):
-        img = cv2.imread(str(img_path))
+        img = read_image_bgr(img_path)
         if img is None:
             n_read_fail += 1
             continue

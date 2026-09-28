@@ -5,8 +5,8 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn.functional as functional
-from PIL import Image
 
+from retrieval.adapters.image_io import open_image, oriented_rgb
 from retrieval.domain.similarity import l2_normalize
 
 
@@ -39,7 +39,8 @@ def build_resnet50_feature_extractor(device: str = "cpu", weights_name: str = "i
 
 
 def extract_global_embedding(image_path: Path, extractor, transform, device) -> np.ndarray:
-    img = Image.open(image_path).convert("RGB")
+    with open_image(image_path) as image:
+        img = oriented_rgb(image, image_path)
     x = transform(img).unsqueeze(0).to(device)
     with torch.no_grad():
         feat = extractor(x).flatten(1).cpu().numpy()[0]
