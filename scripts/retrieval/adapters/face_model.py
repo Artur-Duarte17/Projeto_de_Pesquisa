@@ -25,6 +25,24 @@ def build_face_app(device: str = "cpu", det_size: int = 640):
     return app
 
 
+def face_runtime(app) -> dict[str, dict[str, object]]:
+    """Observe actual model providers without changing inference or priority."""
+    return {
+        name: {
+            "implementation": type(model).__name__,
+            "providers": list(model.session.get_providers()) if hasattr(model, "session") else [],
+        }
+        for name, model in app.models.items()
+    }
+
+
+def face_model_files(app) -> dict[str, Path | None]:
+    return {
+        f"{name}_weights": Path(model.model_file) if getattr(model, "model_file", None) else None
+        for name, model in app.models.items()
+    }
+
+
 def detect_faces_in_image(image_path: Path, app) -> tuple[np.ndarray, list]:
     img = read_image_bgr(image_path)
     if img is None:

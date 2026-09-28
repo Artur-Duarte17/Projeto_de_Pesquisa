@@ -57,6 +57,23 @@ Os pontos de entrada continuam nos locais conhecidos: `scripts/app/streamlit_app
 
 Na prática, uma busca recebe uma foto na interface ou em um comando; o adaptador de modelo extrai seu descritor; o adaptador de arquivos identifica a própria foto e cópias a excluir; a aplicação calcula o ranking; a fusão pode combinar os dois rankings; o ponto de entrada apresenta ou grava o resultado. Essa divisão evita que a regra de ranking dependa diretamente de `cv2.imread`, de um modelo específico ou do formato do caminho da consulta.
 
+## Organização da interface local
+
+O ponto de entrada Streamlit permanece em `scripts/app/streamlit_app.py`. A
+apresentação agora está dividida em `album_views.py` (cadastro, atualização e
+remoção), `components.py` (tema, cartões e galeria paginada) e `runtime.py`
+(estado da sessão, caches limitados e chamadas aos adaptadores compartilhados).
+Operações de arquivos dos álbuns ficam em `retrieval/adapters/album_store.py`.
+Essa separação não cria outro mecanismo de ranking nem substitui protocolos.
+
+O perfil inicial é Uso pessoal; Pesquisa é uma escolha explícita. Acervos
+científicos e fusão não são alternativas automáticas quando faltam álbuns
+pessoais. A interface reutiliza a análise da referência e a última busca,
+invalidando resultados quando mudam a consulta, a pessoa, os parâmetros ou os
+arquivos de índices. Alterações de exibição e paginação não precisam recalcular
+o ranking. Esses comportamentos têm testes propostos na suíte; sua adição não
+constitui, por si só, comprovação de execução ou de desempenho.
+
 ## Fronteiras científicas e limites
 
 Os protocolos **LFW, INRIA Holidays e Gallagher** preservam suas regras específicas nos scripts de preparação e avaliação em `scripts/face/`, `scripts/global/` e `scripts/fusion/`. A separação arquitetural compartilha cálculos e operações gerais, mas não transforma os três protocolos em um protocolo genérico. Isso reduz o risco de alterar sem querer as consultas, a relevância, as exclusões, a ordem do processamento ou as métricas publicadas. Uma mudança futura nessas regras exige justificativa metodológica e nova comparação com as evidências anteriores.

@@ -17,6 +17,7 @@ from retrieval.adapters.global_model import (
     build_resnet50_feature_extractor,
     describe_torch_device,
     extract_global_embeddings_batch,
+    global_weights_file,
 )
 from project_paths import DATA_DIR, OUTPUTS_DIR
 from retrieval.adapters.files import (
@@ -27,7 +28,13 @@ from retrieval.adapters.files import (
     sha256_file,
     stable_image_id,
 )
-from retrieval.adapters.image_io import open_image, oriented_rgb
+from retrieval.adapters.image_io import (
+    DECODE_POLICY_KEY,
+    LARGE_JPEG_POLICY,
+    image_source_size,
+    open_image,
+    oriented_rgb,
+)
 from retrieval.adapters.manifest import write_run_manifest
 
 
@@ -55,13 +62,18 @@ def prepare_image(image_path: Path, transform) -> dict[str, object]:
     try:
         with open_image(image_path) as image:
             rgb = oriented_rgb(image, image_path)
-            width, height = rgb.size
+            width, height = image_source_size(rgb)
+            decoded_width, decoded_height = rgb.size
+            decode_policy = rgb.info.get(DECODE_POLICY_KEY, "native")
             tensor = transform(rgb)
         return {
             "image_path": image_path,
             "tensor": tensor,
             "width": int(width),
             "height": int(height),
+            "decoded_width": int(decoded_width),
+            "decoded_height": int(decoded_height),
+            "decode_policy": decode_policy,
             "sha256": sha256_file(image_path),
             "error": None,
         }
@@ -106,6 +118,7 @@ def main() -> int:
     rows = []
     embs = []
     failures = []
+    reduced_images = []
     progress = tqdm(total=len(image_paths), desc="Indexing global embeddings", unit="img")
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         for batch_start in range(0, len(image_paths), args.batch_size):
@@ -130,6 +143,17 @@ def main() -> int:
 
                 for item, embedding in zip(valid, batch_embeddings, strict=True):
                     img_path = Path(item["image_path"])
+                    if item["decode_policy"] != "native":
+                        reduced_images.append(
+                            {
+                                "image_path": rel_to_root(img_path),
+                                "source_width": item["width"],
+                                "source_height": item["height"],
+                                "decoded_width": item["decoded_width"],
+                                "decoded_height": item["decoded_height"],
+                                "decode_policy": item["decode_policy"],
+                            }
+                        )
                     image_id = (
                         inventory_ids[img_path.resolve()]
                         if inventory_ids is not None
@@ -184,15 +208,25 @@ def main() -> int:
             "split": args.split,
             "label_from_parent": not args.no_label_from_parent,
             "image_id_source": "inventory_csv" if inventory_path else "stable_path_hash",
+            "oversized_jpeg_policy": LARGE_JPEG_POLICY,
         },
-        inputs={"input_directory": input_dir, "inventory_csv": inventory_path},
+        inputs={"input_directory": input_dir, "inventory_csv": inventory_path,
+                "global_weights": global_weights_file(args.weights)},
         result_files=result_files,
-        extra={"images_scanned": len(image_paths), "embeddings": len(meta), "failures": len(failures)},
+        extra={
+            "images_scanned": len(image_paths),
+            "embeddings": len(meta),
+            "failures": len(failures),
+            "reduced_image_count": len(reduced_images),
+            "reduced_images": reduced_images,
+            "actual_device": str(device),
+        },
     )
 
     print(f"[OK] images scanned: {len(image_paths)}")
     print(f"[OK] global embeddings: {len(meta)}")
     print(f"[OK] failures: {len(failures)}")
+    print(f"[OK] JPEGs reduced for safe decoding: {len(reduced_images)}")
     print(f"[OK] {embeddings_path}")
     print(f"[OK] {metadata_path}")
     print(f"[OK] {manifest_path}")

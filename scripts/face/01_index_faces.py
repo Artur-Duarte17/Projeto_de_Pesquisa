@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import DATA_DIR, OUTPUTS_DIR
-from retrieval.adapters.face_model import build_face_app
+from retrieval.adapters.face_model import build_face_app, face_model_files, face_runtime
 from retrieval.adapters.files import (
     list_images,
     load_inventory_image_ids,
@@ -141,7 +141,7 @@ def main() -> int:
             "identity_from_parent": not args.no_identity_from_parent,
             "image_id_source": "inventory_csv" if inventory_path else "stable_path_hash",
         },
-        inputs={"input_directory": input_dir, "inventory_csv": inventory_path},
+        inputs={"input_directory": input_dir, "inventory_csv": inventory_path, **face_model_files(app)},
         result_files={"embeddings": embeddings_path, "metadata": metadata_path},
         extra={
             "images_scanned": len(image_paths),
@@ -149,6 +149,7 @@ def main() -> int:
             "read_failures": n_read_fail,
             "images_without_face": n_no_face,
             "faces_without_embedding": n_no_emb,
+            "model_runtime": face_runtime(app),
         },
     )
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import urlparse
 
 import numpy as np
 import torch
@@ -23,6 +24,15 @@ def describe_torch_device(requested: str, actual: torch.device) -> str:
     if requested.lower() == "cuda":
         return "requested=cuda actual=cpu reason=torch.cuda.is_available() is False"
     return "requested=cpu actual=cpu"
+
+
+def global_weights_file(weights_name: str = "imagenet") -> Path | None:
+    """Locate the loaded torchvision checkpoint; never download it here."""
+    if weights_name == "none":
+        return None
+    from torchvision.models import ResNet50_Weights
+
+    return Path(torch.hub.get_dir()) / "checkpoints" / Path(urlparse(ResNet50_Weights.DEFAULT.url).path).name
 
 
 def build_resnet50_feature_extractor(device: str = "cpu", weights_name: str = "imagenet"):

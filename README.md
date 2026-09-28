@@ -71,9 +71,94 @@ O subfluxo Gallagher continua disponível isoladamente em `scripts/run_final_gal
 
 ## Usar uma coleção própria
 
-Os indexadores recebem qualquer pasta de fotografias pelo argumento `--input-dir`; não é necessário copiar o álbum para o projeto.
+Não é necessário copiar as fotos para o projeto nem informar caminhos de índices
+no uso normal. O álbum fica na pasta original; a aplicação prepara e guarda seus
+índices locais automaticamente.
 
-### 1. Preparar os dois índices
+### 1. Abrir a aplicação
+
+```powershell
+laboratorio/cibir_gpu/Scripts/python.exe -m streamlit run scripts/app/streamlit_app.py
+```
+
+### 2. Preparar ou atualizar pela interface
+
+1. Abra **Meus álbuns** e selecione **Preparar / atualizar**.
+2. Escolha **Adicionar novo álbum**, dê um nome e cole o endereço da pasta com as fotos.
+3. Clique em **Preparar álbum** e aguarde o término. As subpastas também são lidas.
+4. Em **Buscar fotos**, selecione o álbum, envie a foto de consulta, escolha a pessoa e clique em **Buscar fotos no álbum**.
+
+Prepare somente na primeira vez e quando adicionar, remover ou alterar as fotos.
+Para atualizar, selecione o álbum já cadastrado e clique em **Atualizar álbum**;
+isso substitui os índices no mesmo destino, sem criar uma pasta `v2` e sem alterar
+as fotografias. Depois da preparação, o cache dos índices é recarregado
+automaticamente. Não feche a aplicação enquanto ela prepara o álbum.
+
+Álbuns já preparados pelo terminal sob `outputs/collections/`, como `familia`,
+aparecem automaticamente. Se uma preparação pela interface falhar, ela marca
+esse álbum como incompleto e permite tentar novamente; índices incompletos não
+entram na seleção normal de busca. Fotos originais movidas, excluídas ou limpas
+por outro programa deixam de estar disponíveis: informe a pasta atual e prepare
+novamente. A aplicação não oferece hospedagem ou cópia de segurança das fotos.
+
+### 3. Remover um álbum
+
+Abra **Meus álbuns**, selecione **Remover**, escolha o álbum, marque a confirmação e clique em
+**Remover álbum**. A aplicação apaga somente os índices e registros gerados em
+`outputs/collections/` para aquele álbum, nunca as fotos originais. A remoção
+também está disponível para álbuns cuja preparação falhou. Para usar o álbum
+removido novamente, prepare-o outra vez. Pastas externas, vínculos de arquivos
+ou pastas e conteúdos não reconhecidos como gerados bloqueiam a remoção.
+
+### Quantidade de fotos e resultados
+
+A preparação pela interface não impõe um número máximo de fotos: analisa todas
+as imagens compatíveis da pasta e de suas subpastas. O limite antigo de 50 era
+de resultados exibidos por busca, não de tamanho do álbum, e foi removido.
+**Mostrar todos os resultados** não corta o ranking solicitado; a galeria mostra
+24 fotos por página para não carregar todas as prévias ao mesmo tempo. Na busca
+facial, continuam valendo o filtro de semelhança e a exclusão da foto de consulta.
+Também é possível desmarcar essa opção e informar um máximo de resultados,
+inclusive acima de 50.
+
+Essa mudança não comprova desempenho em larga escala. A busca atual carrega os
+índices em memória e compara com o acervo inteiro; capacidade e tempo dependem
+do computador e do tamanho da coleção. Não há teto artificial de quantidade
+na interface, mas existem limites práticos de memória, armazenamento e tempo.
+
+O perfil inicial é **Uso pessoal**, com busca nos álbuns cadastrados. Se não houver
+álbum pronto, a aplicação oferece a preparação do primeiro, sem escolher Gallagher
+ou outro acervo científico como alternativa automática. A navegação separa
+**Buscar fotos** de **Meus álbuns**, onde há cartões para buscar, atualizar e remover.
+
+**Pesquisa** é um perfil ativado explicitamente: permite escolher Gallagher,
+índices personalizados, fusão experimental e detalhes técnicos. Mesmo nesse perfil,
+a fonte inicial é **Meu álbum**, não Gallagher. Nenhum protocolo de avaliação ou
+nova medição científica é executado automaticamente ao abrir a interface.
+
+CPU/CUDA fica em **Preferências de processamento**. Filtro facial e quantidade de
+resultados ficam em **Ajustes da busca**; no perfil Pesquisa, há parâmetros e
+configurações experimentais identificados separadamente. A aplicação recebe uma
+imagem de consulta, mostra os rostos detectados com numeração, permite escolher
+a pessoa e exclui a mesma fotografia quando reconhecida por caminho ou SHA-256.
+No uso pessoal, pontuações e caminhos técnicos ficam ocultos por padrão.
+
+A imagem de referência é armazenada localmente com nome derivado do conteúdo,
+evitando sobrescrita entre fotos diferentes com o mesmo nome. A análise facial
+reutiliza um cache limitado de prévias pequenas e descritores, não de fotografias
+inteiras em resolução original. Resultados da última busca ficam na sessão:
+ajustes de exibição não recalculam o ranking; alterar foto, pessoa, álbum,
+parâmetros ou os arquivos do índice exige uma nova busca. A paginação atualiza
+apenas a galeria. Os caches de índices são limitados e invalidados quando seus
+arquivos mudam ou quando um álbum é preparado ou removido pela interface.
+
+O tema fica em `.streamlit/config.toml`, com componentes nativos, cartões e uma
+paleta de contraste claro. A aplicação continua local: não foi publicada no
+Streamlit Community Cloud nem usa o aplicativo de referência como serviço.
+
+### Preparação pelo terminal (opcional)
+
+Os indexadores também continuam aceitando uma pasta pelo argumento `--input-dir`:
 
 ```powershell
 laboratorio/cibir_gpu/Scripts/python.exe scripts/prepare_collection.py `
@@ -85,8 +170,9 @@ laboratorio/cibir_gpu/Scripts/python.exe scripts/prepare_collection.py `
 O preparador não copia as fotografias. Ele cria os índices `face` e `global`, omite nomes derivados das pastas e grava um manifesto da coleção.
 Aceita JPG, JPEG, PNG, BMP, WebP, HEIC e HEIF em subpastas. Para HEIC/HEIF, instale
 `pillow-heif==1.8.0` no ambiente do projeto antes de preparar a coleção. Vídeos não
-são indexados. Se já existir uma coleção preparada antes desse suporte, use um novo
-`--output-dir` para incluir os HEIC; índices antigos não se atualizam sozinhos.
+são indexados. Se já existir uma coleção preparada antes desse suporte, atualize
+o álbum pela interface para incluir os HEIC; índices antigos não se atualizam
+sozinhos. Pelo terminal, use o mesmo `--output-dir` com `--overwrite`.
 
 O ambiente local foi criado com `uv` e não inclui `pip`. Para adicionar apenas o
 leitor HEIC, sem recriar o ambiente:
@@ -95,13 +181,20 @@ leitor HEIC, sem recriar o ambiente:
 uv pip install --python laboratorio/cibir_gpu/Scripts/python.exe pillow-heif==1.8.0
 ```
 
-### 2. Abrir a aplicação
+### Fotografias JPEG muito grandes
 
-```powershell
-laboratorio/cibir_gpu/Scripts/python.exe -m streamlit run scripts/app/streamlit_app.py
-```
+O limite global do Pillow continua ativo. Quando ele bloqueia um JPEG, o leitor
+aceita no máximo 256 megapixels de origem e solicita decodificação em resolução
+reduzida (1/8 por dimensão), limitada a 8 megapixels decodificados. Os arquivos
+originais não são modificados. Essa leitura atende à extração global e às prévias
+da interface; o leitor facial OpenCV dos JPEGs permanece inalterado. Outros
+formatos acima do limite não ganham uma exceção automática.
 
-Na opção `Personalizado`, informe os diretórios `face` e `global` criados acima. A aplicação recebe uma imagem de consulta, mostra os rostos detectados com numeração, exige a escolha da pessoa que deve ser procurada, exclui do ranking a mesma fotografia quando reconhecida por caminho ou SHA-256 e mostra as imagens recuperadas.
+O manifesto do índice global registra quais imagens receberam essa redução e as
+dimensões usadas. O CSV de metadados mantém as dimensões originais. Os JPEGs comuns
+das bases científicas continuam com a leitura anterior; resultados existentes
+não são recalculados por esta alteração. Uma coleção que tinha falhas de leitura
+precisa ser atualizada pela interface ou preparada novamente com `--overwrite`.
 
 ## Bases da avaliação científica
 
@@ -112,6 +205,11 @@ Na opção `Personalizado`, informe os diretórios `face` e `global` criados aci
 As tarefas não são equivalentes e suas métricas não devem ser comparadas diretamente entre bases.
 
 ## Dados e privacidade
+
+Este é um protótipo acadêmico. O perfil **Uso pessoal** simplifica a interface,
+mas não altera as restrições dos modelos pré-treinados. Consulte
+[dados, modelos e privacidade](docs/dados_modelos_privacidade.md) antes de qualquer
+uso público, redistribuição ou disponibilização comercial.
 
 Não versione fotografias, recortes faciais, embeddings, modelos baixados ou resultados que exponham pessoas. `data/raw/`, `data/query/`, `outputs/`, `.local/` e `laboratorio/` permanecem ignorados pelo Git.
 

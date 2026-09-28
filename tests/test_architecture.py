@@ -15,7 +15,7 @@ SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from retrieval.adapters.search_gateway import search_face_index
-from retrieval.application.search import rank_face_index, rank_global_index
+from retrieval.application.search import rank_face_index, rank_fused_index, rank_global_index
 
 
 def imported_modules(path: Path) -> set[str]:
@@ -131,6 +131,26 @@ class SearchUseCaseTests(unittest.TestCase):
 
         self.assertEqual(results["image_id"].tolist(), ["keep"])
         self.assertEqual(results["rank"].tolist(), [1])
+
+    def test_unlimited_rankings_are_not_capped_at_fifty_photos(self) -> None:
+        count = 73
+        embeddings = np.tile(np.asarray([[1.0, 0.0]], dtype=np.float32), (count, 1))
+        face_metadata = pd.DataFrame(
+            [self._face_row(f"image_{number}_f00", f"image_{number}") for number in range(count)]
+        )
+        global_metadata = face_metadata[["image_id", "image_path"]].copy()
+        query = np.asarray([1.0, 0.0], dtype=np.float32)
+
+        face_results = rank_face_index(query, embeddings, face_metadata, topk=None)
+        global_results = rank_global_index(query, embeddings, global_metadata, topk=None)
+        fused_results = rank_fused_index(
+            query, query, embeddings, face_metadata, embeddings, global_metadata,
+            topk=None, face_weight=0.7, global_weight=0.3,
+        )
+
+        for results in (face_results, global_results, fused_results):
+            self.assertEqual(len(results), count)
+            self.assertEqual(results["rank"].tolist(), list(range(1, count + 1)))
 
     def test_face_gateway_excludes_uploaded_copy_by_sha256(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

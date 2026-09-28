@@ -11,6 +11,8 @@ Esta pasta contém somente documentos que ainda participam da versão final ou d
 | `bibliografia_anotada.md` | cataloga e comenta as referências estudadas |
 | `sintese_revisao_bibliografica.md` | posiciona a contribuição frente à literatura |
 | `evidencias/gallagher_a01_a02_20260922_v2/` | preserva manifests e métricas seguras da correção Gallagher |
+| `fechamento_tecnico_2026.md` | registra escopo congelado, validação e critérios de encerramento |
+| `dados_modelos_privacidade.md` | separa origem, condições de uso, limites de divulgação e uso real de IA |
 
 Materiais históricos, privados ou substituídos ficam em `C:\Projeto_de_Pesquisa_arquivo_local`. Eles não devem ser copiados de volta para a árvore ativa sem uma razão específica.
 

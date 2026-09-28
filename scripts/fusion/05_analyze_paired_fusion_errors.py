@@ -329,7 +329,7 @@ def write_report(
             "- São 20 identidades selecionadas entre as mais frequentes, não todas as pessoas do acervo.",
             "- O cenário global pode coincidir com a pessoa em um evento, mas não representa identidade.",
             "- Os pesos foram declarados antes da execução; os casos positivos não autorizam escolher um peso retrospectivamente.",
-            "- Gallagher não é uma validação agro. O mesmo protocolo precisa ser repetido em uma coleção agro autorizada.",
+            "- Gallagher não é uma validação agro. Uma avaliação agro autorizada seria outro estudo, fora do escopo deste artigo.",
             "",
         ]
     )

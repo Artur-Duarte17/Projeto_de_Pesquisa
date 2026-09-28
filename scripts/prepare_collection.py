@@ -18,6 +18,7 @@ def parse_args() -> argparse.Namespace:
         description="Create face and global indexes for a folder of photographs."
     )
     parser.add_argument("--input-dir", type=Path, required=True)
+    parser.add_argument("--collection-name", default=None, help="Display name in the local application")
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -137,6 +138,7 @@ def main() -> int:
             "workers": args.workers,
             "max_images": args.max_images,
             "identity_labels_stored": False,
+            "collection_name": args.collection_name,
         },
         inputs={"input_directory": input_dir},
         result_files={
