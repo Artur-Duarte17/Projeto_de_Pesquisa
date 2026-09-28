@@ -18,11 +18,33 @@ def ctx_id_from_device(device: str) -> int:
 
 
 def build_face_app(device: str = "cpu", det_size: int = 640):
+    if device.lower() == "cuda":
+        # On Windows, PyTorch loads the CUDA/cuDNN DLLs already in this environment.
+        # InsightFace 0.2.1 ignores a positive ctx_id when choosing ONNX providers.
+        import torch  # noqa: F401
+
     from insightface.app import FaceAnalysis
 
     app = FaceAnalysis(name="buffalo_l")
+    configure_face_providers(app, device)
     app.prepare(ctx_id=ctx_id_from_device(device), det_size=(det_size, det_size))
     return app
+
+
+def configure_face_providers(app, device: str) -> None:
+    """Honor an explicit CUDA request; never silently label CPU inference as CUDA."""
+    if device.lower() != "cuda":
+        return
+    import onnxruntime as ort
+
+    if "CUDAExecutionProvider" not in ort.get_available_providers():
+        raise RuntimeError("CUDA facial indisponível no ONNX Runtime. Selecione CPU.")
+    for name, model in app.models.items():
+        model.session.set_providers(["CUDAExecutionProvider", "CPUExecutionProvider"])
+        if "CUDAExecutionProvider" not in model.session.get_providers():
+            raise RuntimeError(
+                f"O modelo facial {name} não ativou CUDA. Verifique o ambiente ou selecione CPU."
+            )
 
 
 def face_runtime(app) -> dict[str, dict[str, object]]:

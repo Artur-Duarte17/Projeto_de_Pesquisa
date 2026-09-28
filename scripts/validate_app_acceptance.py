@@ -216,6 +216,10 @@ def main() -> int:
 
         providers = {name: model.session.get_providers() for name, model in cached_face_app(args.device, 640).models.items()
                      if hasattr(model, "session")}
+        assert providers
+        if args.device == "cuda":
+            assert all("CUDAExecutionProvider" in values for values in providers.values()), \
+                "Explicit CUDA request must not silently execute facial models on CPU"
         checkpoint("actual_face_providers", requested=args.device, models=providers)
         app.radio(key="app_page").set_value("Meus álbuns").run()
         app.radio(key="album_action").set_value("Remover").run()

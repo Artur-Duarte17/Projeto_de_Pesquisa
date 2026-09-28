@@ -38,6 +38,15 @@ um álbum criado especificamente para validação.
   `954d74959f42f7eda3765df49023e8af193ce1cd`, de 24/09/2026.
 - Suíte atual executada em 28/09/2026: **85 testes aprovados**.
 - Após acrescentar três regressões de proveniência dos modelos: **88 testes aprovados**.
+- A aceitação integrada inicial passou, mas revelou que o pedido `cuda` era
+  ignorado pelos modelos faciais do InsightFace 0.2.1. A primeira reprodução
+  científica deste fechamento foi interrompida antes de concluir a indexação LFW;
+  seus artefatos parciais foram preservados e não constituem resultados finais.
+- O adaptador agora carrega as DLLs existentes pelo PyTorch e seleciona
+  explicitamente `CUDAExecutionProvider` em detecção e reconhecimento. Se a
+  ativação falhar, informa erro em vez de chamar CPU de CUDA. **93 testes passaram**
+  após cinco regressões adicionais; os dois modelos reais ativaram CUDA no teste
+  de diagnóstico. A aceitação e a reprodução serão repetidas nesta candidata.
 - Verificação existente `validate_environment.py --require-cuda`: **aprovada**.
 - Pasta familiar atual: 171 imagens compatíveis (59 HEIC e 112 JPEG); vídeos e
   arquivo sem extensão não são fotografias indexáveis.
@@ -54,8 +63,9 @@ um álbum criado especificamente para validação.
 - [ ] Conferência de hashes, métricas e comparações por consulta.
 - [ ] Documentação canônica atualizada e revisão final aprovada.
 
-Próximo passo: testar criação, busca, atualização e remoção do álbum exclusivo
-de validação. Não declarar sucesso de uma etapa apenas porque sua implementação existe.
+Próximo passo: repetir a aceitação integrada e a reprodução científica depois
+da correção de seleção do processador. Não declarar sucesso de uma etapa apenas
+porque sua implementação existe.
 
 ## Limites do encerramento
 
