@@ -107,7 +107,7 @@ ser comparados entre si como uma competição ou como números oficiais.
 - A descrição do sistema corresponde ao que você reconhece e consegue demonstrar?
 - Você concorda com a interpretação dos objetivos parcialmente atendidos?
 - Há alguma frase cuja autoria ou sentido você não está confortável em assumir?
-- A orientação confirma título, recorte, formato e declaração de assistência de IA?
+- A orientação confirma título, recorte e formato final?
 - Curso e coordenação confirmam o calendário e os procedimentos de entrega?
 - Estão documentadas as condições de uso dos dados e o destino de um backup?
 
