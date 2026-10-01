@@ -10,8 +10,6 @@ Curso de Sistemas de Informação\par
 \vspace{2.4cm}
 {\LARGE\bfseries \titulo\par}
 \vfill
-{\small Versão para revisão de Artur\\Título provisório; sem aprovação institucional de entrega\par}
-\vspace{1cm}
 Urutaí\\2026
 \end{titlepage}
 \hypersetup{pageanchor=true}
@@ -24,22 +22,13 @@ Urutaí\\2026
 \end{center}
 \vspace{2cm}
 \hfill\begin{minipage}{.53\textwidth}\singlespacing
-Monografia em preparação no curso de Sistemas de Informação do Instituto Federal Goiano, Campus Urutaí, para revisão do autor e posterior apreciação da orientação.\par\medskip
-Orientador registrado na proposta: Gabriel da Silva Vieira.
+Monografia desenvolvida no Curso de Sistemas de Informação do Instituto Federal Goiano, Campus Urutaí, como Trabalho de Curso.\par\medskip
+Orientador: Gabriel da Silva Vieira.
 \end{minipage}
 \vfill
 \begin{center}Urutaí\\2026\end{center}
 \clearpage
 \thispagestyle{empty}
-\chapter*{Nota sobre esta versão}
-Esta é uma versão para revisão de Artur Duarte Monteiro. O texto apresenta a pesquisa e o sistema no escopo técnico congelado em setembro de 2026. Não representa aprovação da orientação, da banca ou da instituição. O título permanece provisório.
-
-Ficha catalográfica oficial, composição da banca, data de aprovação, assinaturas, ata e autorização de depósito não foram produzidas. Esses elementos dependem do procedimento institucional. A proposta original foi consultada e preservada; mudanças de escopo são expostas no texto, sem presunção de aceitação formal.
-
-A redação, a organização bibliográfica, a conferência documental e a geração de gráficos e auxiliares foram assistidas por OpenAI Codex. Os números experimentais provêm dos artefatos existentes, não de geração textual. Os 93 testes e a reprodução científica mencionados foram registrados no fechamento anterior; não foram repetidos para esta redação. A revisão e a aprovação final por Artur e pela orientação ainda estão pendentes. A inteligência artificial não é autora.
-
-Não foram incluídas fotografias de pessoas, recortes faciais, descritores biométricos, pesos de modelos ou rankings que vinculem pessoas a fotografias. Os gráficos descrevem métricas e o diagrama representa o fluxo do software. Elegibilidade dos dados e condições de depósito permanecem sujeitas à análise institucional.
-\clearpage
 \chapter*{Resumo}
 \begin{singlespace}
 A recuperação de fotografias de uma pessoa em coleções com múltiplos rostos exige distinguir identidade facial de semelhança visual geral. Este trabalho investiga se a incorporação de contexto visual global por fusão tardia melhora a recuperação baseada em identidade facial. Foi desenvolvido um protótipo local com detecção SCRFD, representação facial ArcFace por InsightFace e descritores globais de ResNet50 previamente treinada, sem novo treinamento. A fotografia inteira é a unidade recuperada; os escores faciais são agregados por máximo e combinados com a similaridade global mediante pesos fixos. A comparação principal usa 589 fotografias Gallagher, 20 consultas de 20 identidades, 19 fotografias-fonte e 588 candidatas por ranking. A relevância deriva das anotações, independentemente do sucesso do detector, e a fonte é excluída. Na execução de fechamento, a busca facial obteve precisão média das consultas (mAP) de 0,952261; a busca global obteve 0,280864; as fusões face/global 0,9/0,1, 0,7/0,3 e 0,5/0,5 obtiveram, respectivamente, 0,946274, 0,901460 e 0,813297. Nenhuma fusão avaliada superou a busca facial no mAP agregado. A fusão 0,9/0,1 apresentou dois ganhos, nove empates e nove perdas por consulta, mostrando que o resultado médio não implica ausência de ganhos locais. LFW e INRIA Holidays são verificações auxiliares com protocolos locais, e o álbum familiar participa apenas da aceitação funcional privada. A contribuição é uma comparação experimental delimitada e rastreável, apoiada em software funcional. Dependência entre consultas, seleção por frequência, pesos não otimizados e uma única coleção principal limitam a generalização. Não se demonstra causalidade do fundo nem significância estatística.
