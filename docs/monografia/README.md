@@ -1,8 +1,9 @@
 # Monografia de Artur Duarte Monteiro
 
-**Versão completa para revisão de Artur — 29/09/2026.** PDF compilado e conferido
-visualmente, com 40 páginas. Não representa aprovação da orientação, conformidade
-institucional já validada ou autorização de depósito.
+**Fonte revisada em 01/10/2026.** A limpeza editorial retirou marcas de rascunho
+e referências à assistência automatizada sem alterar protocolo, métricas ou conclusões
+científicas. O PDF versionado ainda corresponde à compilação anterior e deve ser
+recompilado e conferido antes de substituir a cópia de entrega.
 
 - [PDF para leitura](monografia_artur_revisao.pdf).
 - [Fonte principal](main.tex), com seis capítulos modulares e um apêndice.
@@ -15,7 +16,7 @@ institucional já validada ou autorização de depósito.
 ## Organização e reconstrução documental
 
 `formatacao.sty` contém o estilo; `pretextuais.tex` contém capa, folha de rosto,
-nota de revisão, resumo/abstract e listas. `capitulos/` guarda o corpo textual,
+resumo/abstract e listas. `capitulos/` guarda o corpo textual,
 `figuras/` e `tabelas/` guardam elementos usados no PDF. O pacote leve de métricas
 fica em `../evidencias/fechamento_20260928_cuda/`.
 
