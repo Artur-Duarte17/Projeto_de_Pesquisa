@@ -1,0 +1,8 @@
+insightface==0.2.1
+onnxruntime-gpu==1.23.2
+opencv-python==4.11.0.86
+numpy==2.2.6
+pandas
+tqdm
+matplotlib
+scikit-learn
