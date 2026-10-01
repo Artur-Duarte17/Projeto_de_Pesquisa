@@ -27,7 +27,7 @@ Avaliar experimentalmente o efeito da fusão tardia entre similaridade facial e 
 \end{enumerate}
 
 \section{Delimitação e relação com a proposta}
-A proposta inicial reunia desenvolvimento de um protótipo, integração de representações faciais e globais, interface, métricas de recuperação, FAISS, latência e busca em grande acervo. A versão realizada conserva a integração e a avaliação por ranking, mas delimita a pergunta à comparação de representações em Gallagher. O título utilizado nesta monografia reflete essa redução; sua aceitação formal permanece pendente.
+A proposta inicial reunia desenvolvimento de um protótipo, integração de representações faciais e globais, interface, métricas de recuperação, FAISS, latência e busca em grande acervo. A versão realizada conserva a integração e a avaliação por ranking, mas delimita a pergunta à comparação de representações em Gallagher. O título utilizado nesta monografia reflete essa redução de escopo.
 
 FAISS não integra a versão ativa. Os vetores são armazenados em arquivos e comparados por operações vetorizadas sobre o acervo, sem validação de busca aproximada ou de escala. A implementação facial usa SCRFD e ArcFace, não uma comparação experimental entre diferentes detectores ou reconhecedores. Tempos instrumentais registrados não constituem um estudo controlado de latência. Logo, esses itens da proposta não são apresentados como integralmente cumpridos. A matriz de correspondência no Apêndice~\ref{ap:reproducao} explicita o atendimento e os limites.
 
