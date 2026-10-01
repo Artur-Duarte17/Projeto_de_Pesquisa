@@ -1,24 +1,24 @@
 # Pendências da monografia — roteiro para Artur
 
-Atualizado em **01/10/2026**. A [monografia atual](monografia_artur_revisao.pdf) é um **rascunho completo para sua leitura**: 40 páginas, seis capítulos, três figuras, sete tabelas e 21 referências. O texto foi compilado e conferido tecnicamente; **você e Gabriel ainda não aprovaram o conteúdo**. A conferência feita está registrada em [VERIFICACAO_ENTREGA.md](VERIFICACAO_ENTREGA.md).
+Atualizado em **01/10/2026**. A monografia possui seis capítulos, três figuras, sete tabelas e 21 referências. A fonte foi auditada novamente em 01/10/2026 e recebeu uma limpeza editorial para retirar marcas de rascunho e referências à assistência automatizada. **A revisão de conteúdo por Artur e Gabriel continua necessária antes da entrega oficial**. A conferência feita está registrada em [VERIFICACAO_ENTREGA.md](VERIFICACAO_ENTREGA.md).
 
 ## Primeiro: o que fazer para enviar a Gabriel
 
 Você não precisa resolver todas as questões institucionais antes de pedir a leitura dele. A ordem prática é:
 
 - [ ] **1. Fazer sua primeira leitura.** Leia resumo, metodologia, resultados e conclusão, nesta ordem. Use o [guia de revisão](GUIA_DE_REVISAO_ARTUR.md). Em cada trecho que você não entenda, que não corresponda ao sistema ou que não se sinta confortável em defender, anote **página + dúvida**. Se tiver pouco tempo, envie primeiro as dúvidas mais importantes; não espere conhecer todos os detalhes de memória.
-- [ ] **2. Corrigir os problemas encontrados.** Eu posso conferir suas anotações com o código e os resultados, ajustar o texto e recompilar o PDF. Ao terminar, você confere especialmente se as explicações e conclusões representam o trabalho que quer defender. **Concluído quando:** não houver erro conhecido ou afirmação que você não consiga assumir na versão enviada.
-- [ ] **3. Preparar a cópia para Gabriel.** A capa, a nota inicial e os metadados do PDF ainda dizem **“versão para revisão de Artur”**. Depois da sua primeira leitura, eu ajusto esses trechos para **“versão para revisão do orientador”**, recompilo, confiro as páginas alteradas e atualizo o manifesto do arquivo. **Concluído quando:** o PDF estiver corretamente identificado como rascunho para Gabriel.
+- [x] **2. Limpeza editorial inicial.** A fonte foi ajustada para retirar a página de nota editorial, referências à assistência automatizada e marcas editoriais de rascunho. Resultados, limitações e conclusões científicas foram preservados.
+- [x] **3. Preparar a fonte para a próxima compilação.** Capa, folha de rosto, metadados, introdução, conclusão e apêndice foram limpos. **Ainda é necessário recompilar e conferir o novo PDF antes de substituir a cópia de entrega.**
 - [ ] **4. Enviar para ele.** Você compartilha esse PDF e pede que indique **o que considera obrigatório corrigir para a defesa**. Ele pediu para recebê-lo quanto antes. Não é preciso esperar ficha catalográfica, escolha de banca, artigo aceito ou monografia em formato definitivo para ele começar a ler. **Concluído quando:** ele tiver recebido o rascunho; a aprovação vem depois da leitura e eventuais correções.
 
-**Situação em 01/10:** os passos 1–4 continuam pendentes. O PDF atual e a execução científica permanecem os mesmos; esta atualização mudou apenas este roteiro.
+**Situação em 01/10:** a limpeza editorial da fonte foi concluída. Continuam pendentes a leitura humana, a recompilação/conferência do PDF atualizado, a revisão do orientador e as decisões institucionais.
 
 ## O que perguntar junto com o rascunho
 
 Gabriel disse que provavelmente o trabalho atual basta para a defesa, mas **“vamos olhar”** indica que ele ainda precisa ler. Envie perguntas curtas e objetivas:
 
 1. **Escopo e título:** a proposta incluía comparar modelos faciais, usar FAISS e avaliar grande escala e latência. Hoje a pesquisa avalia busca facial, busca pela imagem inteira e fusão em um conjunto delimitado; a aplicação local funciona. O texto mostra expressamente o que ficou de fora. **Pergunta:** “Com esse recorte e essas limitações, o que o senhor considera obrigatório acrescentar antes da defesa?” A [comparação de modelos](../plano_comparacao_facial.md) é uma proposta, ainda não um resultado. Só iniciar experimentos novos depois de decidir se eles são necessários e se cabem no prazo.
-2. **Modelo do TC:** Gabriel afirmou que existe formato específico e prefere LaTeX. A fonte atual está em LaTeX, mas foi adaptada de um template anterior; não há comprovação de conformidade com o modelo vigente. **Pergunta:** “Qual é o modelo/manual atual e devo entregar apenas PDF ou também os arquivos LaTeX?” Depois de receber o material, conferir capa, folha de rosto, resumo, citações, referências e demais exigências. Perguntar também se há regra institucional ou editorial específica para registrar auxílio de IA.
+2. **Modelo do TC:** Gabriel afirmou que existe formato específico e prefere LaTeX. A fonte atual está em LaTeX, mas foi adaptada de um template anterior; não há comprovação de conformidade com o modelo vigente. **Pergunta:** “Qual é o modelo/manual atual e devo entregar apenas PDF ou também os arquivos LaTeX?” Depois de receber o material, conferir capa, folha de rosto, resumo, citações, referências e demais exigências.
 3. **Datas e banca:** constavam **06/11/2026 para entrega** e **10/12/2026 para defesa** no calendário fornecido anteriormente. Essas datas não foram confirmadas novamente neste fechamento. **Pergunta:** “Esses prazos continuam válidos? Até quando o senhor precisa receber a versão para revisão e como solicitamos a banca?” Se o calendário mudou, ajustar o cronograma pelo documento atualizado.
 4. **Uso das bases de rostos:** Gabriel respondeu que, sendo bases públicas, não seria necessário documento institucional. Isso é a orientação recebida, mas não identifica as condições de cada base nem resolve sozinho o que pode ser divulgado. **Pergunta:** “Para este TC, há alguma declaração, consulta ou restrição de depósito por usarmos imagens faciais de bases públicas sem exibir as fotos?” Se houver dúvida institucional específica, solicitar o canal responsável em vez de presumir uma autorização geral.
 
@@ -43,4 +43,4 @@ Inventário anterior: **72 arquivos da execução (~78 MiB)**, `data/raw` (~3,58
 
 ## Seu próximo passo agora
 
-Abra o [PDF](monografia_artur_revisao.pdf) e o [guia](GUIA_DE_REVISAO_ARTUR.md). Comece pelo resumo e anote dúvidas no formato **“página 4: não entendi esta afirmação”**. Com suas anotações, corrigimos o texto, preparo a cópia marcada para Gabriel e você a envia. O objetivo imediato é obter a revisão dele; a versão de banca vem depois.
+Depois de recompilar a fonte limpa, leia resumo, método, resultados e conclusão e anote dúvidas no formato **“página X: não entendi esta afirmação”**. O objetivo imediato é entregar ao orientador uma versão tecnicamente coerente e sem metadocumentação de rascunho; a versão de banca vem depois das correções dele.
