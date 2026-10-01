@@ -1,0 +1,69 @@
+{
+  "execution": "fechamento_20260928_cuda",
+  "inputs": {
+    "outputs\\validation_runs\\fechamento_20260928_cuda\\gallagher\\evaluation\\fusion_metrics.csv": "de0fcdd33c092b4c774521cb6bca65a4b080e5a15e9a719352dbee71f585335c",
+    "outputs\\validation_runs\\fechamento_20260928_cuda\\gallagher\\evaluation\\fusion_metrics_per_query.csv": "2cd2d25e06e6a938e4071d0a024c7510688720ebbd95d61fd5f37879161848b7"
+  },
+  "operations": [
+    "medias recalculadas das 100 linhas",
+    "deltas pareados por query_id antes de retirar identificadores",
+    "contagens com tolerancia 1e-12",
+    "graficos sem fotos ou identificadores",
+    "diagrama conceitual baseado na arquitetura documentada"
+  ],
+  "outputs": {
+    "tabelas\\agregados.tex": "3e59fbb3a58ad6a667e7e4b5e9394364e44fbf67aae2a687e15bb525778ef8ee",
+    "tabelas\\pareados.tex": "3ad6d5b16bcf40e869b31da125938c223eb0e48fec954ddc0b634f6854b0a59b",
+    "figuras\\deltas_pareados.pdf": "672ee673ccd103f7ed4914a6d94ab80df0a2fed5792ae8a50f04542a88900082",
+    "figuras\\fluxo_sistema.pdf": "bcfba0f9e2b01ec8adbdbd48c9e156071976b9caa6e7f847b7589e3fbd00b267",
+    "figuras\\map_gallagher.pdf": "1e31c83d6c9ac31d5d85f0634fa009196d7d30583946c35c050cc7571c345838"
+  },
+  "checks": {
+    "rows": 100,
+    "queries": 20,
+    "candidates": 588,
+    "relevance_relations": 884
+  },
+  "summary": [
+    {
+      "method": "global_context_only",
+      "ganhos": 0,
+      "empates": 1,
+      "perdas": 19,
+      "media": -0.6713968875104671,
+      "mediana": -0.762430116051442,
+      "minimo": -0.9916124120537559,
+      "maximo": 0.0
+    },
+    {
+      "method": "fusion_0p9_0p1",
+      "ganhos": 2,
+      "empates": 9,
+      "perdas": 9,
+      "media": -0.005987438047819871,
+      "mediana": 0.0,
+      "minimo": -0.0625,
+      "maximo": 0.050000000000000044
+    },
+    {
+      "method": "fusion_0p7_0p3",
+      "ganhos": 1,
+      "empates": 7,
+      "perdas": 12,
+      "media": -0.050801007555978626,
+      "mediana": -0.01769628216217156,
+      "minimo": -0.35,
+      "maximo": 0.050000000000000044
+    },
+    {
+      "method": "fusion_0p5_0p5",
+      "ganhos": 0,
+      "empates": 4,
+      "perdas": 16,
+      "media": -0.13896406644121795,
+      "mediana": -0.09166293670882569,
+      "minimo": -0.776474358974359,
+      "maximo": 0.0
+    }
+  ]
+}

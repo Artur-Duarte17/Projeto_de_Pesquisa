@@ -1,4 +1,4 @@
-# Bibliografia anotada inicial
+# Bibliografia anotada: catálogo e seleção para a monografia
 
 Data: 25/06/2026
 
@@ -8,20 +8,34 @@ Este documento organiza artigos e fontes uteis identificados nos levantamentos b
 
 Os levantamentos preliminares nao devem ser citados. As referencias abaixo apontam para artigos, livros, relatorios ou paginas oficiais.
 
-Classificacao:
+## Seleção atual — 28/09/2026
 
-```text
-Obrigatoria: deve entrar no artigo/TCC.
-Recomendada: entra se houver espaco e melhora a discussao.
-Complementar: util para trabalhos futuros ou aprofundamento.
-Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografica antes da citacao final.
-```
+O catálogo de junho é preservado abaixo como histórico de descoberta. Suas
+classificações foram reavaliadas: nenhuma entrada deve ser citada apenas por
+estar catalogada. O controle atual está em [CONTROLE_FONTES.md](monografia/CONTROLE_FONTES.md)
+e a bibliografia efetivamente citada em [referencias.bib](monografia/referencias.bib).
+Esses arquivos distinguem metadados, conteúdo lido e acesso incompleto.
+
+Foram selecionados Smeulders, Dubey, Babenko, He, Schroff (somente fundamento),
+Deng, Guo/SCRFD, Costache (somente resumo institucional), Zhang, Oh, Li, Atrey,
+Manning, Huang, Jégou, Messina e documentação primária de InsightFace,
+torchvision, Holidays, Cockburn e LGPD. A função de cada fonte está no controle.
+
+Datta e Wan podem aprofundar a revisão, mas não são necessários para as afirmações
+atuais. FAISS não descreve a implementação ativa. Gender Shades não serve como
+prova direta de viés de identidade no sistema. Normas, dados e documentação
+seguem condições próprias; disponibilidade não significa licença irrestrita.
+
+Legenda do catálogo preservado: “candidata histórica” registra prioridade antiga,
+não obrigatoriedade atual; “complementar” e “validar” não significam leitura ou
+conferência concluída. Afirmações antigas de “fonte verificada” devem ser lidas
+no contexto daquele levantamento, não como revalidação integral em setembro.
 
 ## 2. CBIR classico e deep learning
 
 ### Smeulders et al. - Content-Based Image Retrieval at the End of the Early Years
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: CBIR classico, semantic gap, descritores visuais.
 - Fonte verificada: IEEE/ACM.
 - Link: https://ieeexplore.ieee.org/document/895972/
@@ -31,7 +45,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Datta et al. - Image Retrieval: Ideas, Influences, and Trends of the New Age
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: evolucao de image retrieval, busca por similaridade, desafios praticos.
 - Fonte verificada: ACM Computing Surveys.
 - Link: https://dl.acm.org/doi/10.1145/1348246.1348248
@@ -41,7 +55,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Dubey - A Decade Survey of Content Based Image Retrieval using Deep Learning
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: CBIR com deep learning.
 - Fonte verificada: arXiv/IEEE.
 - Link: https://arxiv.org/abs/2012.00641
@@ -51,7 +65,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Wan et al. - Deep Learning for Content-Based Image Retrieval: A Comprehensive Study
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: estudo sistematico de CNNs em CBIR.
 - Fonte indicada no levantamento preliminar: ACM Multimedia 2014.
 - DOI indicado: `10.1145/2647868.2654948`
@@ -68,7 +82,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Jegou, Douze e Schmid - Hamming Embedding and Weak Geometric Consistency for Large Scale Image Search
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: large-scale image search, Hamming Embedding, INRIA Holidays.
 - Fonte verificada: pagina oficial INRIA Holidays e ECCV.
 - Link dataset: https://thoth.inrialpes.fr/~jegou/data.php.html
@@ -79,7 +93,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Razavian et al. - CNN Features Off-the-Shelf: An Astounding Baseline for Recognition
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: CNN pre-treinada como extrator generico.
 - Fonte verificada: arXiv/CVF.
 - Link: https://arxiv.org/abs/1403.6382
@@ -88,7 +102,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Babenko et al. - Neural Codes for Image Retrieval
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: ativacoes de CNN como descritores globais para recuperacao.
 - Fonte verificada: arXiv/ECCV.
 - Link: https://arxiv.org/abs/1404.1777
@@ -97,7 +111,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### He et al. - Deep Residual Learning for Image Recognition
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: arquitetura ResNet.
 - Fonte verificada: CVF/IEEE.
 - Link: https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf
@@ -107,7 +121,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Gordo et al. - Deep Image Retrieval: Learning Global Representations for Image Search
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: representacoes globais profundas para image retrieval.
 - Fonte verificada: arXiv/ECCV.
 - Link: https://arxiv.org/abs/1604.01325
@@ -116,7 +130,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Radenovic, Tolias e Chum - Fine-Tuning CNN Image Retrieval with No Human Annotation
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: fine-tuning e GeM pooling para image retrieval.
 - Fonte verificada: arXiv/TPAMI.
 - Link: https://arxiv.org/abs/1711.02512
@@ -128,7 +142,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Schroff, Kalenichenko e Philbin - FaceNet
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: embeddings faciais, triplet loss, distancia em espaco vetorial.
 - Fonte verificada: arXiv/CVF.
 - Link: https://arxiv.org/abs/1503.03832
@@ -137,7 +151,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Wang et al. - CosFace
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: margem cosseno para reconhecimento facial.
 - Fonte verificada: arXiv/IEEE.
 - Link: https://arxiv.org/abs/1801.09414
@@ -147,7 +161,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Deng et al. - ArcFace
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: Additive Angular Margin Loss, embeddings faciais discriminativos.
 - Fonte verificada: arXiv/IEEE/CVF/InsightFace.
 - Link: https://arxiv.org/abs/1801.07698
@@ -157,7 +171,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Huang et al. - Labeled Faces in the Wild
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: benchmark de reconhecimento facial em ambiente nao controlado.
 - Fonte verificada: HAL/UMass.
 - Link: https://inria.hal.science/inria-00321923
@@ -176,7 +190,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Choi et al. - Face Annotation for Personal Photos Using Context-Assisted Face Recognition
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: contexto ajudando reconhecimento facial em fotos pessoais.
 - Uso no projeto: sustenta a ideia de que situacao, fundo e agrupamento podem ajudar identidade.
 - Diferenca para o projeto: foco em anotacao de faces, nao ranking de fotos completas.
@@ -191,7 +205,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Shimizu et al. - Learning People Co-occurrence Relations by Using Relevance Feedback for Retrieving Group Photos
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: recuperacao de fotos de grupo usando coocorrencia e feedback.
 - Uso no projeto: fundamentar futura busca por casal/grupo e reranking contextual.
 - Status: validar DOI/fonte antes da citacao final.
@@ -225,7 +239,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Li et al. - Sequential Person Recognition in Photo Albums With a Recurrent Network
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: relacoes entre pessoas e contexto de cena em albuns.
 - Uso no projeto: reforcar que cena e relacoes sociais podem ajudar identidade.
 - Status: validar link/fonte final.
@@ -248,7 +262,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Snoek, Worring e Smeulders - Early versus Late Fusion in Semantic Video Analysis
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: early fusion vs late fusion.
 - Fonte verificada: ACM/PDF institucional.
 - Link: https://dl.acm.org/doi/10.1145/1101149.1101236
@@ -284,7 +298,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Muller et al. - Performance Evaluation in Content-Based Image Retrieval: Overview and Proposals
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: avaliacao em CBIR.
 - DOI indicado: `10.1016/S0167-8655(00)00118-5`
 - Uso no projeto: reforcar metricas e protocolo de avaliacao em CBIR.
@@ -294,7 +308,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### INRIA Holidays
 
-- Classificacao: obrigatoria.
+- Classificacao: candidata histórica prioritária; seleção atual no controle.
 - Tema: benchmark de CBIR por grupos de imagens similares.
 - Fonte verificada: pagina oficial THOTH/INRIA.
 - Link: https://thoth.inrialpes.fr/~jegou/data.php.html
@@ -303,7 +317,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### PIPA - People in Photo Albums
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: pessoas em albuns pessoais.
 - Fonte verificada: Exposing.ai e trabalhos Zhang/Oh/Li.
 - Link: https://exposing.ai/pipa/
@@ -328,7 +342,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Buolamwini e Gebru - Gender Shades
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: disparidades interseccionais em sistemas comerciais de analise facial.
 - Fonte verificada: Proceedings of Machine Learning Research.
 - Link: https://proceedings.mlr.press/v81/buolamwini18a.html
@@ -337,7 +351,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### NIST - Face Recognition Vendor Test Part 3: Demographic Effects
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: efeitos demograficos em algoritmos de reconhecimento facial.
 - Fonte verificada: NIST.
 - Link: https://www.nist.gov/publications/face-recognition-vendor-test-part-3-demographic-effects
@@ -347,7 +361,7 @@ Validar: veio do levantamento preliminar, mas precisa de verificacao bibliografi
 
 ### Drozdowski et al. - Demographic Bias in Biometrics
 
-- Classificacao: recomendada.
+- Classificacao: candidata histórica; seleção atual no controle.
 - Tema: survey de vies demografico em biometria.
 - Fonte verificada: arXiv/IEEE.
 - Link: https://arxiv.org/abs/2003.02488

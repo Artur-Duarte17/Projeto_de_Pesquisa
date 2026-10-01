@@ -1,0 +1,2 @@
+method,num_queries,average_precision,precision_at_5,recall_at_5,precision_at_10,recall_at_10,query_time_ms,mAP
+face_lfw_indexed_queries,1672,0.9651361057231722,0.457177033492823,0.9011493006591156,0.2846291866028708,0.945308279704704,0.27323409090842,0.9651361057231722

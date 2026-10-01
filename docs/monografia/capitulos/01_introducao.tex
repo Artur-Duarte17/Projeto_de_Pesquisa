@@ -1,0 +1,39 @@
+\chapter{Introdução}\label{cap:introducao}
+\section{Problema e motivação}
+Uma coleção fotográfica pode registrar a mesma pessoa em diferentes situações e reunir várias pessoas em uma única imagem. Recuperar as fotografias de uma pessoa nesse acervo exige especificar quem se procura e ordenar imagens de acordo com essa intenção. A organização por pastas, eventos ou nomes de arquivos não fornece, por si só, essa associação. A busca por uma fotografia de referência oferece uma forma de consulta visual, mas sua utilidade depende de quais características são comparadas e de como se define uma resposta correta.
+
+A recuperação de imagens baseada em conteúdo, ou CBIR, emprega representações extraídas das imagens para comparar uma consulta com uma coleção. Entretanto, semelhança visual e relevância para o usuário não são equivalentes. A lacuna entre características computáveis e interpretação constitui um problema central da área \cite{Smeulders2000}. Duas fotografias do mesmo ambiente podem ser visualmente semelhantes e retratar pessoas distintas; inversamente, a mesma pessoa pode aparecer em cenários muito diferentes.
+
+Representações faciais oferecem uma pista especializada de identidade. Representações globais sintetizam características da imagem e podem incorporar elementos relacionados à cena, aos objetos e às próprias pessoas. A combinação parece plausível em álbuns nos quais situações e participantes se repetem. A plausibilidade, contudo, não garante melhoria: uma pista contextual útil para reconhecer o evento pode não ajudar a ordenar fotografias de uma identidade específica. Por isso, o efeito da combinação deve ser avaliado com uma definição explícita de relevância e uma base facial de comparação.
+
+A literatura já explora pistas faciais e não faciais em coleções de consumidores \cite{Costache2008}, reconhecimento de pessoas por múltiplas regiões \cite{Zhang2015,Oh2015} e contexto em diferentes níveis do álbum \cite{Li2016}. Assim, esta pesquisa não propõe a primeira combinação de rosto e contexto. Seu foco é uma comparação delimitada: modelos pré-treinados, uma consulta visual por identidade, retorno de fotografias inteiras e fusão de escores com pesos fixos.
+
+\section{Pergunta de pesquisa}
+A pergunta central é: \emph{em coleções fotográficas com múltiplas pessoas, a incorporação de contexto visual global por fusão tardia melhora a recuperação baseada em identidade facial?}
+
+Neste trabalho, ``contexto visual global'' designa o descritor obtido a partir da fotografia inteira, sujeito ao pré-processamento da rede. Não significa somente fundo, tampouco incorpora explicitamente relações sociais, data ou localização. ``Melhora'' refere-se ao mAP agregado no protocolo principal, acompanhado por precisão e revocação em cortes fixos e por diferenças pareadas de AP. A resposta não será extrapolada para qualquer representação contextual ou estratégia de fusão.
+
+\section{Objetivos}
+\subsection{Objetivo geral}
+Avaliar experimentalmente o efeito da fusão tardia entre similaridade facial e similaridade visual global na recuperação de fotografias por identidade anotada, por meio de um protótipo local e de um protocolo rastreável.
+
+\subsection{Objetivos específicos}
+\begin{enumerate}
+\item Organizar representações faciais e globais de fotografias utilizando modelos previamente treinados, sem treinamento adicional.
+\item Implementar e descrever buscas facial, global e combinada, preservando a fotografia inteira como unidade de resposta e a escolha explícita da pessoa na interface.
+\item Comparar as configurações sobre as mesmas consultas, candidatas e relações de relevância, com exclusão da fotografia-fonte e seleção facial vinculada à anotação.
+\item Analisar métricas agregadas e diferenças por consulta, distinguindo a comparação principal das verificações auxiliares e da aceitação funcional.
+\item Registrar proveniência, limitações científicas e restrições de dados de modo que as afirmações possam ser verificadas contra os artefatos da execução.
+\end{enumerate}
+
+\section{Delimitação e relação com a proposta}
+A proposta inicial reunia desenvolvimento de um protótipo, integração de representações faciais e globais, interface, métricas de recuperação, FAISS, latência e busca em grande acervo. A versão realizada conserva a integração e a avaliação por ranking, mas delimita a pergunta à comparação de representações em Gallagher. O título utilizado nesta monografia reflete essa redução; sua aceitação formal permanece pendente.
+
+FAISS não integra a versão ativa. Os vetores são armazenados em arquivos e comparados por operações vetorizadas sobre o acervo, sem validação de busca aproximada ou de escala. A implementação facial usa SCRFD e ArcFace, não uma comparação experimental entre diferentes detectores ou reconhecedores. Tempos instrumentais registrados não constituem um estudo controlado de latência. Logo, esses itens da proposta não são apresentados como integralmente cumpridos. A matriz de correspondência no Apêndice~\ref{ap:reproducao} explicita o atendimento e os limites.
+
+Gallagher é a coleção principal porque permite formular a relevância por identidade em fotografias com várias pessoas. LFW verifica o componente facial em um protocolo local de recuperação, distinto da verificação oficial por pares. INRIA Holidays verifica o componente global com uma definição local de AP. O álbum familiar é exclusivamente um teste privado dos fluxos da aplicação. Nenhum desses recursos é apresentado como validação agropecuária; Agrishow e WIDER FACE não integram a evidência principal desta versão.
+
+\section{Contribuição e organização}
+A contribuição é uma comparação experimental verificável, apoiada por uma implementação funcional. Essa contribuição inclui a definição da unidade recuperada, a separação entre gabarito e detector, o vínculo da consulta com a pessoa anotada e a manutenção de candidatas comuns entre métodos. O resultado negativo para a melhoria agregada é informativo dentro dessas condições, sem significar que o contexto seja universalmente inútil.
+
+O Capítulo~\ref{cap:fundamentacao} apresenta conceitos e trabalhos relacionados. O Capítulo~\ref{cap:sistema} descreve a aplicação existente e suas escolhas. O Capítulo~\ref{cap:metodo} define as coleções, consultas, métricas e a execução utilizada. O Capítulo~\ref{cap:resultados} analisa os resultados e suas ameaças à validade. O Capítulo~\ref{cap:conclusao} responde à pergunta e discute o atendimento aos objetivos. O apêndice reúne orientações de rastreabilidade e a correspondência com a proposta, sem reproduzir código extenso ou dados pessoais.

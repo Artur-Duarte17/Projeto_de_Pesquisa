@@ -1,0 +1,66 @@
+\chapter{Fundamentação e trabalhos relacionados}\label{cap:fundamentacao}
+\section{Recuperação de imagens e representação}
+Um sistema de recuperação recebe uma consulta, compara-a com uma galeria e devolve uma ordenação de candidatas. A consulta expressa uma necessidade de informação; a galeria é o conjunto pesquisado. O descritor é uma representação numérica usada para efetuar a comparação. O ranking, por sua vez, é uma lista ordenada, e não um conjunto de decisões garantidas sobre a identidade das pessoas.
+
+Em CBIR, atributos como cor, textura e forma motivaram representações clássicas. Redes profundas ampliaram as possibilidades de extração de características, mas não eliminaram a necessidade de definir a tarefa e a relevância. \citeonline{Dubey2022} organiza essa evolução em termos de redes, supervisão e tipos de descritores. A separação entre informação visual extraída e interpretação do usuário, discutida por \citeonline{Smeulders2000}, continua útil: proximidade entre vetores não é uma definição universal de significado.
+
+\citeonline{Babenko2014} investigam ativações de redes convolucionais como códigos para recuperação de imagens, incluindo redes treinadas originalmente para classificação. Isso fundamenta o uso de representações transferidas para busca; não estabelece que qualquer camada ou modelo seja ideal para identificar pessoas. Na presente pesquisa, a rede global é usada como uma configuração de referência simples, cuja utilidade adicional deve ser medida diante do descritor facial.
+
+\section{Detecção, representação e identidade facial}
+Detecção facial procura regiões da imagem compatíveis com um rosto. Representação facial transforma a região detectada e alinhada em um vetor. Comparação de identidade utiliza relações entre esses vetores. São operações diferentes: localizar onze rostos em uma fotografia não significa identificar onze pessoas pelo nome. O sistema desenvolvido retorna fotografias por semelhança; não atribui automaticamente identidade civil nem fornece uma probabilidade calibrada de identificação.
+
+\citeonline{Huang2007} distinguem presença de uma face e reconhecimento de um indivíduo ao apresentar LFW. \citeonline{Schroff2015} mostram a aprendizagem de um espaço de representações faciais para verificação, reconhecimento e agrupamento. FaceNet é citado aqui como fundamento histórico do conceito de \emph{embedding}; ele não foi implementado neste protótipo. Um embedding é simplesmente um vetor que representa a entrada de forma adequada a alguma tarefa, não uma fotografia reconstruída nem uma etiqueta infalível.
+
+ArcFace introduz uma função de perda com margem angular aditiva para aprender representações faciais discriminativas \cite{Deng2019}. Essa contribuição pertence ao treinamento do modelo original. O projeto presente utiliza pesos já treinados por terceiros através de InsightFace, sem reaplicar a perda para treinar ou ajustar uma nova rede. É necessário, portanto, distinguir o método descrito no artigo, a biblioteca que o disponibiliza e os arquivos de pesos efetivamente usados.
+
+O detector registrado nos manifestos atuais é SCRFD. Sua publicação descreve estratégias de redistribuição de amostras e de computação para detecção eficiente \cite{Guo2021}. Ele fornece regiões faciais, enquanto ArcFaceONNX fornece descritores. Citar ArcFace não identifica o detector; citar SCRFD não comprova reconhecimento de identidade. Esta distinção evita atribuir ao sistema uma arquitetura facial diferente daquela que realmente executou.
+
+\section{Representação global e similaridade}
+ResNet é uma família de redes residuais cuja formulação facilita a aprendizagem de transformações em redes profundas \cite{He2016}. Uma conexão residual permite combinar a entrada de um bloco com a transformação aprendida por ele. Aqui, usa-se ResNet50 como extrator: remove-se a classificação final e conserva-se a saída após a agregação espacial, obtendo um vetor de 2.048 dimensões.
+
+A configuração concreta depende da biblioteca. Em torchvision 0.26, \metodo{DEFAULT} da ResNet50 corresponde a \metodo{IMAGENET1K\_V2} \cite{Torchvision}. Não se presume que esses pesos sejam idênticos aos do artigo original de ResNet. O pré-processamento e a implementação efetivos são registrados no Capítulo~\ref{cap:sistema}. A expressão ``imagem inteira'' indica a fonte global do descritor em contraste com o recorte da pessoa, embora a transformação padrão redimensione e recorte centralmente a imagem.
+
+Para vetores não nulos $u$ e $v$, a similaridade por cosseno é
+\begin{equation}\label{eq:cosseno}
+ c(u,v)=\frac{u^{\mathsf T}v}{\lVert u\rVert_2\lVert v\rVert_2}.
+\end{equation}
+A normalização L2 divide o vetor pela sua norma; quando ambos os vetores têm norma unitária, o cosseno coincide com o produto interno. O cosseno varia teoricamente entre $-1$ e $1$. Escores elevados indicam proximidade na representação, cuja interpretação depende do modelo e da tarefa.
+
+A representação global pode responder a roupa, pessoas, objetos e organização da cena ao mesmo tempo. Não há segmentação que isole o fundo. Assim, uma mudança de ranking produzida por esse descritor não pode ser atribuída exclusivamente ao fundo sem uma análise adicional que controle essas outras pistas.
+
+\section{Fusão tardia de escores}
+A literatura distingue combinações de características antes da análise e combinações de saídas após análises individuais \cite{Atrey2010}. Este projeto adota a segunda ideia operacional: extrai representações em dois espaços distintos, calcula seus escores e combina os resultados em uma escala comum. As duas pistas vêm da mesma fotografia; não são sensores independentes, e não se presume independência estatística entre elas.
+
+Os cossenos são remapeados por $h(c)=(c+1)/2$ e combinados linearmente. Esse remapeamento conserva a ordem dentro de cada componente e facilita uma soma ponderada, mas não iguala as distribuições dos escores. Se a variabilidade de uma pista for maior, seu efeito na ordenação pode ser desproporcional à interpretação informal de seu peso. Tampouco o intervalo $[0,1]$ transforma similaridade em probabilidade.
+
+A fusão tardia é adequada ao propósito de comparação porque permite observar as referências isoladas e a contribuição de pesos declarados sem concatenar vetores de dimensões distintas. A escolha não demonstra superioridade sobre fusão de características, aprendizagem de pesos ou modelos contextuais mais complexos. Essas alternativas não foram comparadas na execução congelada.
+
+\section{Avaliação por ranking}
+O gabarito associa cada consulta às imagens consideradas relevantes sob uma regra declarada. Precisão mede a proporção relevante entre os resultados examinados; revocação mede a fração do conjunto relevante recuperada. Avaliar um ranking exige também levar em conta as posições nas quais os relevantes aparecem. A AP calcula a média das precisões nessas posições, e o mAP resume as APs das consultas \cite{Manning2008}.
+
+As métricas respondem a perguntas distintas. Uma consulta com apenas quatro imagens relevantes pode atingir AP igual a um e, ainda assim, ter P@10 no máximo igual a 0,4 quando o denominador permanece dez. Por outro lado, a mesma P@10 pode corresponder a diferentes posições internas e diferentes APs. Por isso, o Capítulo~\ref{cap:metodo} explicita os denominadores e utiliza o ranking integral para AP, sem inferi-la apenas do Top-10 salvo.
+
+\section{Trabalhos próximos e limites da comparação}
+\citeonline{Costache2008} apresentam organização e navegação em coleções de consumidores utilizando pessoas como referência, combinando reconhecimento facial com informações de outras regiões. Essa descrição, conferida no resumo do registro institucional, é suficiente para reconhecer a proximidade do problema. O texto integral não foi obtido nesta rodada; portanto, não se atribuem ao trabalho métricas ou detalhes de fusão não conferidos.
+
+\citeonline{Zhang2015} propõem PIPER e a coleção PIPA para reconhecimento de pessoas em condições variadas, combinando pistas de partes do corpo e face. \citeonline{Oh2015} analisam regiões como cabeça, corpo e cena, além de protocolos mais exigentes em PIPA. Esses trabalhos mostram que pistas adicionais podem ser úteis em seus cenários, mas a tarefa de atribuir uma identidade a uma instância não é idêntica a ordenar fotografias completas a partir de uma única referência.
+
+\citeonline{Li2016} modelam contexto em três níveis: pessoa, fotografia e grupo de fotografias. Seu sistema combina classificadores e inferência contextual sobre identidades. A distinção importa porque ``contexto'' não é uma técnica única. Um vetor global genérico não equivale a modelar coocorrência entre identidades, restrições entre pessoas na mesma imagem ou adaptação a grupos de fotos.
+
+Uma busca recente delimitada identificou também \citeonline{Messina2025}, que investigam recuperação multimodal consciente de identidade com consultas textuais, COCO-PFS e adaptação de modelos CLIP. Nesse cenário, o contexto descrito participa da própria intenção de busca. Aqui, uma fotografia é relevante quando contém a identidade anotada, independentemente de repetir a cena da consulta. A diferença na definição de relevância impede transferir diretamente seus resultados para a fusão avaliada.
+
+\begin{table}[htbp]\centering\small
+\caption{Comparação conceitual com trabalhos próximos}\label{tab:relacionados}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm}*{3}{>{\raggedright\arraybackslash}X}}\toprule
+Trabalho & Tarefa e unidade & Pistas/combinação & Distinção neste estudo\\\midrule
+Costache et al. (2008) & Organização e busca de pessoas em coleções & Face e pistas de outras regiões & Resumo consultado; sem comparação numérica\\
+Zhang et al. (2015) & Reconhecimento de instâncias em PIPA & Face, partes e reconhecedor global & Classificação de identidade versus ranking de fotos\\
+Oh et al. (2015) & Reconhecimento e análise de protocolos em PIPA & Regiões corporais, atributos e cena & Outras consultas, treino e métrica de acurácia\\
+Li et al. (2016) & Identificação de instâncias em álbuns & Pessoa, foto e grupo; inferência conjunta & Contexto estruturado versus soma de escores\\
+Messina et al. (2025) & Recuperação com identidade e contexto textual & Modelo multimodal adaptado & Relevância inclui a cena descrita\\
+Este trabalho & Ranking de fotografias Gallagher & Face e imagem inteira; pesos fixos & AP/mAP, sem treinamento adicional\\\bottomrule
+\end{tabularx}
+\fonte{elaboração para esta monografia a partir das fontes citadas; síntese conceitual, não reprodução de seus experimentos}
+\end{table}
+
+A Tabela~\ref{tab:relacionados} situa a contribuição sem uma disputa numérica entre benchmarks incompatíveis. A revisão foi orientada pelos papéis das fontes e pela pergunta central; não é uma revisão sistemática, não quantifica lacunas de toda a literatura e não sustenta alegação de ineditismo da combinação. O efeito observado em Gallagher deve ser interpretado como propriedade desta representação, destas consultas e destes pesos.

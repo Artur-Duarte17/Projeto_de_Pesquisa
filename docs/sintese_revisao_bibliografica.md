@@ -1,4 +1,4 @@
-# Síntese da revisão bibliográfica e posicionamento do artigo
+# Síntese da revisão bibliográfica e posicionamento da monografia
 
 Consolidação: **28/09/2026**. A base bibliográfica anterior permanece em
 [bibliografia anotada](bibliografia_anotada.md). Esta atualização corrige o
@@ -112,3 +112,31 @@ Agrishow e WIDER FACE continuam históricos e fora do artigo definido. Não
 reintroduzir domínio agro, novos modelos ou treinamento para tentar obter
 um resultado positivo. A elegibilidade ética e institucional não é trabalho
 futuro opcional: continua condição para a eventual submissão.
+
+
+## 8. Consolidação para a monografia, posterior ao fechamento
+
+A monografia em português é a prioridade; um artigo em inglês será derivado
+posteriormente. A seleção atual, com versões, trechos consultados e lacunas,
+está em [CONTROLE_FONTES.md](monografia/CONTROLE_FONTES.md). Os registros acima
+sobre o fechamento não são apresentados como leitura integral realizada agora.
+
+A redação retomou as introduções e seções pertinentes de Zhang, Oh e Li,
+distinguindo reconhecimento contextual de pessoas e ranking de fotografias.
+Costache foi utilizado apenas para o precedente descrito em seu resumo
+institucional, com acesso incompleto declarado. A busca recente delimitada
+incluiu Messina et al. (ECIR 2025; arXiv v2), como recuperação cruzada com
+identidade, e não comparação quantitativa direta. Não se iniciou revisão sistemática.
+
+Foram esclarecidos os modelos reais: SCRFD/ArcFaceONNX no pacote buffalo_l e
+ResNet50 DEFAULT/IMAGENET1K_V2 em torchvision 0.26. FaceNet é apenas fundamento.
+Manning sustenta a fórmula local de AP; a página Holidays informa o protocolo
+oficial cuja integração difere da fórmula usada. Os clássicos pertinentes
+foram preservados; rótulos antigos de obrigatoriedade foram retirados do catálogo.
+
+A conclusão continua restrita: nenhuma fusão avaliada superou a busca facial
+no mAP agregado atual. Deltas foram recalculados das linhas gravadas; não houve
+nova execução científica. As três consultas candidatas descartadas na preparação
+foram explicitadas como limite de seleção, sem confundi-las com troca por rosto
+vizinho. Página principal LFW e página Gallagher seguem com acesso indisponível;
+o relatório original LFW foi recuperado no domínio do autor.

@@ -61,7 +61,7 @@ Esta rodada não faz push, submissão, publicação, contato externo nem promess
 de disponibilização. Questões de apreciação/dispensa ética e base de tratamento
 dos dados continuam sendo decisões institucionais; o teste computacional não as resolve.
 
-## Uso real de IA nesta rodada
+## Uso de IA no fechamento técnico anterior
 
 OpenAI Codex auxiliou a inspeção e modificação do código, organizou documentos,
 executou testes locais e a reprodução computacional autorizada, verificou
@@ -73,3 +73,21 @@ texto gerado. O assistente não é autor nem autoridade de aprovação científi
 de revisão e aprovação pelos autores humanos. Não afirmar antecipadamente que
 essa revisão já ocorreu. Uma futura declaração no artigo deve refletir esse uso
 real, inclusive a execução assistida, e a política da revista escolhida.
+
+## Rodada documental da monografia — 28/09/2026
+
+Na preparação em `docs/monografia`, OpenAI Codex auxiliou a redação dos seis
+capítulos, organização das referências, pesquisa bibliográfica delimitada,
+leitura pontual de fontes e código, conferência de métricas e produção de
+tabelas, gráficos, diagrama e auxiliares documentais. Os gráficos foram derivados
+de resultados já existentes. Não houve nova inferência, execução dos 93 testes
+ou alteração do código científico nesta rodada. O uso autorizado de recursos
+LaTeX se limita à construção documental e não muda o ambiente experimental.
+
+O material não inclui fotos familiares ou de terceiros, recortes, embeddings,
+pesos, credenciais ou rankings vinculáveis. A distribuição de deltas é exibida
+sem identificadores de consulta; isso não constitui prova de anonimização.
+A monografia também depende de revisão humana e de elegibilidade para depósito.
+Artur é o autor; o assistente não é autor, e a aprovação de Artur ou do orientador
+não está presumida. O uso de IA deve ser declarado conforme a regra institucional
+aplicável, ainda pendente. O artigo permanece uma entrega futura.

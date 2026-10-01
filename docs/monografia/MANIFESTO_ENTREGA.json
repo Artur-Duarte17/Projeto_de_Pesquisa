@@ -1,0 +1,182 @@
+{
+  "status": "versao completa para revisao de Artur; aprovacao humana pendente",
+  "completed_date": "2026-09-29",
+  "execution": "fechamento_20260928_cuda",
+  "scientific_manifest_sha256": "5fc6acd8c42c75520c0eecefa5366f3a33e0627d217b0b0cf61dd556876f34c9",
+  "document": {
+    "file": "monografia_artur_revisao.pdf",
+    "sha256": "d7b721307dc0ef3837fd4d6750311d57b6061f33c66253bac506c1b54aac9f66",
+    "pages": 40,
+    "chapters": 6,
+    "appendices": 1,
+    "figures": 3,
+    "tables": 7,
+    "references": 21
+  },
+  "checks": {
+    "compile_exit": 0,
+    "unresolved_citations": 0,
+    "overfull_boxes": 0,
+    "missing_glyphs": 0,
+    "all_pages_rendered_and_inspected_by_assistant": true,
+    "human_review_completed": false,
+    "original_run_files_unchanged": 72,
+    "original_run_bytes": 81607118,
+    "new_scientific_tests_or_inference": false,
+    "git_staged": false
+  },
+  "files": {
+    "docs/evidencias/fechamento_20260928_cuda/comparacao_pareada_resumo.csv": {
+      "bytes": 407,
+      "sha256": "64a66fdd8c64834c188f57e35aee6b25380fb22ba62e0adf4cc39896b422d03a"
+    },
+    "docs/evidencias/fechamento_20260928_cuda/face_metrics.csv": {
+      "bytes": 272,
+      "sha256": "78adcfc10a43385d920c30f2ed20a0dc38f8011f1a4f4daa3ebb006c63620ee9"
+    },
+    "docs/evidencias/fechamento_20260928_cuda/fusion_metrics.csv": {
+      "bytes": 1066,
+      "sha256": "de0fcdd33c092b4c774521cb6bca65a4b080e5a15e9a719352dbee71f585335c"
+    },
+    "docs/evidencias/fechamento_20260928_cuda/global_metrics.csv": {
+      "bytes": 346,
+      "sha256": "3d2bf5a415f83c140ff0b1ce6a90d0fdc3a33c58c8bad404a9116ddc5ef2ce1e"
+    },
+    "docs/evidencias/fechamento_20260928_cuda/proveniencia_derivada.json": {
+      "bytes": 1956,
+      "sha256": "44e5653363a723032ef0ecbdeb43aacfb7f37d109f5ac757a0b2bf60a3b83240"
+    },
+    "docs/evidencias/fechamento_20260928_cuda/README.md": {
+      "bytes": 1537,
+      "sha256": "24128c3e4c0f720c5bc68dd6f877004f165beaa0cc1e0a166791f3a22ac3894f"
+    },
+    "docs/monografia/capitulos/01_introducao.tex": {
+      "bytes": 6865,
+      "sha256": "5e161e7e4a253db86d967a4eded723a5a98c6de42491aed8e7d208fb5fbc12de"
+    },
+    "docs/monografia/capitulos/02_fundamentacao.tex": {
+      "bytes": 11463,
+      "sha256": "ac592c8c5f94876947a394cb978f8c06fade2953ed2902176eb8ebca9d840194"
+    },
+    "docs/monografia/capitulos/03_sistema.tex": {
+      "bytes": 10956,
+      "sha256": "9bb3b8bebf7e0771b0c291838af60daf389081ce7bfa7cf006c952e777ad157a"
+    },
+    "docs/monografia/capitulos/04_metodo.tex": {
+      "bytes": 14363,
+      "sha256": "d5880dcc431969ac4fbe07a2de8836ea300e6fc180cc6a287b081e3ab60ddada"
+    },
+    "docs/monografia/capitulos/05_resultados.tex": {
+      "bytes": 10957,
+      "sha256": "fd8bab752ea3de7b4946ca30070daac25be3d5cf2632a3416144439c535a9d49"
+    },
+    "docs/monografia/capitulos/06_conclusao.tex": {
+      "bytes": 3956,
+      "sha256": "be1fb15088c96b98ea8658471a36fb1ba07a4e4cc2dc58f03358a859c8ac2a5e"
+    },
+    "docs/monografia/capitulos/apendice.tex": {
+      "bytes": 4673,
+      "sha256": "9604c289e15bf3845d0a46ac7ac86ac7944ff4f749fa591924de696a6cbe0365"
+    },
+    "docs/monografia/conferir_documento.py": {
+      "bytes": 3457,
+      "sha256": "3b12b247c6162d482f510ed7a70bee7f6cb3de65e42260af3e20f7762af0442d"
+    },
+    "docs/monografia/conferir_metadados.py": {
+      "bytes": 1715,
+      "sha256": "33a90115e0cab3c65d97e136a367e4304b40923bd82b7c41badbaa16285dedae"
+    },
+    "docs/monografia/CONTROLE_FONTES.md": {
+      "bytes": 9815,
+      "sha256": "b9d41d07a9bfc233f4a50b86c4b7e753e3c2ab396ee091870a2db89b7e2d00d8"
+    },
+    "docs/monografia/ESTADO_EXECUCAO.md": {
+      "bytes": 5517,
+      "sha256": "3751b799f0dd173f4cab4236e36dab240d6f9e732b2b005411a6c49040a3d8ab"
+    },
+    "docs/monografia/figuras/deltas_pareados.pdf": {
+      "bytes": 18845,
+      "sha256": "672ee673ccd103f7ed4914a6d94ab80df0a2fed5792ae8a50f04542a88900082"
+    },
+    "docs/monografia/figuras/fluxo_sistema.pdf": {
+      "bytes": 13943,
+      "sha256": "bcfba0f9e2b01ec8adbdbd48c9e156071976b9caa6e7f847b7589e3fbd00b267"
+    },
+    "docs/monografia/figuras/logo_oficial.png": {
+      "bytes": 23040,
+      "sha256": "fdb4c6abe155ce16ebf49f6303579989c493e5a2595ee1085a713d31373a4b3d"
+    },
+    "docs/monografia/figuras/map_gallagher.pdf": {
+      "bytes": 11447,
+      "sha256": "1e31c83d6c9ac31d5d85f0634fa009196d7d30583946c35c050cc7571c345838"
+    },
+    "docs/monografia/formatacao.sty": {
+      "bytes": 1310,
+      "sha256": "33e8a6566e276fc2cf300ce5966a74fec349a42a9b27544eae9adda6458855de"
+    },
+    "docs/monografia/gerar_resultados.py": {
+      "bytes": 6828,
+      "sha256": "0c6f6da2daf17cda34589380c7380e670ebefe7fe4d43dacde92d5469be64494"
+    },
+    "docs/monografia/GUIA_DE_REVISAO_ARTUR.md": {
+      "bytes": 6526,
+      "sha256": "763e54d7b76cb0f9688a330190b874cc9e3512b1a30e1a1f9e5a2bc9b53485d5"
+    },
+    "docs/monografia/main.tex": {
+      "bytes": 704,
+      "sha256": "7f13453a9e575ae77c944f61659c372bbaec9ee7e7e4c1a2400922a3f6a6befb"
+    },
+    "docs/monografia/MAPA_EVIDENCIAS.md": {
+      "bytes": 3261,
+      "sha256": "f28698d0ffc40bcc6419cf6e48376985562b2165babacf1d5cdfa7d59d3bbfd4"
+    },
+    "docs/monografia/minimo.tex": {
+      "bytes": 334,
+      "sha256": "55d39d5fb744c2ae310fb25cec2b19a7c595a9ccd0114101c5bb2181fe02e4c8"
+    },
+    "docs/monografia/monografia_artur_revisao.pdf": {
+      "bytes": 196695,
+      "sha256": "d7b721307dc0ef3837fd4d6750311d57b6061f33c66253bac506c1b54aac9f66"
+    },
+    "docs/monografia/PENDENCIAS.md": {
+      "bytes": 6222,
+      "sha256": "c3b0da61bbafbde3bf68fe0959dbb05ba8b6f92379e9aaa768596385c3320477"
+    },
+    "docs/monografia/preparar_evidencias.py": {
+      "bytes": 2465,
+      "sha256": "ba1915f89641444188d42f51dd35b7c09a2b514853fdd08a2069d80229d3bd84"
+    },
+    "docs/monografia/pretextuais.tex": {
+      "bytes": 7846,
+      "sha256": "8c51d1965ce84ba449857d11da2e355040e53b8081a4fcb877078e78bda267b3"
+    },
+    "docs/monografia/PROVENIENCIA_FIGURAS_TABELAS.json": {
+      "bytes": 2358,
+      "sha256": "5132e05ae9585ba3283ef857ba1a2ea1243977a6e0d4896c12d5689879717fa7"
+    },
+    "docs/monografia/README.md": {
+      "bytes": 2355,
+      "sha256": "137e8f7d498af0a415f34654b445ce51971cb1558b8840cb00b3b212a2f33634"
+    },
+    "docs/monografia/referencias.bib": {
+      "bytes": 7804,
+      "sha256": "8e83cf9666bdf70fdab92a2c79510091ef2477a32a16976cbde26aff4bfb5db1"
+    },
+    "docs/monografia/tabelas/agregados.tex": {
+      "bytes": 485,
+      "sha256": "3e59fbb3a58ad6a667e7e4b5e9394364e44fbf67aae2a687e15bb525778ef8ee"
+    },
+    "docs/monografia/tabelas/pareados.tex": {
+      "bytes": 377,
+      "sha256": "3ad6d5b16bcf40e869b31da125938c223eb0e48fec954ddc0b634f6854b0a59b"
+    },
+    "docs/monografia/TEMPLATE.md": {
+      "bytes": 2981,
+      "sha256": "c0e92f5e728297cfd10103ceb3abc369b2d68fa63ecb1be8fd3f04ed7f7154f9"
+    },
+    "docs/monografia/VERIFICACAO_ENTREGA.md": {
+      "bytes": 5751,
+      "sha256": "c6b90a7a21419f329d2f9265d99af42c6bce1de320836d670c1741b0117a7d14"
+    }
+  }
+}

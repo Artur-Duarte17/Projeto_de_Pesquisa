@@ -1,0 +1,26 @@
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage{formatacao}
+\hypersetup{pdftitle={\titulo},pdfauthor={Artur Duarte Monteiro},pdfsubject={Versão para revisão do autor}}
+\begin{document}
+\selectlanguage{brazil}
+\input{pretextuais}
+\onehalfspacing
+\numerartrue
+\pagestyle{fancy}
+\input{capitulos/01_introducao}
+\input{capitulos/02_fundamentacao}
+\input{capitulos/03_sistema}
+\input{capitulos/04_metodo}
+\input{capitulos/05_resultados}
+\input{capitulos/06_conclusao}
+\clearpage
+\singlespacing
+\phantomsection
+\addcontentsline{toc}{chapter}{Referências}
+{\small\raggedright
+\bibliography{referencias}
+}
+\onehalfspacing
+\appendix
+\input{capitulos/apendice}
+\end{document}

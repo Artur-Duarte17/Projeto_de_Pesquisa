@@ -16,6 +16,10 @@ O protocolo Gallagher corrigido foi reproduzido em 28/09/2026 com CUDA efetivame
 
 O fechamento técnico está concluído no escopo testado: 93 testes aprovados, aceitação integrada com modelos e fotos reais e reprodução científica completa no commit limpo `91a2a28`. A execução foi assistida e autorizada por Artur. Veja [o fechamento e seus limites](docs/fechamento_tecnico_2026.md). Isso não equivale à aprovação ética, institucional ou editorial para publicação.
 
+## Entrega acadêmica atual
+
+A monografia em português é prioritária para a defesa. Um único artigo em inglês será derivado da mesma pesquisa posteriormente, sem depender de aceite editorial para o planejamento da monografia. Software e resultados estão congelados. Consulte [a execução da monografia](docs/monografia/ESTADO_EXECUCAO.md). A redação assistida ainda exige revisão de Artur e validações institucionais.
+
 ## Estrutura ativa
 
 - `scripts/retrieval/`: regras compartilhadas, busca e adaptadores; veja [arquitetura de software](docs/arquitetura_software.md).

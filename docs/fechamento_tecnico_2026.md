@@ -204,3 +204,7 @@ A origem, os limites de licença e o uso real de IA estão em
 bibliográfica foi ajustada para não prometer novidade, causalidade ou aceite
 sem evidência. A declaração final de IA e a interpretação científica exigem
 validação pelos autores humanos.
+
+## Adendo documental posterior ao fechamento — monografia
+
+O mandato de escrita de 28/09/2026 prioriza a monografia em português, com um artigo em inglês derivado posteriormente. Essa decisão posterior não altera o escopo histórico, as verificações ou os resultados descritos acima. A escrita é acompanhada em `monografia/ESTADO_EXECUCAO.md`; testes e inferência não foram repetidos para iniciá-la.

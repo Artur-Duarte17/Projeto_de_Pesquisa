@@ -1,0 +1,27 @@
+% Adaptacao limpa do modelo de Cristiane de Fatima dos Santos Cardoso.
+% Origem: pacote monografia2024 fornecido pelo autor; detalhes em TEMPLATE.md.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{formatacao}[2026/09/28 Monografia para revisao]
+\usepackage[T1]{fontenc}
+\usepackage[brazil,english]{babel}
+\usepackage{mathptmx}
+\usepackage[a4paper,top=30mm,bottom=20mm,left=30mm,right=20mm]{geometry}
+\usepackage{graphicx,amsmath,amssymb,booktabs,array,longtable,tabularx}
+\usepackage[Glenn]{fncychap}
+\usepackage{indentfirst,setspace,fancyhdr}
+\usepackage[skip=7pt,font=small,labelfont=bf,labelsep=colon]{caption}
+\usepackage[hidelinks,unicode]{hyperref}
+\usepackage[alf,bibjustif,abnt-etal-list=0]{abntex2cite}
+\urlstyle{same}
+\setlength{\parindent}{1.25cm}
+\setlength{\headheight}{15pt}
+\setlength{\emergencystretch}{2em}
+\fancyhf{}
+\fancyhead[L]{\scriptsize\nouppercase{\rightmark}}
+\fancyhead[R]{\thepage}
+\newif\ifnumerar
+\numerarfalse
+\fancypagestyle{plain}{\fancyhf{}\ifnumerar\fancyhead[R]{\thepage}\fi\renewcommand{\headrulewidth}{0pt}}
+\newcommand{\fonte}[1]{\par\smallskip{\footnotesize Fonte: #1.\par}}
+\newcommand{\metodo}[1]{\texttt{#1}}
+\newcommand{\titulo}{Recuperação de fotografias por identidade facial: avaliação experimental da fusão com contexto visual global}

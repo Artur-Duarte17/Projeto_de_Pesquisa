@@ -4,7 +4,7 @@ Data de referência: **28 de setembro de 2026**.
 
 ## Objetivo atual
 
-Finalizar uma única versão do sistema e produzir um artigo científico em inglês sobre a pergunta:
+Preparar a monografia em português para defesa e, posteriormente, derivar um único artigo científico em inglês da mesma pesquisa. O aceite editorial não é dependência do planejamento da monografia. Software e resultados científicos permanecem congelados. Pergunta:
 
 > Em coleções fotográficas com múltiplas pessoas, acrescentar contexto visual global por fusão tardia melhora a recuperação baseada em identidade facial?
 
@@ -60,4 +60,4 @@ O álbum familiar foi usado apenas para aceitação funcional privada. Os 207 ar
 
 ## Próximo marco
 
-O fechamento técnico e documental foi concluído no escopo testado. O próximo marco é a preparação do artigo em inglês, com revisão e validação pelos autores humanos. Antes da submissão, continuam necessárias as decisões institucionais de TC/calendário, a elegibilidade ética e de uso dos dados, a aprovação da autoria e a compatibilidade editorial. O funcionamento do software não resolve essas decisões nem garante aceite.
+O fechamento técnico e documental foi concluído no escopo testado. A versão completa da monografia para revisão de Artur foi preparada em 29/09/2026; o próximo marco é sua revisão humana e a validação institucional pertinente. O artigo em inglês será derivado posteriormente. Acompanhe `docs/monografia/ESTADO_EXECUCAO.md`. Antes da submissão, continuam necessárias as decisões institucionais de TC/calendário, a elegibilidade ética e de uso dos dados, a aprovação da autoria e a compatibilidade editorial. O funcionamento do software não resolve essas decisões nem garante aceite.

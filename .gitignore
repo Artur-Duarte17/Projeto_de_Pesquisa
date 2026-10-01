@@ -57,6 +57,11 @@ docs/fontes_bibliograficas_brutas/
 docs/Referencias/
 tmp/
 
+# Monografia: construcao, leituras locais e rastreabilidade restrita
+docs/monografia/build/
+docs/monografia/cache/
+docs/monografia/local/
+
 # OS/editor noise
 .DS_Store
 Thumbs.db

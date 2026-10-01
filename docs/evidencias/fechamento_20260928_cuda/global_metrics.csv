@@ -1,0 +1,2 @@
+method,num_queries,average_precision,precision_at_5,recall_at_5,false_positives_at_5,precision_at_10,recall_at_10,false_positives_at_10,query_time_ms,mAP
+global_resnet50_holidays_indexed_queries,500,0.8426116320310646,0.32400000000000007,0.8702146464646464,3.38,0.17760000000000004,0.9175632756132757,8.224,0.418718799999624,0.8426116320310646

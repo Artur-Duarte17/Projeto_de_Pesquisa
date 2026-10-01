@@ -9,9 +9,7 @@ A aplicação mostra que o método pode ser usado; a pesquisa mede e compara
 os métodos sob regras controladas. Não é um serviço publicado na internet,
 um produto comercial pronto ou um artigo já aceito.
 
-O fechamento técnico e documental está concluído no escopo testado. A etapa
-seguinte é escrever e validar o artigo em inglês, com as decisões institucionais
-e de uso dos dados separadas da aprovação dos testes.
+O fechamento técnico e documental está concluído no escopo testado. A etapa documental atual é a monografia em português para revisão de Artur. Um único artigo em inglês será derivado posteriormente; aceite editorial não é dependência do planejamento da monografia. Resultados e software permanecem congelados. As decisões institucionais e de uso dos dados são separadas da aprovação dos testes.
 
 ## 2. O que a aplicação faz
 
@@ -101,7 +99,10 @@ Não houve benchmark de carga, nova instalação do zero, avaliação demográfi
 ou aprovação jurídica/ética. Dados e modelos continuam com restrições próprias,
 descritas em [dados, modelos e privacidade](dados_modelos_privacidade.md).
 
-Antes da submissão, continuam necessários: redação e validação humana do artigo;
-confirmações de TC, aceite, entrega e calendário; decisão institucional sobre
-dados/biometria; aprovação da autoria; e conformidade com a revista e o depósito
-institucional. Não houve push, contato externo, publicação ou submissão.
+A prioridade posterior ao fechamento é a monografia em português para revisão
+de Artur, em [docs/monografia](monografia/ESTADO_EXECUCAO.md). Permanecem a validação
+humana, as confirmações de título, recorte, formato, entrega e calendário e a
+decisão institucional sobre dados/biometria e depósito. Um artigo em inglês será
+derivado posteriormente; aceite editorial não é dependência deste planejamento.
+O registro técnico acima se refere ao fechamento anterior, não a novos testes
+durante a redação. Não houve push, contato externo, publicação ou submissão.

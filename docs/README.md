@@ -1,6 +1,6 @@
 # Documentação ativa
 
-Esta pasta contém somente documentos que ainda participam da versão final ou da elaboração do artigo.
+Esta pasta contém somente documentos que ainda participam da versão técnica congelada, da monografia prioritária ou do futuro artigo derivado.
 
 | Documento | Função |
 |---|---|
@@ -27,4 +27,6 @@ Em caso de divergência, os dados e hashes da execução válida prevalecem sobr
 
 ## Limite atual
 
-O fechamento técnico e documental foi concluído em 28/09/2026: testes, aceitação privada e reprodução completa foram executados pelo assistente com autorização de Artur. Os resultados atuais pertencem ao commit limpo `91a2a28`, não à execução anterior. O relatório de fechamento registra a cobertura e seus limites. Ainda faltam redação e validação humana do artigo em inglês e decisões institucionais, éticas, autorais e editoriais; não há liberação para submissão.
+O fechamento técnico e documental foi concluído em 28/09/2026: testes, aceitação privada e reprodução completa foram executados pelo assistente com autorização de Artur. Os resultados atuais pertencem ao commit limpo `91a2a28`, não à execução anterior. O relatório de fechamento registra a cobertura e seus limites. A redação prioritária é a monografia em português, em `monografia/`; o artigo em inglês será derivado depois, sem redigi-lo nesta rodada. Validação humana e decisões institucionais, éticas, autorais e editoriais continuam necessárias; não há liberação para entrega institucional ou submissão.
+
+A [monografia para revisão de Artur](monografia/README.md) foi concluída documentalmente em 29/09/2026, com PDF de 40 páginas compilado e conferido visualmente. Aprovação humana e institucional permanecem pendentes.

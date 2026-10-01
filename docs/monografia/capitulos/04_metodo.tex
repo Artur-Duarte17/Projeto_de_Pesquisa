@@ -1,0 +1,94 @@
+\chapter{Método de avaliação}\label{cap:metodo}
+\section{Desenho e unidade de análise}
+A pesquisa compara cinco configurações de recuperação no mesmo conjunto de consultas e candidatas. O fator variado é a contribuição facial/global: somente face, somente global e três combinações com pesos fixos. A variável principal de resposta é mAP; precisão e revocação nas posições 5 e 10 complementam a interpretação. A comparação por consulta é pareada, pois cada configuração responde à mesma consulta sob o mesmo gabarito.
+
+A unidade recuperada é a fotografia completa. A presença de uma identidade anotada define a relevância para a consulta principal. Não se avalia apenas se o rosto mais semelhante pertence à pessoa, tampouco se a fotografia retrata o mesmo evento. A separação dessas unidades evita confundir detecção de faces, classificação de identidade e utilidade de uma lista de imagens.
+
+O desenho é descritivo e delimitado. Não há sorteio de uma população de álbuns, otimização validada de pesos, treinamento novo ou teste de hipótese com independência presumida. Todas as vinte consultas compartilham galeria e contexto de coleção; duas compartilham a mesma fotografia-fonte. Essa dependência é preservada na discussão, sem interpretar as consultas como vinte ensaios independentes da população geral.
+
+\section{Coleções e papéis}
+\begin{table}[htbp]\centering\small
+\caption{Coleções na execução atual e função de cada avaliação}\label{tab:bases}
+\begin{tabularx}{\textwidth}{lrrX}\toprule
+Coleção & Fotos locais & Consultas & Papel\\\midrule
+Gallagher & 589 & 20 & Comparação principal de recuperação por identidade anotada\\
+LFW & 13.233 & 1.672 & Verificação facial local, condicionada à indexação\\
+INRIA Holidays & 1.491 & 500 & Verificação global com AP adaptada\\
+Álbum familiar & 171 usadas & --- & Aceitação funcional privada; sem benchmark de identidade\\\bottomrule
+\end{tabularx}
+\fonte{manifestos da execução de fechamento e relatório de aceitação de 28/09/2026; as contagens de LFW e Gallagher são anteriores às exclusões de detecção descritas no texto}
+\end{table}
+
+Gallagher é a coleção principal. Seus arquivos locais incluem anotações de identidade e coordenadas dos olhos, usadas para construir o protocolo. A fonte de aquisição registrada pelo projeto é a página \emph{Gallagher Collection Person Dataset}, mantida no endereço do responsável em Cornell. A página não respondeu à reconsulta documental; isso é uma limitação da verificação atual de seus termos, não autorização de redistribuição. A descrição de \citeonline{Oh2015} também identifica o recorte de anotações faciais da coleção. Não se presume que toda pessoa visível tenha rótulo.
+
+LFW foi concebida para estudar comparação de faces sob variações de captura, com protocolo de pares descrito por \citeonline{Huang2007}. O projeto usa uma adaptação para recuperação, apresentada separadamente. Holidays contém grupos de imagens da mesma cena ou objeto; sua página oficial identifica 1.491 imagens e 500 consultas \cite{Holidays,Jegou2008}. Essas diferenças de relevância impedem interpretar os mAPs das três bases como uma classificação comum de dificuldade ou qualidade.
+
+\section{Galeria, gabarito e consultas Gallagher}
+As 589 imagens globais definem a galeria elegível. As 931 linhas de anotação mapeadas para essa galeria determinam a presença das identidades. Para cada consulta, o conjunto relevante é formado pelas fotografias que contêm a identidade anotada, excluída a fotografia-fonte. O total nas vinte consultas é de 884 relações de relevância. Uma fotografia pode ser relevante para mais de uma pessoa; portanto, esse total não é uma contagem de fotografias distintas.
+
+O índice facial contém 1.303 rostos em 587 fotografias. Duas fotografias não tiveram face detectada, mas permanecem na galeria e no gabarito. A regra é essencial: o detector não define quais fotografias são verdadeiramente relevantes. Condicionar o gabarito ao sucesso do método avaliado retiraria falhas do universo e alteraria o significado das métricas.
+
+O protocolo ordena identidades pela frequência de fotografias anotadas e seleciona vinte identidades elegíveis. Exige ao menos três fotografias relevantes após retirar a fonte e utiliza uma consulta por identidade. Dentro de cada identidade, as candidatas seguem a ordem do nome da imagem e do índice anotado da face. Essa seleção é determinística, mas não aleatória nem representativa de todas as pessoas da coleção.
+
+O recorte de consulta é construído a partir das coordenadas dos olhos, com escala registrada igual a 6,0 e limites de recorte compatíveis com a imagem. O ponto médio dos olhos é convertido para as coordenadas do recorte. A face aceita precisa ter uma caixa detectada que contenha esse ponto. Havendo mais de uma caixa elegível, o desempate utiliza distância ao centro, menor área e coordenadas. Não existe substituição pelo maior rosto vizinho.
+
+A preparação registrou três recortes descartados antes de completar as vinte consultas. Quando uma candidata não satisfaz a validação, o motivo é registrado e a preparação pode examinar a próxima candidata da mesma identidade na ordem definida. Isso é diferente de trocar a pessoa-alvo dentro do recorte. Na avaliação de uma consulta já congelada, ausência de face contendo o ponto anotado produz erro explícito. O procedimento seleciona consultas para as quais foi possível obter uma representação facial válida; essa condição limita a extrapolação para consultas em que a pessoa não é detectada.
+
+As consultas finais envolvem vinte identidades e dezenove fotografias-fonte. O componente facial utiliza o recorte associado à pessoa anotada; o componente global utiliza o descritor da fotografia-fonte completa já presente no índice global. A fonte é retirada tanto do conjunto relevante quanto das candidatas. Cada ranking tem, assim, 588 fotografias. Reutilizar o descritor da fonte para formar a consulta global não significa deixá-la entre os resultados.
+
+\section{Escores, ausência de face e ordenação}
+Seja $F_i$ o conjunto de vetores faciais da fotografia $i$, $f_q$ o vetor da pessoa da consulta e $g_q,g_i$ os descritores globais. A contribuição facial é definida por
+\begin{equation}\label{eq:face}
+ s_f(q,i)=\begin{cases}
+ \displaystyle\frac{1+\max_{f\in F_i}c(f_q,f)}{2},&F_i\ne\varnothing,\\[4pt]
+ 0,&F_i=\varnothing.
+ \end{cases}
+\end{equation}
+O componente global é $s_g(q,i)=[1+c(g_q,g_i)]/2$. A fusão é
+\begin{equation}\label{eq:fusao}
+ s_{\alpha}(q,i)=\alpha s_f(q,i)+(1-\alpha)s_g(q,i),
+ \quad\alpha\in\{1;0;0{,}9;0{,}7;0{,}5\}.
+\end{equation}
+Uma face ausente recebe contribuição zero após o tratamento de disponibilidade, e não cosseno zero remapeado para 0,5. Essa distinção garante que ausência de detecção não seja confundida com um escore facial mediano.
+
+O protocolo pareado mantém todas as candidatas em cada configuração, incluindo as sem face. Ordena os resultados por escore decrescente e, nos empates, por identificador crescente da imagem. A soma usa os pesos registrados; não há seleção posterior de valores para maximizar o teste. Os resultados ``somente face'' deste protocolo são, portanto, a configuração facial dentro do universo comum, e não uma busca que elimina previamente todas as imagens sem detecção.
+
+\section{Métricas e cálculo das diferenças}
+Seja $r_q(k)$ igual a um quando a fotografia na posição $k$ é relevante para a consulta $q$, e zero caso contrário. Seja $R_q$ o conjunto relevante depois das exclusões. Para $K\in\{5,10\}$,
+\begin{equation}
+ P@K(q)=\frac{\sum_{k=1}^{K}r_q(k)}{K},\qquad
+ R@K(q)=\frac{\sum_{k=1}^{K}r_q(k)}{|R_q|}.
+\end{equation}
+O denominador de precisão é sempre $K$. A AP considera as $N_q$ candidatas do ranking integral:
+\begin{equation}\label{eq:ap}
+ AP(q)=\frac{1}{|R_q|}\sum_{k=1}^{N_q}P@k(q)\,r_q(k),
+ \qquad mAP=\frac{1}{|Q|}\sum_{q\in Q}AP(q).
+\end{equation}
+As definições correspondem à média das precisões em posições relevantes descrita por \citeonline{Manning2008}. O avaliador retorna zero para conjuntos relevantes vazios, mas a preparação Gallagher exige relevantes e não produz esse caso nas vinte consultas. Relevantes não recuperados não acrescentam termos ao numerador; o denominador continua sendo o total relevante.
+
+Por exemplo, em um ranking didático com três imagens relevantes nas posições 1, 3 e 5, a AP é $(1+2/3+3/5)/3\approx0{,}7556$. O exemplo apenas esclarece a fórmula e não é uma consulta experimental. AP igual a 0,95 não significa 95\% de probabilidade de uma fotografia conter a identidade. A medida sintetiza a ordenação em relação a um gabarito.
+
+A comparação pareada calcula $\Delta AP_m(q)=AP_m(q)-AP_{\mathrm{face}}(q)$. Valores acima de $10^{-12}$ são ganhos, abaixo de $-10^{-12}$ são perdas e os demais são empates. A tolerância é aplicada antes de arredondar a apresentação. Reportam-se média, mediana e contagens, sem teste de significância ou intervalo de confiança baseado em independência não demonstrada.
+
+\section{Protocolos auxiliares}
+Em LFW, 13.233 imagens foram examinadas, e 48 sem detecção não entraram no índice. Restaram 13.185 fotografias e 16.058 rostos. O protocolo escolhe uma consulta por identidade com pelo menos duas imagens indexadas, mediante chave determinística SHA-256 com semente 20260915, totalizando 1.672 consultas. A consulta usa o vetor da maior face da imagem indexada, enquanto a relevância deriva dos rótulos da coleção. Essa regra difere da vinculação por olhos anotados de Gallagher e é uma limitação adicional da verificação auxiliar. Após excluir a fonte, existem 13.184 candidatas por consulta. O mAP local não é a acurácia do protocolo oficial de pares.
+
+Em Holidays, a primeira imagem de cada grupo é a consulta e as demais imagens do grupo são relevantes. Há 500 consultas e 1.490 candidatas por ranking após excluir a fonte. A AP local utiliza a Equação~\ref{eq:ap}; o avaliador oficial integra trapézios na curva precisão--revocação, diferença já registrada no fechamento. Com um único relevante na segunda posição, a fórmula local produz 0,5, enquanto a integração oficial produz 0,25. Os resultados não são diretamente equivalentes.
+
+A cópia local Holidays contém três pares byte a byte idênticos em grupos distintos. A origem dessa duplicação não foi determinada. O avaliador exclui a fonte por identificador/caminho, não todas as cópias por hash, ao passo que a interface também emprega SHA-256. Os avaliadores auxiliares utilizam ordenação vetorizada em PyTorch, sem garantia de desempate idêntico em todo equipamento. Essas ressalvas acompanham seus números e impedem comparações externas sem harmonização do protocolo.
+
+\section{Execução, proveniência e verificações documentais}
+A execução científica utilizada é \metodo{fechamento\_20260928\_cuda}, realizada no commit \metodo{91a2a28}, com árvore limpa registrada nos manifestos. O ambiente usa Python 3.10.20, InsightFace 0.2.1, ONNX Runtime GPU 1.23.2, PyTorch 2.11.0+cu128 e torchvision 0.26.0+cu128. A verificação de ambiente registra NVIDIA GeForce RTX 3050 Ti Laptop GPU, com aproximadamente 4 GiB de memória. Esses dados caracterizam a execução, sem constituir recomendação de hardware ou medida de desempenho.
+
+A indexação global usa lotes de 32 imagens e quatro trabalhadores; a configuração geral registra avaliação auxiliar em lotes de 128. O protocolo pareado possui sua configuração própria, registrada no manifesto de fusão. Os hashes dos três pesos e das entradas/saídas permitem distinguir os artefatos efetivos de arquivos homônimos.
+
+O fechamento registra treze manifestos, conferência de 92 referências a arquivos e hashes de 15.265 fotografias-fonte indexadas. Também registra a reconstrução do gabarito, a verificação geométrica das consultas e a preservação das referências anteriores. Trata-se de evidência já registrada. Nesta etapa de escrita foram reconferidos o manifesto final, as métricas utilizadas e a preservação dos arquivos da execução; as médias das cem linhas Gallagher e os deltas foram recalculados sem inferência.
+
+Os rankings integrais foram usados pelo avaliador, mas somente o Top-10 foi persistido para inspeção. Portanto, recalcular a média das APs não é recalcular independentemente cada AP a partir de um ranking integral salvo. Essa fronteira é mantida na rastreabilidade do Apêndice~\ref{ap:reproducao}. Os números de execuções anteriores não foram mesclados com os atuais.
+
+\section{Dados, privacidade e uso responsável}
+Fotografias e representações faciais exigem cuidados de tratamento e divulgação. A LGPD é uma referência normativa para essa avaliação \cite{Brasil2018}; este trabalho não emite parecer jurídico nem presume dispensa ética. Execução local reduz a necessidade de transmitir imagens, mas não resolve automaticamente finalidade, elegibilidade, controle de acesso, retenção ou direitos das pessoas.
+
+Código, pesos e fotografias são recursos distintos. A política consultada de InsightFace diferencia a licença MIT do código das condições de pesquisa não comercial dos modelos pré-treinados \cite{InsightFace}. A página Holidays atribui direitos das imagens ao INRIA \cite{Holidays}. A indisponibilidade das páginas de Gallagher e LFW impede afirmar nova confirmação integral de seus termos. O relatório original LFW permaneceu acessível em página do autor, o que permite fundamentar a tarefa sem substituir a verificação das condições atuais da coleção.
+
+O pacote documental contém métricas agregadas e proveniência derivada; não contém fotografias, recortes, pesos ou embeddings. Para a comparação por consulta, os pares são calculados localmente antes de retirar os identificadores da apresentação. O gráfico mostra a distribuição completa de diferenças sem ligação entre pontos e pessoas. Isso reduz exposição e não é alegação de anonimização do acervo. A rastreabilidade detalhada permanece local, e a futura disponibilização da monografia exige confirmação institucional própria.

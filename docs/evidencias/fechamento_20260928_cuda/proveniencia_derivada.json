@@ -1,0 +1,56 @@
+{
+  "notice": "Extrato documental derivado; nao e o manifesto original. Caminhos absolutos e entradas privadas omitidos.",
+  "original_manifest_sha256": "5fc6acd8c42c75520c0eecefa5366f3a33e0627d217b0b0cf61dd556876f34c9",
+  "git": {
+    "commit": "91a2a28360ded41fd86abf3371c989d571bf95bd",
+    "dirty": false
+  },
+  "runtime": {
+    "packages": {
+      "insightface": "0.2.1",
+      "numpy": "2.2.6",
+      "onnxruntime-gpu": "1.23.2",
+      "pandas": "2.3.3",
+      "torch": "2.11.0+cu128",
+      "torchvision": "0.26.0+cu128"
+    },
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.20"
+  },
+  "configuration": {
+    "batch_size": 32,
+    "dataset_acquisition_included": false,
+    "datasets": [
+      "LFW",
+      "INRIA Holidays",
+      "Gallagher"
+    ],
+    "det_size": 640,
+    "device": "cuda",
+    "evaluation_batch_size": 128,
+    "isolated_run": true,
+    "workers": 4
+  },
+  "sources": [
+    {
+      "source": "outputs/validation_runs/fechamento_20260928_cuda/gallagher/evaluation/fusion_metrics.csv",
+      "sha256": "de0fcdd33c092b4c774521cb6bca65a4b080e5a15e9a719352dbee71f585335c",
+      "copy": "fusion_metrics.csv",
+      "transformation": "copia identica, metricas agregadas apenas"
+    },
+    {
+      "source": "outputs/validation_runs/fechamento_20260928_cuda/lfw/evaluation/face_metrics.csv",
+      "sha256": "78adcfc10a43385d920c30f2ed20a0dc38f8011f1a4f4daa3ebb006c63620ee9",
+      "copy": "face_metrics.csv",
+      "transformation": "copia identica, metricas agregadas apenas"
+    },
+    {
+      "source": "outputs/validation_runs/fechamento_20260928_cuda/holidays/evaluation/global_metrics.csv",
+      "sha256": "3d2bf5a415f83c140ff0b1ce6a90d0fdc3a33c58c8bad404a9116ddc5ef2ce1e",
+      "copy": "global_metrics.csv",
+      "transformation": "copia identica, metricas agregadas apenas"
+    }
+  ],
+  "preserved_run_files": 72,
+  "preserved_run_bytes": 81607118
+}
