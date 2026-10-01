@@ -1,6 +1,6 @@
 # Estado de execução da monografia
 
-Atualizado em **29/09/2026**. **Fases 1–5 concluídas: versão completa para revisão
+Atualizado em **01/10/2026**. **Fases 1–5 concluídas: versão completa para revisão
 de Artur**, com PDF de 40 páginas compilado e conferido visualmente. Não há
 aprovação humana, institucional ou autorização de depósito presumida.
 Trabalho realizado nesta conversa, sem subagentes ou novos chats.
@@ -76,8 +76,7 @@ preservada. Não houve stage, commit, push, publicação, submissão ou contato 
 
 Gallagher principal; LFW e Holidays auxiliares; família privada. Nenhuma fusão
 avaliada superou face no mAP agregado atual; ganhos locais não negados.
-Sem alegação de significância, causalidade do fundo ou escala. Software,
-protocolos e resultados originais permaneceram intactos. IA não é autora.
+Sem alegação de significância, causalidade do fundo ou escala. Software, protocolos e resultados originais permaneceram intactos.
 
 Referências: afirmações usadas têm leitura pertinente registrada; Costache
 limitado ao resumo; páginas principais Gallagher/LFW indisponíveis para termos
