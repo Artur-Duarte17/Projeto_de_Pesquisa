@@ -1,6 +1,6 @@
 # Verificação documental da entrega
 
-Concluída pelo assistente em 29/09/2026. Revisão e aprovação por Artur e pela
+Conferência documental original concluída em 29/09/2026. Revisão e aprovação por Artur e pela
 orientação continuam pendentes. Este registro descreve verificações documentais,
 não uma nova auditoria integral nem reprodução científica.
 
@@ -20,8 +20,7 @@ não uma nova auditoria integral nem reprodução científica.
   fórmulas, diagrama e comparação pareada também foram abertos ampliados.
   Ajustes finais de paginação, bibliografia e apêndice foram recompilados,
   renderizados e reexaminados. Não há conteúdo cortado observado.
-- Capa e corpo indicam versão para revisão, título provisório e assistência de
-  IA. Não foram fabricados aprovação, banca, ficha catalográfica ou assinaturas.
+- A versão originalmente conferida continha marcações editoriais de revisão. A limpeza de 01/10/2026 removeu essas marcações da fonte; a nova compilação ainda precisa ser verificada antes de substituir o PDF de entrega.
 
 ## Coerência numérica e preservação
 
