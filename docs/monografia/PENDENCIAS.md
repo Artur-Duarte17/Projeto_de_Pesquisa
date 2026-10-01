@@ -7,7 +7,7 @@ Atualizado em **01/10/2026**. A monografia possui seis capítulos, três figuras
 Você não precisa resolver todas as questões institucionais antes de pedir a leitura dele. A ordem prática é:
 
 - [ ] **1. Fazer sua primeira leitura.** Leia resumo, metodologia, resultados e conclusão, nesta ordem. Use o [guia de revisão](GUIA_DE_REVISAO_ARTUR.md). Em cada trecho que você não entenda, que não corresponda ao sistema ou que não se sinta confortável em defender, anote **página + dúvida**. Se tiver pouco tempo, envie primeiro as dúvidas mais importantes; não espere conhecer todos os detalhes de memória.
-- [x] **2. Limpeza editorial inicial.** A fonte foi ajustada para retirar a página de nota editorial, referências à assistência automatizada e marcas como “versão para revisão de Artur”. Resultados, limitações e conclusões científicas foram preservados.
+- [x] **2. Limpeza editorial inicial.** A fonte foi ajustada para retirar a página de nota editorial, referências à assistência automatizada e marcas editoriais de rascunho. Resultados, limitações e conclusões científicas foram preservados.
 - [x] **3. Preparar a fonte para a próxima compilação.** Capa, folha de rosto, metadados, introdução, conclusão e apêndice foram limpos. **Ainda é necessário recompilar e conferir o novo PDF antes de substituir a cópia de entrega.**
 - [ ] **4. Enviar para ele.** Você compartilha esse PDF e pede que indique **o que considera obrigatório corrigir para a defesa**. Ele pediu para recebê-lo quanto antes. Não é preciso esperar ficha catalográfica, escolha de banca, artigo aceito ou monografia em formato definitivo para ele começar a ler. **Concluído quando:** ele tiver recebido o rascunho; a aprovação vem depois da leitura e eventuais correções.
 
