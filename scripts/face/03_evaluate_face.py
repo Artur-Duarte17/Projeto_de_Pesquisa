@@ -10,17 +10,17 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from face_lib import build_face_app, load_face_index, query_embedding_from_image, search_face_index
 from project_paths import OUTPUTS_DIR
-from retrieval_common import (
-    aggregate_metrics,
+from retrieval.adapters.face_model import build_face_app, query_embedding_from_image
+from retrieval.adapters.index_store import load_face_index
+from retrieval.adapters.search_gateway import search_face_index
+from retrieval.adapters.files import (
     exclude_query_images_from_relevance,
     now_ms,
     relevance_from_csv,
-    relevance_from_labels,
     save_visual_grid,
-    summarize_rankings,
 )
+from retrieval.domain.metrics import aggregate_metrics, relevance_from_labels, summarize_rankings
 
 
 def parse_args() -> argparse.Namespace:

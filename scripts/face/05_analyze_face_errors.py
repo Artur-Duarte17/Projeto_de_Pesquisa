@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from project_paths import OUTPUTS_DIR
-from retrieval_common import relevance_from_csv, resolve_stored_path
+from retrieval.adapters.files import relevance_from_csv, resolve_stored_path
 
 
 def parse_args() -> argparse.Namespace:

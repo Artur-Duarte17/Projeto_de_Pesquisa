@@ -10,23 +10,21 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from global_lib import (
+from retrieval.adapters.global_model import (
     build_resnet50_feature_extractor,
     describe_torch_device,
     extract_global_embedding,
-    load_global_index,
-    search_global_index,
 )
 from project_paths import OUTPUTS_DIR
-from retrieval_common import (
-    aggregate_metrics,
+from retrieval.adapters.index_store import load_global_index
+from retrieval.adapters.search_gateway import search_global_index
+from retrieval.adapters.files import (
     exclude_query_images_from_relevance,
     now_ms,
     relevance_from_csv,
-    relevance_from_labels,
     save_visual_grid,
-    summarize_rankings,
 )
+from retrieval.domain.metrics import aggregate_metrics, relevance_from_labels, summarize_rankings
 
 
 def parse_args() -> argparse.Namespace:
